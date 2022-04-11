@@ -1,4 +1,30 @@
 {
+  "name": "uncivserver.xyz",
+  "version": "1.0.0",
+  "description": "An Unciv Multiplayer Server written in Javascript",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/touhidurrr/UncivServer.xyz.git"
+  },
+  "keywords": [
+    "Unciv",
+    "Multiplayer",
+    "Server",
+    "Discord",
+    "Turn",
+    "Notifications"
+  ],
+  "author": "Md. Touhidur Rahman",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/touhidurrr/UncivServer.xyz/issues"
+  },
+  "homepage": "https://github.com/touhidurrr/UncivServer.xyz#readme",
   "dependencies": {
     "axios": "^0.26.1",
     "dotenv": "^16.0.0",
