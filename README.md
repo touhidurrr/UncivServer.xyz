@@ -1,6 +1,6 @@
 # UncivServer.xyz
 
-An Open Source,Unciv Multiplayer server written in
+An Open Source, Unciv Multiplayer server written in
 Javascript.
 
 You can deploy it to Github Pages directly or from
