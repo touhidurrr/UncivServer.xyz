@@ -1,0 +1,40 @@
+name: Push to Evennode
+
+on: [push, workflow_dispatch]
+
+jobs:
+  start:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Write SSH keys
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.EVENNODE_PRIVATE_SSH }}" > ~/.ssh/id_rsa
+          host='git.evennode.com'
+          hosts="$(dig +short "$host" | grep -v '\.$' | sed -z 's|\n|,|g')$host"
+          ssh-keyscan -H "$hosts" > ~/.ssh/known_hosts
+
+      - name: Preprocessing
+        run: |
+          rm _*
+          rm -rf .??*
+          rm -rf functions
+          rm -rf build
+          mkdir assets files
+          curl https://c6.patreon.com/becomePatronButton.bundle.js -o assets/becomePatronButton.bundle.js
+          echo "last startp initiated at $(TZ=Asia/Dhaka date)" > files/startup
+
+      - name: Push to Evennode
+        run: |
+          git init
+          git config user.email "${{ secrets.EVENNODE_USER_EMAIL }}"
+          git config user.name "${{ secrets.EVENNODE_USER_NAME }}"
+          git add --all && git commit -m "release $(date)"
+          git remote add evennode "${{ secrets.EVENNODE_GIT_URL }}"
+          git push evennode master -f
+
+      - name: Clean Some Files
+        run: rm ~/.ssh/id_rsa ~/.ssh/known_hosts

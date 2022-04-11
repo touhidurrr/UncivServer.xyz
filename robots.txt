@@ -1,0 +1,5 @@
+User-agent: *
+Disallow: /files/
+Disallow: /isalive
+
+Sitemap: https://uncivserver.xyz/sitemap.txt

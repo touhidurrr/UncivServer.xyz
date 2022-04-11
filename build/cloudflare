@@ -1,0 +1,7 @@
+#!/bin/bash
+
+rm *.js *.json
+rm -rf .??*
+mkdir assets
+curl https://c6.patreon.com/becomePatronButton.bundle.js -o assets/becomePatronButton.bundle.js
+rm -rf build
