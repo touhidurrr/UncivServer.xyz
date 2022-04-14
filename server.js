@@ -146,6 +146,11 @@ server.get('/files/:fileName', async (req, res) => {
 const gamePreviewRegex = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}_Preview$/;
 
 server.put('/files/:fileName', async (req, res) => {
+  if (!req.body) {
+    req.sendStatus(400);
+    return;
+  }
+
   writeFileSync(req.path.slice(1), req.body);
   await server.locals.db.UncivServer.updateOne(
     { _id: req.params.fileName },
