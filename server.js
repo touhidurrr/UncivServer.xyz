@@ -136,7 +136,7 @@ server.get('/files/:fileName', async (req, res) => {
 
     writeFileSync(req.path.slice(1), data);
     await db.UncivServer.insertOne({ _id: fileName, timestamp: Date.now(), text: data });
-    req.end(fileData);
+    req.end(data);
   } catch (err) {
     errorLogger(err);
     res.sendStatus(404);
