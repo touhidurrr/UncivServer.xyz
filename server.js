@@ -63,12 +63,27 @@ server.use(function (req, res, next) {
 
 server.use(express.static('.', { limit: '5mb' }));
 
-server.use(
-  express.text({
-    limit: '5mb',
-    type: ['', '*/*'],
-  })
-);
+// Limit, 5 MegaBytes
+// 1 << 10 = 1024 << 10 = 1024 * 1024
+const limit = 5 << 20;
+
+// Text Body Parser
+server.use(function (req, res, next) {
+  req.body = '';
+  let overLimit = false;
+  req.on('data', chunk => {
+    if (overLimit) return;
+    req.body += chunk;
+    if (req.body.length > limit) {
+      overLimit = true;
+      req.status(400).end('Request Too Big!');
+      return;
+    }
+  });
+  req.on('end', () => {
+    if (!overLimit) next();
+  });
+});
 
 server.get('/isalive', async (req, res) => {
   res.end('true');
@@ -134,8 +149,6 @@ server.get('/files/:fileName', async (req, res) => {
       return;
     }
 
-    writeFileSync(req.path.slice(1), data);
-    await db.UncivServer.insertOne({ _id: fileName, timestamp: Date.now(), text: data });
     res.end(data);
   } catch (err) {
     errorLogger(err);
@@ -147,7 +160,8 @@ const gamePreviewRegex = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}_Preview$/;
 
 server.put('/files/:fileName', async (req, res) => {
   if (!req.body) {
-    req.sendStatus(400);
+    console.dir(req);
+    res.sendStatus(400);
     return;
   }
 
