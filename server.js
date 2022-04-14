@@ -69,6 +69,11 @@ const limit = 5 << 20;
 
 // Text Body Parser
 server.use(function (req, res, next) {
+  let ln = req.get('content-length');
+  if (ln && ln > limit) {
+    res.sendStatus(413);
+    return;
+  }
   req.body = '';
   let overLimit = false;
   req.on('data', chunk => {
