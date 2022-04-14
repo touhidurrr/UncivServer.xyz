@@ -76,7 +76,7 @@ server.use(function (req, res, next) {
     req.body += chunk;
     if (req.body.length > limit) {
       overLimit = true;
-      req.status(400).end('Request Too Big!');
+      res.sendStatus(413);
       return;
     }
   });
