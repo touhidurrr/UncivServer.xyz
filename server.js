@@ -226,7 +226,7 @@ server.put('/files/:fileName', async (req, res) => {
             fields: [
               {
                 name: 'game ID',
-                value: `\`\`\`${req.params.fileName}\`\`\``,
+                value: `\`\`\`${req.params.fileName.slice(0, -8)}\`\`\``,
                 inline: false,
               },
               {
