@@ -63,9 +63,9 @@ server.use(function (req, res, next) {
 
 server.use(express.static('.', { limit: '5mb' }));
 
-// Limit, 5 MegaBytes
+// Limit, 3 MegaBytes
 // 1 << 10 = 1024 << 10 = 1024 * 1024
-const limit = 5 << 20;
+const limit = 3 << 20;
 
 // Text Body Parser
 server.use(function (req, res, next) {
