@@ -213,6 +213,7 @@ server.put('/files/:fileName', async (req, res) => {
     } else return;
 
     if (!queryResponse.dmChannel) return;
+    const { name } = await server.locals.db.UncivServer.findOne({ _id: req.params.fileName });
     await dicord
       .post(`/channels/${queryResponse.dmChannel}/messages`, {
         embeds: [
@@ -225,8 +226,8 @@ server.put('/files/:fileName', async (req, res) => {
             },
             fields: [
               {
-                name: 'game ID',
-                value: `\`\`\`${req.params.fileName.slice(0, -8)}\`\`\``,
+                name: name || 'game ID',
+                value: `\`\`\`${name || req.params.fileName.slice(0, -8)}\`\`\``,
                 inline: false,
               },
               {
