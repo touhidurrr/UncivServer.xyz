@@ -129,32 +129,14 @@ server.get('/files/:fileName', async (req, res) => {
       })
       .catch(err => err.response || {});
 
-    //console.dir({ status, data }, { depth: null });
-
     if (!status) {
       res.sendStatus(404);
       return;
     }
 
-    if (status === 429) {
-      const ct = req.get('Content-Type');
-      res
-        .status(429)
-        .set('Content-Type', ct)
-        .end(ct.includes('json') ? data : JSON.parse(data));
-      return;
-    }
-
-    if (
-      typeof data === 'object' &&
-      data.error_summary &&
-      data.error_summary.startsWith('path/not_found/')
-    ) {
-      res.sendStatus(404);
-      return;
-    }
-
-    res.end(data);
+    console.log('Dropbox Status:', status);
+    if (status !== 200) console.log('Dropbox Data:', data);
+    res.status(status).send(data);
   } catch (err) {
     errorLogger(err);
     res.sendStatus(404);
