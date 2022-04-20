@@ -162,6 +162,7 @@ server.put('/files/:fileName', async (req, res) => {
 
   // If fileName is game Preview type
   if (gamePreviewRegex.test(req.params.fileName)) {
+    const gameId = req.params.fileName.slice(0, -8);
     const uncivJson = gunzipSync(Buffer.from(req.body, 'base64')).toString();
 
     const { civilizations, currentPlayer, turns } = parseUncivJson(uncivJson);
@@ -174,10 +175,38 @@ server.put('/files/:fileName', async (req, res) => {
 
     const queryResponse = await server.locals.db.PlayerProfiles.findOne(
       { uncivUserIds: playerId },
-      { projection: { notifications: 1, dmChannel: 1 } }
+      { projection: { notifications: 1, dmChannel: 1, turnLogs: 1 } }
     ).catch(errorLogger);
 
-    if (queryResponse && queryResponse.notifications === 'enabled') {
+    if (queryResponse) {
+      let update = {};
+      if (!queryResponse.turnLogs) {
+        update.$set = {
+          turnLogs: [{ gameId, currentPlayer, turns: turns || 0, timestamp: Date.now() }],
+        };
+      } else {
+        const index = queryResponse.turnLogs.findIndex(entry => entry.gameId === gameId);
+        if (index < 0) {
+          update.$push = {
+            turnLogs: { gameId, currentPlayer, turns: turns || 0, timestamp: Date.now() },
+          };
+          if (turnLogs.length >= 10) {
+            update.$pull = { turnLogs: turnLogs.sort((a, b) => a.timestamp - b.timestamp).gameID };
+          }
+        } else {
+          update.$set = {
+            [`turnLogs.${index}`]: {
+              gameId,
+              currentPlayer,
+              turns: turns || 0,
+              timestamp: Date.now(),
+            },
+          };
+        }
+      }
+
+      await server.locals.db.PlayerProfiles.updateOne({ _id: queryResponse._id }, update);
+
       if (!queryResponse.dmChannel) {
         try {
           const dmChannel = await dicord
@@ -194,7 +223,7 @@ server.put('/files/:fileName', async (req, res) => {
       }
     } else return;
 
-    if (!queryResponse.dmChannel) return;
+    if (!queryResponse.dmChannel || queryResponse.notifications !== 'enabled') return;
     const { name } = await server.locals.db.UncivServer.findOne({ _id: req.params.fileName });
     await dicord
       .post(`/channels/${queryResponse.dmChannel}/messages`, {
@@ -209,7 +238,7 @@ server.put('/files/:fileName', async (req, res) => {
             fields: [
               {
                 name: !name ? 'game ID' : 'Name',
-                value: `\`\`\`${name || req.params.fileName.slice(0, -8)}\`\`\``,
+                value: `\`\`\`${name || gameID}\`\`\``,
                 inline: false,
               },
               {
