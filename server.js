@@ -180,7 +180,7 @@ server.put('/files/:fileName', async (req, res) => {
 
     if (queryResponse) {
       let update = {};
-      if (!queryResponse.turnLogs) {
+      if (queryResponse.turnLogs === undefined) {
         update.$set = {
           turnLogs: [{ gameID, currentPlayer, turns: turns || 0, timestamp: Date.now() }],
         };
