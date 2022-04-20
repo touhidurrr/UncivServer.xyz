@@ -162,7 +162,7 @@ server.put('/files/:fileName', async (req, res) => {
 
   // If fileName is game Preview type
   if (gamePreviewRegex.test(req.params.fileName)) {
-    const gameId = req.params.fileName.slice(0, -8);
+    const gameID = req.params.fileName.slice(0, -8);
     const uncivJson = gunzipSync(Buffer.from(req.body, 'base64')).toString();
 
     const { civilizations, currentPlayer, turns } = parseUncivJson(uncivJson);
@@ -182,13 +182,13 @@ server.put('/files/:fileName', async (req, res) => {
       let update = {};
       if (!queryResponse.turnLogs) {
         update.$set = {
-          turnLogs: [{ gameId, currentPlayer, turns: turns || 0, timestamp: Date.now() }],
+          turnLogs: [{ gameID, currentPlayer, turns: turns || 0, timestamp: Date.now() }],
         };
       } else {
-        const index = queryResponse.turnLogs.findIndex(entry => entry.gameId === gameId);
+        const index = queryResponse.turnLogs.findIndex(entry => entry.gameID === gameID);
         if (index < 0) {
           update.$push = {
-            turnLogs: { gameId, currentPlayer, turns: turns || 0, timestamp: Date.now() },
+            turnLogs: { gameID, currentPlayer, turns: turns || 0, timestamp: Date.now() },
           };
           if (queryResponse.turnLogs.length >= 10) {
             update.$pull = {
@@ -198,7 +198,7 @@ server.put('/files/:fileName', async (req, res) => {
         } else {
           update.$set = {
             [`turnLogs.${index}`]: {
-              gameId,
+              gameID,
               currentPlayer,
               turns: turns || 0,
               timestamp: Date.now(),
