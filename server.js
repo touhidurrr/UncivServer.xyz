@@ -190,8 +190,10 @@ server.put('/files/:fileName', async (req, res) => {
           update.$push = {
             turnLogs: { gameId, currentPlayer, turns: turns || 0, timestamp: Date.now() },
           };
-          if (turnLogs.length >= 10) {
-            update.$pull = { turnLogs: turnLogs.sort((a, b) => a.timestamp - b.timestamp).gameID };
+          if (queryResponse.turnLogs.length >= 10) {
+            update.$pull = {
+              turnLogs: queryResponse.turnLogs.sort((a, b) => a.timestamp - b.timestamp).gameID,
+            };
           }
         } else {
           update.$set = {
