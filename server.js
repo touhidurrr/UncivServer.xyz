@@ -209,7 +209,7 @@ server.put('/files/:fileName', async (req, res) => {
 
       await server.locals.db.PlayerProfiles
         .updateOne({ _id: queryResponse._id }, update)
-        .catch(err => console.error(err.stack, turnLogs, update);
+        .catch(err => console.error(err.stack, turnLogs, update));
 
       if (!queryResponse.dmChannel) {
         try {
