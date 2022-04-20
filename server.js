@@ -192,7 +192,7 @@ server.put('/files/:fileName', async (req, res) => {
           };
           if (queryResponse.turnLogs.length >= 10) {
             update.$pull = {
-              turnLogs: queryResponse.turnLogs.sort((a, b) => a.timestamp - b.timestamp).gameID,
+              turnLogs: queryResponse.turnLogs.sort((a, b) => a.timestamp - b.timestamp)[0],
             };
           }
         } else {
