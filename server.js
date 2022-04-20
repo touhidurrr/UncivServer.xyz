@@ -178,17 +178,33 @@ server.put('/files/:fileName', async (req, res) => {
       { projection: { notifications: 1, dmChannel: 1, turnLogs: 1 } }
     ).catch(errorLogger);
 
+    const { name } = await server.locals.db.UncivServer.findOne({ _id: req.params.fileName });
+
     if (queryResponse) {
       let update = {};
       if (queryResponse.turnLogs === undefined) {
         update.$set = {
-          turnLogs: [{ gameID, currentPlayer, turns: turns || 0, timestamp: Date.now() }],
+          turnLogs: [
+            {
+              gameID,
+              name: !name ? '' : name,
+              currentPlayer,
+              turns: turns || 0,
+              timestamp: Date.now(),
+            },
+          ],
         };
       } else {
         const index = queryResponse.turnLogs.findIndex(entry => entry.gameID === gameID);
         if (index < 0) {
           update.$push = {
-            turnLogs: { gameID, currentPlayer, turns: turns || 0, timestamp: Date.now() },
+            turnLogs: {
+              gameID,
+              name: !name ? '' : name,
+              currentPlayer,
+              turns: turns || 0,
+              timestamp: Date.now(),
+            },
           };
           if (queryResponse.turnLogs.length >= 10) {
             update.$pull = {
@@ -199,6 +215,7 @@ server.put('/files/:fileName', async (req, res) => {
           update.$set = {
             [`turnLogs.${index}`]: {
               gameID,
+              name: !name ? '' : name,
               currentPlayer,
               turns: turns || 0,
               timestamp: Date.now(),
@@ -207,9 +224,9 @@ server.put('/files/:fileName', async (req, res) => {
         }
       }
 
-      await server.locals.db.PlayerProfiles
-        .updateOne({ _id: queryResponse._id }, update)
-        .catch(err => console.error(err.stack, turnLogs, update));
+      await server.locals.db.PlayerProfiles.updateOne({ _id: queryResponse._id }, update).catch(
+        err => console.error(err.stack, turnLogs, update)
+      );
 
       if (!queryResponse.dmChannel) {
         try {
@@ -228,7 +245,6 @@ server.put('/files/:fileName', async (req, res) => {
     } else return;
 
     if (!queryResponse.dmChannel || queryResponse.notifications !== 'enabled') return;
-    const { name } = await server.locals.db.UncivServer.findOne({ _id: req.params.fileName });
     await dicord
       .post(`/channels/${queryResponse.dmChannel}/messages`, {
         embeds: [
