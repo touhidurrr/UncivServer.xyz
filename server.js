@@ -334,20 +334,20 @@ const parseUncivJson = (() => {
   }
 
   function parser() {
-    if (str[i] == '[') {
+    if (str.at(i) == '[') {
       let array = [];
 
-      while (str[++i] != ']') {
-        if (str[i] == '[' || str[i] == '{') array.push(parser());
+      while (str.at(++i) != ']') {
+        if (str.at(i) == '[' || str.at(i) == '{') array.push(parser());
 
         let value = '';
-        while (str[i] != ',' && str[i] != ']') {
-          value += str[i++];
+        while (str.at(i) != ',' && str.at(i) != ']') {
+          value += str.at(i++);
         }
 
         if (value) array.push(parseData(value));
 
-        if (str[i] == ']') break;
+        if (str.at(i) == ']') break;
       }
 
       i += 1;
@@ -356,22 +356,22 @@ const parseUncivJson = (() => {
 
     let object = {};
 
-    while (str[++i] != '}') {
+    while (str.at(++i) != '}') {
       let param = '';
-      while (str[i] != ':') {
-        param += str[i++];
+      while (str.at(i) != ':') {
+        param += str.at(i++);
       }
 
       ++i;
       let value = '';
-      if (str[i] == '[' || str[i] == '{') value = parser();
-      while (str[i] && str[i] != ',' && str[i] != '}') {
-        value += str[i++];
+      if (str.at(i) == '[' || str.at(i) == '{') value = parser();
+      while (str.at(i) && str.at(i) != ',' && str.at(i) != '}') {
+        value += str.at(i++);
       }
 
       object[parseData(param)] = parseData(value);
 
-      if (str[i] == '}') break;
+      if (str.at(i) == '}') break;
     }
 
     ++i;
