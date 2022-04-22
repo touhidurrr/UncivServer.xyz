@@ -168,8 +168,8 @@ server.put('/files/:fileName', async (req, res) => {
   // If fileName is game Preview type
   if (gamePreviewRegex.test(req.params.fileName)) {
     const gameID = req.params.fileName.slice(0, -8);
-    const uncivJson = gunzipSync(Buffer.from(req.body, 'base64')).toString();
 
+    const uncivJson = gunzipSync(Buffer.from(req.body, 'base64')).toString();
     const { civilizations, currentPlayer, turns } = parseUncivJson(uncivJson);
 
     console.dir({ turns, currentPlayer, civilizations }, { depth: null });
@@ -183,7 +183,13 @@ server.put('/files/:fileName', async (req, res) => {
       { projection: { notifications: 1, dmChannel: 1, turnLogs: 1 } }
     ).catch(errorLogger);
 
-    const { name } = await server.locals.db.UncivServer.findOne({ _id: req.params.fileName });
+    const { name } = (
+      await server.locals.db.UncivServer.findOneAndUpdate(
+        { _id: req.params.fileName },
+        { $set: { currentPlayer } },
+        { projection: { _id: 0, name: 1 } }
+      )
+    ).value;
 
     if (queryResponse) {
       let update = {};
