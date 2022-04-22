@@ -100,13 +100,16 @@ server.get('/files/:fileName', async (req, res) => {
   const { fileName } = req.params;
 
   // MongoDB
-  var fileData = await db.UncivServer.findOne({ _id: fileName }).catch(errorLogger);
+  var fileData = await db.UncivServer.findOne(
+    { _id: fileName },
+    { projection: { _id: 0, text: 1 } }
+  ).catch(errorLogger);
+
   if (fileData) {
     writeFileSync(req.path.slice(1), fileData.text);
     res.end(fileData.text);
     return;
   }
-  console.dir(fileData);
 
   // Workers KV
   // Comment for Now
@@ -170,75 +173,23 @@ server.put('/files/:fileName', async (req, res) => {
     const gameID = req.params.fileName.slice(0, -8);
 
     const uncivJson = gunzipSync(Buffer.from(req.body, 'base64')).toString();
-    const { civilizations, currentPlayer, turns } = parseUncivJson(uncivJson);
+    const { civilizations, currentPlayer, turns, gameParameters } = parseUncivJson(uncivJson);
 
+    // Log & exit if invalid data
     console.dir({ turns, currentPlayer, civilizations }, { depth: null });
     if (!currentPlayer || !civilizations) return;
 
+    // find currentPlayer's ID
     const { playerId } = civilizations.find(c => c.civName === currentPlayer);
     if (!playerId) return;
 
+    // Check if the Player exists in DB
     const queryResponse = await server.locals.db.PlayerProfiles.findOne(
       { uncivUserIds: playerId },
-      { projection: { notifications: 1, dmChannel: 1, turnLogs: 1 } }
+      { projection: { notifications: 1, dmChannel: 1 } }
     ).catch(errorLogger);
 
-    const { name } = (
-      await server.locals.db.UncivServer.findOneAndUpdate(
-        { _id: req.params.fileName },
-        { $set: { currentPlayer, playerId, turns } },
-        { projection: { _id: 0, name: 1 } }
-      )
-    ).value;
-
     if (queryResponse) {
-      let update = {};
-      if (queryResponse.turnLogs === undefined) {
-        update.$set = {
-          turnLogs: [
-            {
-              gameID,
-              name: !name ? '' : name,
-              currentPlayer,
-              turns: turns || 0,
-              timestamp: Date.now(),
-            },
-          ],
-        };
-      } else {
-        const index = queryResponse.turnLogs.findIndex(entry => entry.gameID === gameID);
-        if (index < 0) {
-          update.$push = {
-            turnLogs: {
-              gameID,
-              name: !name ? '' : name,
-              currentPlayer,
-              turns: turns || 0,
-              timestamp: Date.now(),
-            },
-          };
-          if (queryResponse.turnLogs.length >= 10) {
-            update.$pull = {
-              turnLogs: queryResponse.turnLogs.sort((a, b) => a.timestamp - b.timestamp)[0],
-            };
-          }
-        } else {
-          update.$set = {
-            [`turnLogs.${index}`]: {
-              gameID,
-              name: !name ? '' : name,
-              currentPlayer,
-              turns: turns || 0,
-              timestamp: Date.now(),
-            },
-          };
-        }
-      }
-
-      await server.locals.db.PlayerProfiles.updateOne({ _id: queryResponse._id }, update).catch(
-        err => console.error(err.stack, turnLogs, update)
-      );
-
       if (!queryResponse.dmChannel) {
         try {
           const dmChannel = await dicord
@@ -254,6 +205,19 @@ server.put('/files/:fileName', async (req, res) => {
         }
       }
     } else return;
+
+    // Unique list of Players
+    const players = [
+      ...new Set((civilizations + gameParameters.players).map(c => c.playerId).filter(id => id)),
+    ];
+
+    const { name } = (
+      await server.locals.db.UncivServer.findOneAndUpdate(
+        { _id: req.params.fileName },
+        { $set: { currentPlayer, playerId, turns, players } },
+        { projection: { _id: 0, name: 1 } }
+      )
+    ).value;
 
     if (!queryResponse.dmChannel || queryResponse.notifications !== 'enabled') return;
     await dicord
