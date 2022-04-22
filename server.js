@@ -208,7 +208,12 @@ server.put('/files/:fileName', async (req, res) => {
 
     // Unique list of Players
     const players = [
-      ...new Set((civilizations + gameParameters.players).map(c => c.playerId).filter(id => id)),
+      ...new Set(
+        gameParameters.players
+          .concat(civilizations)
+          .map(c => c.playerId)
+          .filter(id => id)
+      ),
     ];
 
     const { name } = (
