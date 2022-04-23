@@ -219,7 +219,7 @@ server.put('/files/:fileName', async (req, res) => {
     const { name } = (
       await server.locals.db.UncivServer.findOneAndUpdate(
         { _id: req.params.fileName },
-        { $set: { currentPlayer, playerId, turns, players } },
+        { $set: { currentPlayer, playerId, turns: turns || 0, players } },
         { projection: { _id: 0, name: 1 } }
       )
     ).value;
