@@ -1,9 +1,10 @@
 require('dotenv').config();
-var axios = require('axios');
-var express = require('express');
-const { gunzipSync } = require('zlib');
-var { MongoClient } = require('mongodb');
-var { writeFileSync, rmSync } = require('fs');
+const axios = require('axios');
+const json5 = require('json5');
+const express = require('express');
+const { MongoClient } = require('mongodb');
+const { gzipSync, gunzipSync } = require('zlib');
+const { readFileSync, writeFileSync, existsSync, rmSync } = require('fs');
 
 // error logger
 const errorLogger = e => console.error(e.stack);
@@ -172,8 +173,7 @@ server.put('/files/:fileName', async (req, res) => {
   if (gamePreviewRegex.test(req.params.fileName)) {
     const gameID = req.params.fileName.slice(0, -8);
 
-    const uncivJson = gunzipSync(Buffer.from(req.body, 'base64')).toString();
-    const { civilizations, currentPlayer, turns, gameParameters } = parseUncivJson(uncivJson);
+    const { civilizations, currentPlayer, turns, gameParameters } = UncivParser.parse(req.body);
 
     // Log & exit if invalid data
     console.dir({ turns, currentPlayer, civilizations }, { depth: null });
@@ -295,71 +295,89 @@ process.on('error', errorLogger);
 
 // a recursive json parser written by me for the game json output of unciv
 // doesn't support whitespaces
-const parseUncivJson = (() => {
-  function parseData(str) {
-    if (typeof str == 'string') {
-      if (str == 'true') return true;
-      if (str == 'false') return false;
-      let num = Number(str);
-      if (!isNaN(num)) str = num;
-      if (typeof str == 'string' && str.startsWith('"') && str.endsWith('"')) {
-        return str.slice(1, -1).replaceAll('\\"', '"').replaceAll('\\\\', '\\');
+const UncivParser = (() => {
+  const parseUncivJson = (() => {
+    function parseData(str) {
+      if (typeof str == 'string') {
+        if (str == 'true') return true;
+        if (str == 'false') return false;
+        let num = Number(str);
+        if (!isNaN(num)) str = num;
+        if (typeof str == 'string' && str.startsWith('"') && str.endsWith('"')) {
+          return str.slice(1, -1).replaceAll('\\"', '"').replaceAll('\\\\', '\\');
+        }
       }
+      return str;
     }
-    return str;
-  }
 
-  function parser() {
-    if (str.at(i) == '[') {
-      let array = [];
+    function parser() {
+      if (str.at(i) == '[') {
+        let array = [];
 
-      while (str.at(++i) != ']') {
-        if (str.at(i) == '[' || str.at(i) == '{') array.push(parser());
+        while (str.at(++i) != ']') {
+          if (str.at(i) == '[' || str.at(i) == '{') array.push(parser());
 
+          let value = '';
+          while (str.at(i) != ',' && str.at(i) != ']') {
+            value += str.at(i++);
+          }
+
+          if (value) array.push(parseData(value));
+
+          if (str.at(i) == ']') break;
+        }
+
+        i += 1;
+        return array;
+      }
+
+      let object = {};
+
+      while (str.at(++i) != '}') {
+        let param = '';
+        while (str.at(i) != ':') {
+          param += str.at(i++);
+        }
+
+        ++i;
         let value = '';
-        while (str.at(i) != ',' && str.at(i) != ']') {
+        if (str.at(i) == '[' || str.at(i) == '{') value = parser();
+        while (str.at(i) && str.at(i) != ',' && str.at(i) != '}') {
           value += str.at(i++);
         }
 
-        if (value) array.push(parseData(value));
+        object[parseData(param)] = parseData(value);
 
-        if (str.at(i) == ']') break;
-      }
-
-      i += 1;
-      return array;
-    }
-
-    let object = {};
-
-    while (str.at(++i) != '}') {
-      let param = '';
-      while (str.at(i) != ':') {
-        param += str.at(i++);
+        if (str.at(i) == '}') break;
       }
 
       ++i;
-      let value = '';
-      if (str.at(i) == '[' || str.at(i) == '{') value = parser();
-      while (str.at(i) && str.at(i) != ',' && str.at(i) != '}') {
-        value += str.at(i++);
-      }
-
-      object[parseData(param)] = parseData(value);
-
-      if (str.at(i) == '}') break;
+      return object;
     }
 
-    ++i;
-    return object;
-  }
+    var i = 0;
+    var str = '';
 
-  var i = 0;
-  var str = '';
+    return function (s) {
+      i = 0;
+      str = s;
+      return parser();
+    };
+  })();
 
-  return function (s) {
-    i = 0;
-    str = s;
-    return parser();
+  return {
+    parse(gameData) {
+      const jsonText = gunzipSync(Buffer.from(gameData, 'base64')).toString();
+      return parseUncivJson(jsonText);
+    },
+    stringify(json) {
+      const jsonText = json5.stringify(json);
+      return gzipSync(jsonText).toString('base64');
+    },
+    parseFromFile(path) {
+      if (!existsSync(path)) return null;
+      const gameData = readFileSync(path, 'utf8');
+      return this.parse(gameData);
+    },
   };
 })();
