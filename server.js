@@ -1,6 +1,5 @@
 require('dotenv').config();
 const axios = require('axios');
-const json5 = require('json5');
 const express = require('express');
 const { MongoClient } = require('mongodb');
 const { gzipSync, gunzipSync } = require('zlib');
