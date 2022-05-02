@@ -165,7 +165,7 @@ server.post('/addbrgame/:gameID', async (req, res) => {
     return;
   }
 
-  if (!gameRegex.test()) {
+  if (!gameRegex.test(req.params.gameID)) {
     res.sendStatus(400);
     return;
   }
