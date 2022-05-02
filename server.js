@@ -165,12 +165,14 @@ server.post('/addbrgame/:gameID', async (req, res) => {
     return;
   }
 
-  if (!gameRegex.test(req.params.gameID)) {
+  const { gameID } = req.params;
+
+  if (!gameID || !gameRegex.test(gameID)) {
     res.sendStatus(400);
     return;
   }
 
-  const path = `files/${req.params.gameID}`;
+  const path = `files/${gameID}`;
 
   if (!existsSync(path)) {
     res.sendStatus(404);
