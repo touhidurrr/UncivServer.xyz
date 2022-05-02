@@ -319,15 +319,15 @@ function distanceToCenter(pos) {
 }
 
 function handleBRGame(req) {
-  json = UncivParser.parse(req.body);
+  let json = UncivParser.parse(req.body);
 
-  const { radius } = json.tileMap.mapParameters.mapSize;
+  let { radius } = json.tileMap.mapParameters.mapSize;
 
   // Stop when radius becomes 0
   if (!radius) return;
 
   // Cut last radius tiles of the tileList
-  const cut = 1 + 3 * radius * (radius - 1);
+  let cut = 1 + 3 * radius * (radius - 1);
   json.tileMap.tileList = json.tileMap.tileList.slice(0, cut);
 
   let unitCount = {};
@@ -474,7 +474,7 @@ const UncivParser = (() => {
       return parseUncivJson(jsonText);
     },
     stringify(json) {
-      const jsonText = json5.stringify(json);
+      const jsonText = JSON.stringify(json);
       return gzipSync(jsonText).toString('base64');
     },
     parseFromFile(path) {
