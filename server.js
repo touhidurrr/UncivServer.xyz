@@ -157,9 +157,16 @@ server.get('/files/:fileName', async (req, res) => {
   }
 });
 
-server.put('/addbrgame/:gameID', async => {
-  if (req.headers.get('Authorization') !== process.env.BRAuth) {
+const gameRegex = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
+
+server.post('/addbrgame/:gameID', async (req, res) => {
+  if (req.body !== process.env.BRAuth) {
     res.sendStatus(403);
+    return;
+  }
+
+  if (!gameRegex.test()) {
+    res.sendStatus(400);
     return;
   }
 
@@ -186,6 +193,7 @@ server.put('/files/:fileName', async (req, res) => {
   if (BattleRoyale.hasOwnProperty(req.params.fileName)) {
     handleBRGame(req.params.fileName, req.body);
     res.sendStatus(200);
+    return;
   }
 
   writeFileSync(req.path.slice(1), req.body);
