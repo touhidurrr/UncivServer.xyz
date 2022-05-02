@@ -7,9 +7,7 @@ const { gzipSync, gunzipSync } = require('zlib');
 const { readFileSync, writeFileSync, existsSync, rmSync } = require('fs');
 
 // Battle Royale Games
-var BattleRoyale = {
-  // gameId: gameData;
-};
+var BattleRoyaleGames = new Set();
 
 // error logger
 const errorLogger = e => console.error(e.stack);
@@ -172,6 +170,11 @@ server.post('/addbrgame/:gameID', async (req, res) => {
     return;
   }
 
+  if (BattleRoyaleGames.has(gameID)) {
+    res.status(200).end('Already Added');
+    return;
+  }
+
   const path = `files/${gameID}`;
 
   if (!existsSync(path)) {
@@ -179,8 +182,8 @@ server.post('/addbrgame/:gameID', async (req, res) => {
     return;
   }
 
-  BattleRoyale[gameID] = readFileSync(path, 'utf8');
-  rmSync(path, { force: true });
+  BattleRoyaleGames.add(gameID);
+  res.sendStatus(200);
 });
 
 const gamePreviewRegex = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}_Preview$/;
@@ -192,11 +195,7 @@ server.put('/files/:fileName', async (req, res) => {
     return;
   }
 
-  if (BattleRoyale.hasOwnProperty(req.params.fileName)) {
-    handleBRGame(req.params.fileName, req.body);
-    res.sendStatus(200);
-    return;
-  }
+  if (BattleRoyaleGames.has(req.params.fileName)) handleBRGame(req);
 
   writeFileSync(req.path.slice(1), req.body);
   await server.locals.db.UncivServer.updateOne(
@@ -319,16 +318,13 @@ function distanceToCenter(pos) {
   return Math.max(Math.abs(pos.x), Math.abs(pos.y), Math.abs(pos.x - pos.y));
 }
 
-function handleBRGame(gameID, gameData) {
-  json = UncivParser.parse(gameData);
+function handleBRGame(req) {
+  json = UncivParser.parse(req.body);
 
   const { radius } = json.tileMap.mapParameters.mapSize;
 
   // Stop when radius becomes 0
-  if (!radius) {
-    BattleRoyale[gameID] = gameData;
-    return;
-  }
+  if (!radius) return;
 
   // Cut last radius tiles of the tileList
   const cut = 1 + 3 * radius * (radius - 1);
@@ -377,7 +373,7 @@ function handleBRGame(gameID, gameData) {
   // Decease radius by 1
   json.tileMap.mapParameters.mapSize.radius--;
 
-  BattleRoyale[gameID] = UncivParser.stringify(json);
+  req.body = UncivParser.stringify(json);
 }
 
 // Start Server
