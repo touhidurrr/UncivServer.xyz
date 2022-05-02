@@ -6,6 +6,11 @@ const { MongoClient } = require('mongodb');
 const { gzipSync, gunzipSync } = require('zlib');
 const { readFileSync, writeFileSync, existsSync, rmSync } = require('fs');
 
+// Battle Royale Games
+var BattleRoyale = {
+  // gameId: gameData;
+};
+
 // error logger
 const errorLogger = e => console.error(e.stack);
 
@@ -152,6 +157,23 @@ server.get('/files/:fileName', async (req, res) => {
   }
 });
 
+server.put('/addbrgame/:gameID', async => {
+  if (req.headers.get('Authorization') !== process.env.BRAuth) {
+    res.sendStatus(403);
+    return;
+  }
+
+  const path = `files/${req.params.gameID}`;
+
+  if (!existsSync(path)) {
+    res.sendStatus(404);
+    return;
+  }
+
+  BattleRoyale[gameID] = readFileSync(path, 'utf8');
+  rmSync(path, { force: true });
+});
+
 const gamePreviewRegex = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}_Preview$/;
 
 server.put('/files/:fileName', async (req, res) => {
@@ -159,6 +181,11 @@ server.put('/files/:fileName', async (req, res) => {
     console.dir(req);
     res.sendStatus(400);
     return;
+  }
+
+  if (BattleRoyale.hasOwnProperty(req.params.fileName)) {
+    handleBRGame(req.params.fileName, req.body);
+    res.sendStatus(200);
   }
 
   writeFileSync(req.path.slice(1), req.body);
@@ -272,6 +299,76 @@ server.delete('/files/:fileName', async (req, res) => {
   await server.locals.db.UncivServer.deleteOne({ _id: req.params.fileName }).catch(errorLogger);
   res.sendStatus(200);
 });
+
+function distanceToCenter(pos) {
+  if (typeof pos !== 'object') return 0;
+
+  pos.x = pos.x || 0;
+  pos.y = pos.y || 0;
+
+  return Math.max(Math.abs(pos.x), Math.abs(pos.y), Math.abs(pos.x - pos.y));
+}
+
+function handleBRGame(gameID, gameData) {
+  json = UncivParser.parse(gameData);
+
+  const { radius } = json.tileMap.mapParameters.mapSize;
+
+  // Stop when radius becomes 0
+  if (!radius) {
+    BattleRoyale[gameID] = gameData;
+    return;
+  }
+
+  // Cut last radius tiles of the tileList
+  const cut = 1 + 3 * radius * (radius - 1);
+  json.tileMap.tileList = json.tileMap.tileList.slice(0, cut);
+
+  let unitCount = {};
+
+  // Remove deleted tiles from exploredTiles of Civs
+  json.civilizations = json.civilizations.map(civ => {
+    if (civ.exploredTiles) {
+      civ.exploredTiles = civ.exploredTiles.filter(p => distanceToCenter(p) < radius);
+    }
+    unitCount[civ.civName] = 0;
+    return civ;
+  });
+
+  console.log(unitCount);
+
+  // Remove deleted tiles from movementMemories
+  json.tileMap.tileList = json.tileMap.tileList.map(t => {
+    if (t.militaryUnit && t.militaryUnit.movementMemories) {
+      ++unitCount[t.militaryUnit.owner];
+      t.militaryUnit.movementMemories = t.militaryUnit.movementMemories.filter(
+        m => distanceToCenter(m.position) < radius
+      );
+    }
+    if (t.civilianUnit && t.civilianUnit.movementMemories) {
+      ++unitCount[t.civilianUnit.owner];
+      t.civilianUnit.movementMemories = t.civilianUnit.movementMemories.filter(
+        m => distanceToCenter(m.position) < radius
+      );
+    }
+    return t;
+  });
+
+  // Remove Barbarians Camps in deleted tiles
+  if (json.barbarians && json.barbarians.camps) {
+    Object.entries(json.barbarians.camps).forEach(entry => {
+      [key, { position }] = entry;
+      if (distanceToCenter(position) >= radius) {
+        delete json.barbarians.camps[key];
+      }
+    });
+  }
+
+  // Decease radius by 1
+  json.tileMap.mapParameters.mapSize.radius--;
+
+  BattleRoyale[gameID] = UncivParser.stringify(json);
+}
 
 // Start Server
 (async () => {
