@@ -6,7 +6,7 @@ exports.createMessage = async (channelId, message) => {
       Accept: 'application/json',
       Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
     },
-    body: JSON.parse(message),
+    body: JSON.stringify(message),
   });
 };
 
