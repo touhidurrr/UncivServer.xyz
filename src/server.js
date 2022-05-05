@@ -1,5 +1,4 @@
 require('dotenv').config();
-const axios = require('axios');
 const express = require('express');
 const { MongoClient } = require('mongodb');
 const { writeFileSync, rmSync } = require('fs');
@@ -184,9 +183,7 @@ server.put('/files/:fileName', async (req, res) => {
     if (queryResponse) {
       if (!queryResponse.dmChannel) {
         try {
-          const dmChannel = await dicord
-            .post('/users/@me/channels', { recipient_id: queryResponse._id })
-            .then(ch => ch.data.id);
+          const dmChannel = await Discord.getDMChannel(queryResponse._id);
           await server.locals.db.PlayerProfiles.updateOne(
             { _id: queryResponse._id },
             { $set: { dmChannel } }
