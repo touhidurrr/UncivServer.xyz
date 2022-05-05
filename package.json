@@ -2,10 +2,10 @@
   "name": "uncivserver.xyz",
   "version": "1.0.0",
   "description": "An Open Source, Unciv Multiplayer Server written in Javascript",
-  "main": "server.js",
+  "main": "src/server.js",
   "scripts": {
-    "start": "node server.js",
-    "test": "node server.js"
+    "start": "node src/server.js",
+    "test": "node src/server.js"
   },
   "repository": {
     "type": "git",
