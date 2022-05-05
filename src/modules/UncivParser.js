@@ -73,7 +73,7 @@ module.exports = {
   },
   parse(gameData) {
     const jsonText = gunzipSync(Buffer.from(gameData, 'base64')).toString();
-    return parseUncivJson(jsonText);
+    return this.parseUncivJson(jsonText);
   },
   stringify(json) {
     const jsonText = JSON.stringify(json);

@@ -4,5 +4,6 @@ files
 !.github
 !.gitignore
 !.prettierignore
+!.prettierrc.yaml
 node_modules
 package-lock.json
