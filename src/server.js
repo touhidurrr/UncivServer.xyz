@@ -98,11 +98,15 @@ server.get('/files/:fileName', async (req, res) => {
     });
 
     let data = await r.text();
+    let ct = r.headers.get('Content-Type');
 
     // Log Dropbox Response
     console.log('Dropbox Status:', r.status);
-    if (r.status !== 200) console.log('Dropbox Data:', data);
+    if (r.status !== 200) {
+      console.log('Dropbox Data:', (ct && ct.includes('json')) ? data : JSON.parse(data));
+    }
 
+    if (ct) res.set('Content-Type', ct);
     res.status(r.status).end(data);
   } catch (err) {
     errorLogger(err);
