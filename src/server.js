@@ -21,6 +21,13 @@ server.locals.mongoClient = new MongoClient(process.env.MongoURL, {
   useUnifiedTopology: true,
 });
 
+server.get('/isalive', async (req, res) => {
+  res.set({
+    'Content-Type': 'text/plain',
+    'Cache-Control': 'public, max-age=60',
+  }).end('true');
+});
+
 server.use(function (req, res, next) {
   req.path = req.path.replace(/\/{2,}/g, '/').replace(/\s+/g, '');
   if (
@@ -67,13 +74,6 @@ server.use(function (req, res, next) {
   req.on('end', () => {
     if (!overLimit) next();
   });
-});
-
-server.get('/isalive', async (req, res) => {
-  await res.set({
-    'Content-Type': 'text/plain',
-    'Cache-Control': 'public, max-age=60',
-  }).end('true');
 });
 
 server.get('/files/:fileName', async (req, res) => {
