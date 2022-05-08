@@ -22,10 +22,12 @@ server.locals.mongoClient = new MongoClient(process.env.MongoURL, {
 });
 
 server.get('/isalive', async (req, res) => {
-  res.set({
-    'Content-Type': 'text/plain',
-    'Cache-Control': 'public, max-age=60',
-  }).end('true');
+  res
+    .set({
+      'Content-Type': 'text/plain',
+      'Cache-Control': 'public, max-age=60',
+    })
+    .end('true');
 });
 
 server.use(function (req, res, next) {
@@ -47,7 +49,7 @@ server.use(function (req, res, next) {
   next();
 });
 
-server.use(express.static('.', { limit: '5mb' }));
+server.use(express.static('.', { limit: '5mb', lastModified: false }));
 
 // Limit, 3 MegaBytes
 // 1 << 10 = 1024 << 10 = 1024 * 1024
@@ -107,7 +109,7 @@ server.get('/files/:fileName', async (req, res) => {
     // Log Dropbox Response
     console.log('Dropbox Status:', r.status);
     if (r.status !== 200) {
-      console.log('Dropbox Data:', (ct && ct.includes('json')) ? data : JSON.parse(data));
+      console.log('Dropbox Data:', ct && ct.includes('json') ? data : JSON.parse(data));
     }
 
     if (ct) res.set('Content-Type', ct);
