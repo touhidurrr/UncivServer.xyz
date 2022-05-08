@@ -14,6 +14,7 @@ const errorLogger = e => console.error(e.stack);
 
 // express
 var server = express();
+server.disable('x-powered-by');
 
 server.locals.mongoClient = new MongoClient(process.env.MongoURL, {
   useNewUrlParser: true,
@@ -69,6 +70,8 @@ server.use(function (req, res, next) {
 });
 
 server.get('/isalive', async (req, res) => {
+  res.set('Cache-Control', 'public, max-age=60');
+  res.set('Content-Type', 'text/plain');
   res.end('true');
 });
 
