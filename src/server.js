@@ -70,9 +70,10 @@ server.use(function (req, res, next) {
 });
 
 server.get('/isalive', async (req, res) => {
-  res.set('Cache-Control', 'public, max-age=60');
-  res.set('Content-Type', 'text/plain');
-  res.end('true');
+  await res.set({
+    'Content-Type': 'text/plain',
+    'Cache-Control': 'public, max-age=60',
+  }).end('true');
 });
 
 server.get('/files/:fileName', async (req, res) => {
