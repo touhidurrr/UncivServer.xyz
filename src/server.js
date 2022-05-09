@@ -159,7 +159,7 @@ server.put('/files/:fileName', async (req, res) => {
   if (BattleRoyaleGames.has(req.params.fileName)) handleBRGame(req);
 
   writeFileSync(req.path.slice(1), req.body);
-  process.env.ServerList.forEach(endpoint => {
+  ServerList.forEach(endpoint => {
     fetch(`http://${endpoint}/files/${req.params.fileName}`, { method: 'PATCH', body: req.body });
   });
   await server.locals.db.UncivServer.updateOne(
