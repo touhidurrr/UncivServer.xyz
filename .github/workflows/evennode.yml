@@ -42,7 +42,7 @@ jobs:
             read name url <<< $entry
             git remote add $name $url
             echo "Pushing to $name"
-            git push $name master -f
+            git push $name master -f &
           done
 
       - name: Clean Some Files
