@@ -41,9 +41,11 @@ jobs:
           do
             read name url <<< $entry
             git remote add $name $url
-            echo "Pushing to $name"
             git push $name master -f &
           done
+
+          # wait for uploads to get finished
+          wait
 
       - name: Clean Some Files
         run: |
