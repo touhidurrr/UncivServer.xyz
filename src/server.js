@@ -22,12 +22,8 @@ server.locals.mongoClient = new MongoClient(process.env.MongoURL, {
 });
 
 server.get('/isalive', async (req, res) => {
-  res
-    .set({
-      'Content-Type': 'text/plain',
-      'Cache-Control': 'public, max-age=60, immutable',
-    })
-    .end('true');
+  res.set('Content-Type', 'text/plain');
+  res.end('true');
 });
 
 server.use(function (req, res, next) {
@@ -43,7 +39,6 @@ server.use(function (req, res, next) {
     return;
   }
   if (req.path.startsWith('/files')) {
-    res.set('Cache-Control', 'public, max-age=2, immutable');
     res.set('Content-Type', 'text/plain');
   }
   next();
