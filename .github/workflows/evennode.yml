@@ -19,7 +19,7 @@ jobs:
 
       - name: Preprocessing
         run: |
-          rm _*
+          rm -f _* *.md
           rm -rf .??*
           rm -rf functions
           rm -rf build
@@ -29,12 +29,23 @@ jobs:
 
       - name: Push to Evennode
         run: |
+          # initialize git repository
           git init
           git config user.email "${{ secrets.EVENNODE_USER_EMAIL }}"
           git config user.name "${{ secrets.EVENNODE_USER_NAME }}"
           git add --all && git commit -m "release $(date)"
-          git remote add evennode "${{ secrets.EVENNODE_GIT_URL }}"
-          git push evennode master -f
+
+          # push to all remotes
+          readarray -t REMOTE_LIST <<< "${{ secrets.EVENNODE_GIT_URL_LIST }}"
+          for entry in "${REMOTE_LIST[@]}"
+          do
+            read name url <<< $entry
+            git remote add $name $url
+            echo "Pushing to $name"
+            git push $name master -f
+          done
 
       - name: Clean Some Files
-        run: rm ~/.ssh/id_rsa ~/.ssh/known_hosts
+        run: |
+          rm -f ~/.ssh/id_rsa ~/.ssh/known_hosts
+          rm -rf .git
