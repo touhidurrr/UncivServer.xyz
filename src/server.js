@@ -28,7 +28,6 @@ server.get('/isalive', async (req, res) => {
 });
 
 server.use(function (req, res, next) {
-  req.path = req.path.replace(/\/{2,}/g, '/').replace(/\s+/g, '');
   if (
     !req.path.startsWith('/assets') &&
     (req.path.startsWith('/src') ||
