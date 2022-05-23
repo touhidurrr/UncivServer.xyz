@@ -25,7 +25,7 @@ jobs:
           rm -rf build
           mkdir assets files
           curl https://c6.patreon.com/becomePatronButton.bundle.js -o assets/becomePatronButton.bundle.js
-          echo "last startp initiated at $(TZ=Asia/Dhaka date)" > files/startup
+          echo "Built at $(TZ=Asia/Dhaka date)" > files/status
 
       - name: Push to Evennode
         run: |
