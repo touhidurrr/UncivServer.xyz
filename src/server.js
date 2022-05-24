@@ -291,5 +291,24 @@ server.delete('/files/:fileName', async (req, res) => {
   });
 })();
 
+// Periodical File Cleaner
+const interval = 15 * 60 * 1000; // 15 minutes
+setInterval(async () => {
+  readdir('files', async (err, files) => {
+    if (err) errorLogger(err);
+    console.log('Cached Files:', files.length);
+    files.forEach(async fileName => {
+      const path = `files/${fileName}`;
+      stat(path, async (err, { mtimeMs }) => {
+        if (err) errorLogger(err);
+        if (Date.now() - mtimeMs > interval) {
+          console.log('Removing cache for:', fileName);
+          rm(path, async err => err && errorLogger(err));
+        }
+      });
+    });
+  });
+}, interval);
+
 // error handler
 process.on('error', errorLogger);
