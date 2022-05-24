@@ -1,10 +1,10 @@
 require('dotenv').config();
 const express = require('express');
 const { MongoClient } = require('mongodb');
-const { writeFileSync, rmSync } = require('fs');
 const Discord = require('./modules/Discord.js');
 const UncivParser = require('./modules/UncivParser.js');
 const { handleBRGame } = require('./modules/BattleRoyale.js');
+const { rm, stat, readdir, rmSync, writeFileSync } = require('fs');
 
 // Battle Royale Games
 var BattleRoyaleGames = new Set();
