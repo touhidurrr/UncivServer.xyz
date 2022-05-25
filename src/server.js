@@ -306,7 +306,7 @@ setInterval(async () => {
       });
     });
   });
-}, interval);
+}, interval / 3);
 
 // error handler
 process.on('error', errorLogger);
