@@ -175,7 +175,7 @@ server.put('/files/:fileName', async (req, res) => {
     const { civilizations, currentPlayer, turns, gameParameters } = UncivParser.parse(req.body);
 
     // Log & exit if invalid data
-    console.dir({ turns, currentPlayer, civilizations }, { depth: null });
+    console.dir({ turns, currentPlayer, civilizations, gameID }, { depth: null });
     if (!currentPlayer || !civilizations) return;
 
     // find currentPlayer's ID
