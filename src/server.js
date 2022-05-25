@@ -98,15 +98,17 @@ server.get('/files/:fileName', async (req, res) => {
       },
     });
 
+    let data = await r.text();
+
     // Log Dropbox Response
     console.log('Dropbox Status:', r.status);
     if (r.status !== 200) {
-      console.log('Dropbox Data:', ct && ct.includes('json') ? data : JSON.parse(data));
+      console.log('Dropbox Data:', data.startsWith('{') ? data : JSON.parse(data));
       res.sendStatus(404);
       return;
     }
 
-    res.end(await r.text());
+    res.end(data);
   } catch (err) {
     errorLogger(err);
     res.sendStatus(404);
