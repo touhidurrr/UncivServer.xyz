@@ -103,7 +103,7 @@ server.get('/files/:fileName', async (req, res) => {
     // Log Dropbox Response
     console.log('Dropbox Status:', r.status);
     if (r.status !== 200) {
-      console.log('Dropbox Data:', data.startsWith('{') ? data : JSON.parse(data));
+      console.log('Dropbox Data:', !data.startsWith('{') ? data : JSON.parse(data));
       res.sendStatus(404);
       return;
     }
