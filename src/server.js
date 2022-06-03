@@ -4,7 +4,7 @@ const { MongoClient } = require('mongodb');
 const Discord = require('./modules/Discord.js');
 const UncivParser = require('./modules/UncivParser.js');
 const { handleBRGame } = require('./modules/BattleRoyale.js');
-const { rm, stat, readdir, rmSync, writeFileSync } = require('fs');
+const { rm, stat, mkdir, readdir, rmSync, writeFileSync } = require('fs');
 
 // Battle Royale Games
 var BattleRoyaleGames = new Set();
@@ -276,6 +276,9 @@ server.delete('/files/:fileName', async (req, res) => {
 
 // Start Server
 (async () => {
+  // Try making directory files
+  mkdir('files', err => err && errorLogger(err));
+
   // Initialize MongoDB
   console.dir('Initializing MongoDB ...');
   await server.locals.mongoClient.connect();
