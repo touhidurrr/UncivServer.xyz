@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 // import fetch from node_fetch if not available
-if (!global.fetch) {
+if (!fetch) {
   import fetch, { Headers, Request, Response } from 'node-fetch';
 
   global.fetch = fetch;
