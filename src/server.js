@@ -4,10 +4,10 @@ require('dotenv').config();
 if (!global.fetch) (() => {
   import fetch, { Headers, Request, Response } from 'node-fetch';
 
-  globalThis.fetch = fetch;
-  globalThis.Headers = Headers;
-  globalThis.Request = Request;
-  globalThis.Response = Response;
+  global.fetch = fetch;
+  global.Headers = Headers;
+  global.Request = Request;
+  global.Response = Response;
 })();
 
 const express = require('express');
