@@ -1,4 +1,15 @@
 require('dotenv').config();
+
+// import fetch from node_fetch if not available
+if (!global.fetch) (() => {
+  import fetch, { Headers, Request, Response } from 'node-fetch';
+
+  globalThis.fetch = fetch;
+  globalThis.Headers = Headers;
+  globalThis.Request = Request;
+  globalThis.Response = Response;
+})();
+
 const express = require('express');
 const { MongoClient } = require('mongodb');
 const Discord = require('./modules/Discord.js');
@@ -289,8 +300,9 @@ server.delete('/files/:fileName', async (req, res) => {
   console.dir('MongoBD Initiated !');
 
   // start server
-  server.listen(process.env.PORT || 8080, async () => {
-    console.dir(`Listening on ${process.env.PORT || 8080} ...`);
+  const port = parseInt(process.env.PORT) || 8080;
+  server.listen(port, async () => {
+    console.dir(`Listening on ${port} ...`);
   });
 })();
 
