@@ -46,7 +46,8 @@ server.use(function (req, res, next) {
 });
 
 server.use(express.static('.', { limit: '5mb', lastModified: false }));
-
+server.use(express.text({ limit: '3mb', type: '*' }));
+/*
 // Limit, 3 MegaBytes
 // 1 << 10 = 1024 << 10 = 1024 * 1024
 const limit = 3 << 20;
@@ -73,7 +74,7 @@ server.use(function (req, res, next) {
     if (!overLimit) next();
   });
 });
-
+*/
 server.get('/files/:fileName', async (req, res) => {
   const { db } = server.locals;
   const { fileName } = req.params;
