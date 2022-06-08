@@ -46,7 +46,7 @@ server.use(function (req, res, next) {
 });
 
 server.use(express.static('.', { limit: '5mb', lastModified: false }));
-server.use(express.text({ limit: '3mb', type: '*' }));
+server.use(express.text({ limit: '3mb', type: () => true }));
 /*
 // Limit, 3 MegaBytes
 // 1 << 10 = 1024 << 10 = 1024 * 1024
