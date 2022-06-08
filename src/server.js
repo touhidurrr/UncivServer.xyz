@@ -47,34 +47,7 @@ server.use(function (req, res, next) {
 
 server.use(express.static('.', { limit: '5mb', lastModified: false }));
 server.use(express.text({ limit: '3mb', type: () => true }));
-/*
-// Limit, 3 MegaBytes
-// 1 << 10 = 1024 << 10 = 1024 * 1024
-const limit = 3 << 20;
 
-// Text Body Parser
-server.use(function (req, res, next) {
-  let ln = req.get('content-length');
-  if (ln && ln > limit) {
-    res.sendStatus(413);
-    return;
-  }
-  req.body = '';
-  let overLimit = false;
-  req.on('data', chunk => {
-    if (overLimit) return;
-    req.body += chunk;
-    if (req.body.length > limit) {
-      overLimit = true;
-      res.sendStatus(413);
-      return;
-    }
-  });
-  req.on('end', () => {
-    if (!overLimit) next();
-  });
-});
-*/
 server.get('/files/:fileName', async (req, res) => {
   const { db } = server.locals;
   const { fileName } = req.params;
