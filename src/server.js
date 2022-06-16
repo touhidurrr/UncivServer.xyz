@@ -1,5 +1,10 @@
 require('dotenv').config();
 
+// import 'node-fetch' as fetch if not available
+if (!global.fetch) {
+  global.fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+}
+
 const express = require('express');
 const { MongoClient } = require('mongodb');
 const Discord = require('./modules/Discord.js');
