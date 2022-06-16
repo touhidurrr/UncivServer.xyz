@@ -14,7 +14,7 @@ const { rm, stat, mkdir, readdir, rmSync, writeFileSync } = require('fs');
 
 // Battle Royale Games
 var BattleRoyaleGames = new Set();
-//const ServerList = process.env.Servers.split(/[\n\s]+/);
+const ServerList = process.env.Servers.split(/[\n\s]+/);
 
 // error logger
 const errorLogger = e => console.error(e.stack);
@@ -138,9 +138,9 @@ server.put('/files/:fileName', async (req, res) => {
   if (BattleRoyaleGames.has(req.params.fileName)) handleBRGame(req);
 
   writeFileSync(req.path.slice(1), req.body);
-  /*ServerList.forEach(endpoint => {
-    fetch(`http://${endpoint}/files/${req.params.fileName}`, { method: 'PATCH', body: req.body });
-  });*/
+  ServerList.forEach(endpoint => {
+    fetch(`${endpoint}/files/${req.params.fileName}`, { method: 'PATCH', body: req.body });
+  })
   await server.locals.db.UncivServer.updateOne(
     { _id: req.params.fileName },
     { $set: { timestamp: Date.now(), text: req.body } },
