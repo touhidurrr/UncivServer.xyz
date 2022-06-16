@@ -10,7 +10,7 @@ const { MongoClient } = require('mongodb');
 const Discord = require('./modules/Discord.js');
 const UncivParser = require('./modules/UncivParser.js');
 const { handleBRGame } = require('./modules/BattleRoyale.js');
-const { rm, stat, mkdir, readdir, rmSync, writeFileSync } = require('fs');
+const { rm, stat, mkdir, readdir, rmSync, existsSync, writeFileSync } = require('fs');
 
 // Battle Royale Games
 var BattleRoyaleGames = new Set();
