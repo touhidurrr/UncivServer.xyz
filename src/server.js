@@ -139,8 +139,8 @@ server.put('/files/:fileName', async (req, res) => {
 
   writeFileSync(req.path.slice(1), req.body);
   ServerList.forEach(endpoint => {
-    fetch(`${endpoint}/files/${req.params.fileName}`, { method: 'PATCH', body: req.body });
-  })
+    fetch(`${endpoint}/files/${req.params.fileName}`, { method: 'PATCH', body: req.body }).catch(errorLogger);
+  });
   await server.locals.db.UncivServer.updateOne(
     { _id: req.params.fileName },
     { $set: { timestamp: Date.now(), text: req.body } },
