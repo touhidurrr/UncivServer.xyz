@@ -65,7 +65,7 @@ function parser() {
 var i = 0;
 var str = '';
 
-module.exports = {
+exports = {
   parseUncivJson(s) {
     i = 0;
     str = s;
@@ -85,3 +85,10 @@ module.exports = {
     return this.parse(gameData);
   },
 };
+
+// Make compatible to Browser
+if (typeof window !== 'undefined') {
+  window.UncivParser = exports;
+} else {
+  module.exports = exports;
+}
