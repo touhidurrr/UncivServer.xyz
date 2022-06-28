@@ -31,7 +31,7 @@ server.locals.mongoClient = new MongoClient(process.env.MongoURL, {
 server.use(function (req, res, next) {
   if (!req.hostname.endsWith('uncivserver.xyz')) {
     console.warn(`Blocked a request from ${req.host}`);
-    res.status(401).end('401 Unauthorized !\nThis enpoint will be blocked from now on.\nPlease use https://uncivserver.xyz\n');
+    res.status(401).end('\n401 Unauthorized !\nThis enpoint will be blocked from now on.\nPlease use https://uncivserver.xyz\n');
     return;
   }
   if (
@@ -54,8 +54,7 @@ server.use(express.static('.', { limit: '5mb', lastModified: false }));
 server.use(express.text({ limit: '3mb', type: () => true }));
 
 server.get('/isalive', async (req, res) => {
-  res.set('Content-Type', 'text/plain');
-  res.end('true');
+  res.set('Content-Type', 'text/plain').end('true');
 });
 
 server.get('/files/:fileName', async (req, res) => {
