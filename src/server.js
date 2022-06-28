@@ -55,12 +55,12 @@ server.use(function (req, res, next) {
   next();
 });
 
-server.use(express.static('.', { limit: '5mb', lastModified: false }));
-server.use(express.text({ limit: '3mb', type: () => true }));
-
 server.get('/isalive', async (req, res) => {
   res.set('Content-Type', 'text/plain').end('true');
 });
+
+server.use(express.static('.', { limit: '5mb', lastModified: false }));
+server.use(express.text({ limit: '3mb', type: () => true }));
 
 server.get('/files/:fileName', async (req, res) => {
   const { db } = server.locals;
