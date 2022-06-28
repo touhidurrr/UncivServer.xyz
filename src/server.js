@@ -28,11 +28,6 @@ server.locals.mongoClient = new MongoClient(process.env.MongoURL, {
   useUnifiedTopology: true,
 });
 
-server.get('/isalive', async (req, res) => {
-  res.set('Content-Type', 'text/plain');
-  res.end('true');
-});
-
 server.use(function (req, res, next) {
   if (!req.hostname.endsWith('uncivserver.xyz')) {
     console.warn(`Blocked a request from ${req.host}`);
@@ -57,6 +52,11 @@ server.use(function (req, res, next) {
 
 server.use(express.static('.', { limit: '5mb', lastModified: false }));
 server.use(express.text({ limit: '3mb', type: () => true }));
+
+server.get('/isalive', async (req, res) => {
+  res.set('Content-Type', 'text/plain');
+  res.end('true');
+});
 
 server.get('/files/:fileName', async (req, res) => {
   const { db } = server.locals;
