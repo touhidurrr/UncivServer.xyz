@@ -30,7 +30,7 @@ server.locals.mongoClient = new MongoClient(process.env.MongoURL, {
 });
 
 server.use(function (req, res, next) {
-  if (!req.hostname.endsWith('uncivserver.xyz')) {
+  if (!req.hostname.endsWith('uncivserver.xyz') && req.method !== 'PATCH') {
     console.warn(`Blocked a request from ${req.host}`);
     res
       .status(401)
