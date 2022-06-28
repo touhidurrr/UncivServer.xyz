@@ -1,6 +1,6 @@
 module.exports = {
   async download(fileName) {
-    let res = fetch('https://content.dropboxapi.com/2/files/download', {
+    let res = await fetch('https://content.dropboxapi.com/2/files/download', {
       headers: {
         'Dropbox-API-Arg': `{"path":"/MultiplayerGames/${fileName}"}`,
         Authorization: 'Bearer LTdBbopPUQ0AAAAAAAACxh4_Qd1eVMM7IBK3ULV3BgxzWZDMfhmgFbuUNF_rXQWb',
