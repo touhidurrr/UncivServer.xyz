@@ -2,12 +2,13 @@ require('dotenv').config();
 
 // import 'node-fetch' as fetch if not available
 if (!global.fetch) {
-  global.fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+  global.fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 }
 
 const express = require('express');
 const { MongoClient } = require('mongodb');
 const Discord = require('./modules/Discord.js');
+const Dropbox = require('./modules/Dropbox.js');
 const UncivParser = require('./modules/UncivParser.js');
 const { handleBRGame } = require('./modules/BattleRoyale.js');
 const { rm, stat, mkdir, readdir, rmSync, existsSync, writeFileSync } = require('fs');
@@ -31,7 +32,11 @@ server.locals.mongoClient = new MongoClient(process.env.MongoURL, {
 server.use(function (req, res, next) {
   if (!req.hostname.endsWith('uncivserver.xyz')) {
     console.warn(`Blocked a request from ${req.host}`);
-    res.status(401).end('\n401 Unauthorized !\nThis enpoint will be blocked from now on.\nPlease use https://uncivserver.xyz\n');
+    res
+      .status(401)
+      .end(
+        '401 Unauthorized !\nThis enpoint will be blocked from now on.\nPlease use https://uncivserver.xyz\n'
+      );
     return;
   }
   if (
@@ -74,29 +79,9 @@ server.get('/files/:fileName', async (req, res) => {
   }
 
   // Dropbox
-  try {
-    let r = await fetch('https://content.dropboxapi.com/2/files/download', {
-      headers: {
-        'Dropbox-API-Arg': `{"path": "/MultiplayerGames/${fileName}"}`,
-        Authorization: 'Bearer LTdBbopPUQ0AAAAAAAACxh4_Qd1eVMM7IBK3ULV3BgxzWZDMfhmgFbuUNF_rXQWb',
-      },
-    });
-
-    let data = await r.text();
-
-    // Log Dropbox Response
-    console.log('Dropbox Status:', r.status);
-    if (r.status !== 200) {
-      console.log('Dropbox Data:', !data.startsWith('{') ? data : JSON.parse(data));
-      res.sendStatus(404);
-      return;
-    }
-
-    res.end(data);
-  } catch (err) {
-    errorLogger(err);
-    res.sendStatus(404);
-  }
+  fileData = await Dropbox.download(fileName);
+  if (fileData === null) res.sendStatus(404);
+  else res.end(fileData);
 });
 
 const gameRegex = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
@@ -142,8 +127,11 @@ server.put('/files/:fileName', async (req, res) => {
   if (BattleRoyaleGames.has(req.params.fileName)) handleBRGame(req);
 
   writeFileSync(req.path.slice(1), req.body);
-  ServerList.forEach(endpoint => {
-    fetch(`${endpoint}/files/${req.params.fileName}`, { method: 'PATCH', body: req.body }).catch(errorLogger);
+  Dropbox.upload(req.params.fileName);
+  ServerList.forEach(api => {
+    fetch(`${api}/files/${req.params.fileName}`, { method: 'PATCH', body: req.body }).catch(
+      errorLogger
+    );
   });
   await server.locals.db.UncivServer.updateOne(
     { _id: req.params.fileName },
@@ -254,6 +242,7 @@ server.patch('/files/:fileName', async (req, res) => {
 
 server.delete('/files/:fileName', async (req, res) => {
   rmSync(req.path.slice(1), { force: true });
+  Dropbox.delete(req.params.fileName);
   await server.locals.db.UncivServer.deleteOne({ _id: req.params.fileName }).catch(errorLogger);
   res.sendStatus(200);
 });
