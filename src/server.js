@@ -34,6 +34,10 @@ server.get('/isalive', async (req, res) => {
 });
 
 server.use(function (req, res, next) {
+  if (!req.hostname.endsWith('uncivserver.xyz')) {
+    res.status(401).end('401 Unauthorized !\nThis enpoint will be blocked from now on.\nPlease use https://uncivserver.xyz\n');
+    return;
+  }
   if (
     !req.path.startsWith('/assets') &&
     (req.path.startsWith('/src') ||
