@@ -1,4 +1,4 @@
-modules.export = {
+module.exports = {
   async download(fileName) {
     let res = fetch('https://content.dropboxapi.com/2/files/download', {
       headers: {
