@@ -7,17 +7,14 @@ module.exports = {
       },
     }).catch(e => console.error(e.stack));
 
-    const data = await res.text();
-
     // Log Dropbox Response
     console.log('Dropbox Status:', res.status);
     if (!res.ok) {
-      console.log('Dropbox Data:', !data.startsWith('{') ? data : JSON.parse(data));
-      res.sendStatus(404);
+      console.log('Dropbox Data:', await res.json());
       return null;
     }
 
-    return data;
+    return await res.text();
   },
   async upload(fileName, fileData) {
     await fetch('https://content.dropboxapi.com/2/files/upload', {
@@ -29,7 +26,7 @@ module.exports = {
       method: 'POST',
       data: fileData,
     })
-      .then(async res => console.log(res.status, await res.text()))
+      .then(async res => console.log(res.status, await res.json()))
       .catch(e => console.error(e.stack));
   },
   async delete(fileName) {
@@ -41,7 +38,7 @@ module.exports = {
       method: 'POST',
       data: `{"path":"/MultiplayerGames/${fileName}"}`,
     })
-      .then(async res => console.log(res.status, await res.text()))
+      .then(async res => console.log(res.status, await res.json()))
       .catch(e => console.error(e.stack));
   },
 };
