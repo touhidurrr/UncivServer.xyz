@@ -35,6 +35,7 @@ server.get('/isalive', async (req, res) => {
 
 server.use(function (req, res, next) {
   if (!req.hostname.endsWith('uncivserver.xyz')) {
+    console.warn(`Blocked a request from ${req.host}`);
     res.status(401).end('401 Unauthorized !\nThis enpoint will be blocked from now on.\nPlease use https://uncivserver.xyz\n');
     return;
   }
