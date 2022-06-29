@@ -29,9 +29,9 @@
     "node": "18.x"
   },
   "dependencies": {
-    "dotenv": "^16.0.0",
+    "dotenv": "^16.0.1",
     "express": "^5.0.0-beta.1",
-    "mongodb": "^4.5.0",
-    "node-fetch": "^3.2.5"
+    "mongodb": "^4.7.0",
+    "node-fetch": "^3.2.6"
   }
 }
