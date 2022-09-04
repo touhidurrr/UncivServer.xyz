@@ -4,8 +4,7 @@
   "description": "An Open Source, Unciv Multiplayer Server written in Javascript",
   "main": "src/server.js",
   "scripts": {
-    "start": "node src/server.js",
-    "test": "node src/server.js"
+    "start": "node src/server.js"
   },
   "repository": {
     "type": "git",
