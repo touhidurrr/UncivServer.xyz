@@ -245,8 +245,17 @@ server.delete('/files/:fileName', async (req, res) => {
 
 // Start Server
 (async () => {
-  // Try making directory files
+  // Try making directory files & assets
   mkdir('files', err => err && errorLogger(err));
+  mkdir('assets', err => err && errorLogger(err));
+
+  // populate assets
+  await Promise.all([
+    fetch('https://c6.patreon.com/becomePatronButton.bundle.js').then(res => res.text())
+      .then(file => writeFileSync('assets/becomePatron.js', file)),
+    fetch('https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js').then(res => res.text())
+      .then(file => writeFileSync('assets/buymeacoffeeButton.js', file)),
+  ]).catch(err => err && errorLogger(err));
 
   // Initialize MongoDB
   console.dir('Initializing MongoDB ...');
