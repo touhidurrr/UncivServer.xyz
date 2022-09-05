@@ -23,8 +23,8 @@ jobs:
 
       - name: Cleanup unnecessay files
         run: |
-          rm -rf .g* build
-          rm .??* *.md *.json Procfile
+          rm -rf .github build
+          rm .p* _* *.md *.json .gitignore Procfile
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
