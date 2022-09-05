@@ -29,8 +29,10 @@ server.locals.mongoClient = new MongoClient(process.env.MongoURL, {
   useUnifiedTopology: true,
 });
 
-server.use(function (req, res, next) {
-  if (!req.hostname.endsWith('uncivserver.xyz') && req.method !== 'PATCH') {
+const blockedPaths = /(^\/(src|node_modules))|(\.js(on)?$)/;
+server.use(function ({method, path, host, hostname}, res, next) {
+  const isFilesPath = path.startsWith('/files');
+  if (!hostname.endsWith('uncivserver.xyz') && method !== 'PATCH' && (isFilesPath || path === 'isalive')) {
     console.warn(`Blocked a request from ${req.host}`);
     res
       .status(401)
@@ -39,17 +41,11 @@ server.use(function (req, res, next) {
       );
     return;
   }
-  if (
-    !req.path.startsWith('/assets') &&
-    (req.path.startsWith('/src') ||
-      req.path.startsWith('/node_modules') ||
-      req.path.endsWith('.js') ||
-      req.path.endsWith('.json'))
-  ) {
+  if (!path.startsWith('/assets') && blockedPaths.test(path)) {
     res.sendStatus(403);
     return;
   }
-  if (req.path.startsWith('/files')) {
+  if (isFilesPath) {
     res.set('Content-Type', 'text/plain');
   }
   next();
