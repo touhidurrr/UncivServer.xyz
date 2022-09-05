@@ -30,7 +30,7 @@ server.locals.mongoClient = new MongoClient(process.env.MongoURL, {
 });
 
 const blockedPaths = /(^\/(src|node_modules))|(\.js(on)?$)/;
-server.use(function ({method, path, host, hostname}, res, next) {
+server.use(async ({method, path, host, hostname}, res, next) => {
   const isFilesPath = path.startsWith('/files');
   if (!hostname.endsWith('uncivserver.xyz') && method !== 'PATCH' && (isFilesPath || path === 'isalive')) {
     console.warn(`Blocked a request from ${req.host}`);
