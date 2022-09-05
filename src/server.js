@@ -37,7 +37,7 @@ server.use(async ({method, path, host, hostname}, res, next) => {
     res
       .status(401)
       .end(
-        '401 Unauthorized !\nThis enpoint will be blocked from now on.\nPlease use https://uncivserver.xyz\n'
+        '401 Unauthorized !\nThis enpoint will be blocked from now on.\nPlease use uncivserver.xyz or its subdomains.\n'
       );
     return;
   }
