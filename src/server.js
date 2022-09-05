@@ -33,7 +33,7 @@ const blockedPaths = /(^\/(src|node_modules))|(\.js(on)?$)/;
 server.use(async ({method, path, host, hostname}, res, next) => {
   const isFilesPath = path.startsWith('/files');
   if (!hostname.endsWith('uncivserver.xyz') && method !== 'PATCH' && (isFilesPath || path === 'isalive')) {
-    console.warn(`Blocked a request from ${req.host}`);
+    console.warn(`Blocked a request from ${host}`);
     res
       .status(401)
       .end(
