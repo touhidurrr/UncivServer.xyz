@@ -26,12 +26,6 @@ jobs:
           rm -rf .github build
           rm .p* _* *.md .gitignore Procfile
 
-      - name: Populate assets
-        run: |
-          mkdir assets
-          curl https://c6.patreon.com/becomePatronButton.bundle.js -o assets/becomePatron.js
-          curl https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js -o assets/buymeacoffeeButton.js
-
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v2
