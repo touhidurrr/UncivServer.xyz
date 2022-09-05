@@ -17,6 +17,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16
+          cache: npm
 
       - name: Install npm packages
         run: npm install
@@ -25,6 +26,11 @@ jobs:
         run: |
           rm -rf .github build
           rm .p* _* *.md .gitignore Procfile
+
+      - name: Populate assets
+        run: |
+          curl https://c6.patreon.com/becomePatronButton.bundle.js -o assets/becomePatron.js
+          curl https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js -o assets/buymeacoffeeButton.js
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
