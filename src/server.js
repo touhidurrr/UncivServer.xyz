@@ -239,6 +239,9 @@ server.delete('/files/:fileName', async (req, res) => {
 
 // Start Server
 (async () => {
+  // change working directory to public
+  process.chdir('public');
+
   // Try making directory files & assets
   mkdir('files', err => err && errorLogger(err));
   mkdir('assets', err => err && errorLogger(err));
