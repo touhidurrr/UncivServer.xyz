@@ -23,12 +23,10 @@ jobs:
 
       - name: Preprocessing
         run: |
-          rm -f _* *.md
-          rm -rf .??*
-          rm -rf functions
-          rm -rf build
-          mkdir assets files
+          cd public
+          mkdir assets
           curl https://c6.patreon.com/becomePatronButton.bundle.js -o assets/becomePatronButton.bundle.js
+          curl https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js -o assets/buymeacoffeeButton.js
           echo "Built at $(TZ=Asia/Dhaka date)" > files/status
 
       - name: Push to Evennode

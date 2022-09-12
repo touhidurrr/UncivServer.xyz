@@ -29,7 +29,6 @@ server.locals.mongoClient = new MongoClient(process.env.MongoURL, {
   useUnifiedTopology: true,
 });
 
-const blockedPaths = /(^\/(src|node_modules))|(\.js(on)?$)/;
 server.use(({method, path, host, hostname}, res, next) => {
   const isFilesPath = path.startsWith('/files');
   if (!hostname.endsWith('uncivserver.xyz') && method !== 'PATCH' && (isFilesPath || path === 'isalive')) {
@@ -39,10 +38,6 @@ server.use(({method, path, host, hostname}, res, next) => {
       .end(
         '401 Unauthorized !\nThis enpoint will be blocked from now on.\nPlease use uncivserver.xyz or its subdomains.\n'
       );
-    return;
-  }
-  if (!path.startsWith('/assets') && blockedPaths.test(path)) {
-    res.sendStatus(403);
     return;
   }
   if (isFilesPath) {
@@ -55,8 +50,7 @@ server.get('/isalive', async (req, res) => {
   res.set('Content-Type', 'text/plain').end('true');
 });
 
-server.use(express.static('.', { limit: '5mb', lastModified: false }));
-server.use(express.text({ limit: '3mb', type: () => true }));
+server.use(express.static('public', { limit: '5mb', lastModified: false }));
 
 server.get('/files/:fileName', async (req, res) => {
   const { db } = server.locals;
@@ -112,7 +106,7 @@ server.post('/addbrgame/:gameID', async (req, res) => {
 });
 
 const gamePreviewRegex = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}_Preview$/;
-
+server.use(express.text({ limit: '3mb', type: () => true }));
 server.put('/files/:fileName', async (req, res) => {
   if (!req.body) {
     console.dir(req);
