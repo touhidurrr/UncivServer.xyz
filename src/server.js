@@ -190,8 +190,7 @@ server.put('/files/:fileName', async (req, res) => {
           color: Math.floor(0x1000000 * Math.random()),
           author: {
             name: 'UncivServer.xyz Turn Notification',
-            icon_url:
-              'https://cdn.discordapp.com/avatars/866759632617996308/fda14396efe2014f5f50666e5bcc4730.png',
+            icon_url: 'https://i.imgur.com/nf2lNl0.png',
           },
           fields: [
             {
