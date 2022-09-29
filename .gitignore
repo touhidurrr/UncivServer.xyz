@@ -1,7 +1,9 @@
 .*
 test*
 files/
+assets/
 public/files/
+public/assets/
 !.github
 !.gitignore
 !.prettierignore
