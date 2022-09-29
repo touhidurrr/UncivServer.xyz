@@ -1,6 +1,7 @@
 .*
 test*
-files
+files/
+public/files/
 !.github
 !.gitignore
 !.prettierignore
