@@ -106,7 +106,7 @@ server.post('/addbrgame/:gameID', async (req, res) => {
 });
 
 const gamePreviewRegex = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}_Preview$/;
-server.use(express.text({ limit: '3mb', type: () => true }));
+server.use(express.text({ limit: '1mb', type: () => true }));
 server.put('/files/:fileName', async (req, res) => {
   if (!req.body) {
     console.dir(req);
