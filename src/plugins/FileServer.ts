@@ -35,7 +35,7 @@ export default fp(async function (server) {
   populateFromDirectory(filesDir, redis);
 
   // make directory 'files'
-  mkdir('files', err => err && server.errorLogger(err));
+  mkdir(`${filesDir}/files`, err => err && server.errorLogger(err));
 
   server.addHook('onRequest', async function (req, reply) {
     // set default contentType if none is available

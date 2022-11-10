@@ -46,7 +46,8 @@ server.delete('/files/:id', deleteFile);
 
 // start server
 const port: number = (process.env.PORT || 8080) as number;
-server.listen({ port }, function (err, address) {
+const host: string = process.env.HOST || '0.0.0.0';
+server.listen({ port, host }, function (err, address) {
   if (err) {
     server.log.error(err);
     process.exit(1);
