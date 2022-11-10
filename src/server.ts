@@ -57,12 +57,13 @@ server.listen({ port, host }, function (err, address) {
 
 // Periodical File Cleaner
 const interval = 15 * 60 * 1000; // 15 minutes
+const filesDir = `${server.filesDir}/files`;
 setInterval(async () => {
-  readdir('files', async (err, files) => {
+  readdir(filesDir, async (err, files) => {
     if (err) errorLogger(err);
     console.log('Cached Files:', files.length);
     files.forEach(async fileName => {
-      const path = `files/${fileName}`;
+      const path = `${filesDir}/${fileName}`;
       stat(path, async (err, { mtimeMs }) => {
         if (err) errorLogger(err);
         if (Date.now() - mtimeMs > interval) {
