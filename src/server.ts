@@ -44,7 +44,9 @@ server.put('/files/:id', putFile);
 server.patch('/files/:id', patchFile);
 server.delete('/files/:id', deleteFile);
 
-server.listen({ port: 3333 }, function (err, address) {
+// start server
+const port: number = (process.env.PORT || 8080) as number;
+server.listen({ port }, function (err, address) {
   if (err) {
     server.log.error(err);
     process.exit(1);
