@@ -25,7 +25,7 @@ const errorLogger = e => console.error(e.stack);
 
 // initialize fastify
 const server = Fastify({
-  logger: true,
+  logger: process.env.PRODUCTION !== 'true',
   // the default is 1 MB
   // bodyLimit: bytes.parse('1MB')!,
 });
