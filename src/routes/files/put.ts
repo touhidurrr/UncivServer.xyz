@@ -32,7 +32,7 @@ const putFile: RouteHandlerMethod = async (
   await server.redis.set(url, body as string).catch(errorLogger);
   await server.db.UncivServer.updateOne(
     { _id: gameFileName },
-    { $set: { timestamp: Date.now(), text: body } },
+    { $set: { timestamp: Date.now(), text: (body as Buffer).toString('utf8') } },
     { upsert: true }
   );
 
