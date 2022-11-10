@@ -39,7 +39,8 @@ export default fp(async function (server) {
 
   server.addHook('onRequest', async function (req, reply) {
     // set default contentType if none is available
-    if (!req.raw.headers['content-type']) {
+    // or the app sends some silly header in PUT requests
+    if (!req.raw.headers['content-type'] || req.method === 'PUT') {
       req.raw.headers['content-type'] = defaultType;
     }
 
