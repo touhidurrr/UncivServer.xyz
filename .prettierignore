@@ -1,4 +1,8 @@
-files
-assets
 *.md
 *.html
+/files/
+/assets/
+node_modules/
+/public/files/
+/public/assets/
+package-lock.json

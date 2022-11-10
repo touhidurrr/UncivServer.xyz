@@ -1,10 +1,14 @@
 # UncivServer.xyz
 
-An Open Source, Unciv Multiplayer server written in
-Javascript.
+An Open Source, Unciv Multiplayer server written in TypeScript.
 
-You can deploy it to Github Pages directly or from
-node by the command
+To run the server:
+    1. Install Redis on your system and start a Redis Server.
+    2. Intsall NodeJs.
+    3. Install dependencies and devDependcies.
+
+Then run the following commands...
 ```bash
-node server.js
+tsc
+node src/server.js
 ```

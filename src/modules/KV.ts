@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   async getValue(key) {
     try {
       return await fetch(

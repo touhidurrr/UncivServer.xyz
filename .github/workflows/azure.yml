@@ -27,5 +27,6 @@ jobs:
         with:
           app-name: uncivserver
           slot-name: Production
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_53127F4E211C4742B16BB8929AEC973C }}
+          publish-profile:
+            ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_53127F4E211C4742B16BB8929AEC973C }}
           package: .

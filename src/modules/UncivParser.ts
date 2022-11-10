@@ -1,8 +1,8 @@
 // a recursive json parser written by me for the game json output of unciv
 // doesn't support whitespaces
 
-const { gzipSync, gunzipSync } = require('zlib');
-const { readFileSync, existsSync } = require('fs');
+import { gzipSync, gunzipSync } from 'zlib';
+import { readFileSync, existsSync } from 'fs';
 
 function parseData(str) {
   if (typeof str == 'string') {
@@ -47,7 +47,7 @@ function parser() {
     }
 
     ++i;
-    let value = '';
+    let value: any = '';
     if (str.at(i) == '[' || str.at(i) == '{') value = parser();
     while (str.at(i) && str.at(i) != ',' && str.at(i) != '}') {
       value += str.at(i++);
@@ -65,13 +65,13 @@ function parser() {
 var i = 0;
 var str = '';
 
-module.exports = {
-  parseUncivJson(s) {
+export default {
+  parseUncivJson(s: string) {
     i = 0;
     str = s;
     return parser();
   },
-  parse(gameData) {
+  parse(gameData: string) {
     const jsonText = gunzipSync(Buffer.from(gameData, 'base64')).toString();
     return this.parseUncivJson(jsonText);
   },
@@ -79,7 +79,7 @@ module.exports = {
     const jsonText = JSON.stringify(json);
     return gzipSync(jsonText).toString('base64');
   },
-  parseFromFile(path) {
+  parseFromFile(path: string) {
     if (!existsSync(path)) return null;
     const gameData = readFileSync(path, 'utf8');
     return this.parse(gameData);

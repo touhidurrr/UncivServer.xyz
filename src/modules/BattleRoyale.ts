@@ -53,8 +53,8 @@ exports.handleBRGame = req => {
 
   // Remove Barbarians Camps in deleted tiles
   if (json.barbarians && json.barbarians.camps) {
-    Object.entries(json.barbarians.camps).forEach(entry => {
-      [key, { position }] = entry;
+    Object.entries(json.barbarians.camps).forEach((entry: [string, any]) => {
+      const [key, { position }] = entry;
       if (distanceToCenter(position) >= radius) {
         delete json.barbarians.camps[key];
       }
