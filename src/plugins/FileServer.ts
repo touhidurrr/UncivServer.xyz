@@ -64,7 +64,7 @@ export default fp(async function (server) {
       }
 
       // if cache is in the local files
-      if (existsSync(req.fileName)) {
+      if (!req.url.startsWith('/files/') && existsSync(req.fileName)) {
         try {
           const fileBody = readFileSync(req.fileName);
           await this.redis.set(req.url, fileBody, { EX: expireAfter });
