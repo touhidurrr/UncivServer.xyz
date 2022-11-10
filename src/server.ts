@@ -55,25 +55,27 @@ server.listen({ port, host }, function (err, address) {
   server.log.info(`Server running on; ${address}`);
 });
 
+// global error handler
+process.on('error', errorLogger);
+
 // Periodical File Cleaner
-const interval = 15 * 60 * 1000; // 15 minutes
-const filesDir = `${server.filesDir}/files`;
-setInterval(async () => {
-  readdir(filesDir, async (err, files) => {
-    if (err) errorLogger(err);
-    console.log('Cached Files:', files.length);
-    files.forEach(async fileName => {
-      const path = `${filesDir}/${fileName}`;
-      stat(path, async (err, { mtimeMs }) => {
-        if (err) errorLogger(err);
-        if (Date.now() - mtimeMs > interval) {
-          console.log('Removing cache for:', fileName);
-          rm(path, async err => err && errorLogger(err));
-        }
+server.ready(err => {
+  const interval = 15 * 60 * 1000; // 15 minutes
+  const filesDir = `${server.filesDir}/files`;
+  setInterval(async () => {
+    readdir(filesDir, async (err, files) => {
+      if (err) errorLogger(err);
+      console.log('Cached Files:', files.length);
+      files.forEach(async fileName => {
+        const path = `${filesDir}/${fileName}`;
+        stat(path, async (err, { mtimeMs }) => {
+          if (err) errorLogger(err);
+          if (Date.now() - mtimeMs > interval) {
+            console.log('Removing cache for:', fileName);
+            rm(path, async err => err && errorLogger(err));
+          }
+        });
       });
     });
-  });
-}, interval / 3);
-
-// error handler
-process.on('error', errorLogger);
+  }, interval / 3);
+});
