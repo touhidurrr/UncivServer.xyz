@@ -22,7 +22,7 @@ export default fp(async function (server) {
 
       for (let fileName of fileList) {
         try {
-          const fileBody = readFileSync(fileName, { encoding: 'utf8' });
+          const fileBody = readFileSync(fileName);
           const uriPath = fileName.slice(sliceLength);
           await cache.set(uriPath, fileBody, { EX: expireAfter });
         } catch (err) {
@@ -44,8 +44,14 @@ export default fp(async function (server) {
     }
 
     // set fileName & type
+    // append 'index.html' if url ends with '/'
     req.fileName = filesDir + req.url;
-    reply.type(mime.lookup(req.url) || defaultType);
+    if (req.url.at(-1) === '/') {
+      req.fileName += 'index.html';
+    }
+
+    // determine contentType from fileName
+    reply.type(mime.lookup(req.fileName) || defaultType);
 
     if (req.method === 'GET') {
       // lookup in redis cache
@@ -60,7 +66,7 @@ export default fp(async function (server) {
       // if cache is in the local files
       if (existsSync(req.fileName)) {
         try {
-          const fileBody = readFileSync(req.fileName, { encoding: 'utf8' });
+          const fileBody = readFileSync(req.fileName);
           await this.redis.set(req.url, fileBody, { EX: expireAfter });
           reply.send(fileBody);
           return reply;
