@@ -21,7 +21,7 @@ import patchFile from './routes/files/patch';
 import deleteFile from './routes/files/delete';
 
 // errorLogger
-const errorLogger = e => console.error(e.stack);
+const errorLogger = e => e && console.error(e?.stack);
 
 // initialize fastify
 const server = Fastify({

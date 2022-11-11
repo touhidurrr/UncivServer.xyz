@@ -15,7 +15,7 @@ declare module 'fastify' {
 // constants
 const filesDir = 'public';
 const expireAfter = 15 * 60; // expiration in seconds
-const errorLogger = e => console.error(e?.stack);
+const errorLogger = e => e && console.error(e?.stack);
 const defaultType = mime.contentType('text/plain') as string;
 const gameFileRegex = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}(_Preview)?$/;
 

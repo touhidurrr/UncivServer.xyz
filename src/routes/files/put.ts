@@ -4,7 +4,7 @@ import UncivParser from '../../modules/UncivParser';
 import { type FastifyRequest } from 'fastify/types/request';
 import { type RouteHandlerMethod } from 'fastify/types/route';
 
-const errorLogger = e => console.error(e?.stack);
+const errorLogger = e => e && console.error(e?.stack);
 const ServerList = process.env.Servers.split(/[\n\s]+/);
 
 const putFile: RouteHandlerMethod = async (
