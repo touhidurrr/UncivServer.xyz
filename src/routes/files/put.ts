@@ -29,7 +29,7 @@ const putFile: RouteHandlerMethod = async (
   }
 
   // update cache
-  await server.redis.set(url, body as string).catch(errorLogger);
+  await server.redis.set(url, body as string, { EX: server.expireAfter }).catch(errorLogger);
   // try updating other file locations asynchronously for better performance
   tryUpdatingGameDataSilently(req, gameFileName);
 

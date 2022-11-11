@@ -6,7 +6,7 @@ async function saveFile(req: FastifyRequest, data: string) {
   const { fileName, server, url } = req;
 
   writeFile(fileName, data, server.errorLogger);
-  await server.redis.set(url, data).catch(server.errorLogger);
+  await server.redis.set(url, data, { EX: server.expireAfter }).catch(server.errorLogger);
 }
 
 const patchFile: RouteHandlerMethod = async (
