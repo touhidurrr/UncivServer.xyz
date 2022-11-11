@@ -14,7 +14,7 @@ export default fp(async function (server) {
   // populate cache from 'public' directory once
   const { redis, filesDir, defaultType, expireAfter } = server;
 
-  function populateFromDirectory(dirName: string, cache) {
+  function populateFromDirectory(dirName: string, cache: typeof redis) {
     const sliceLength = dirName.length;
 
     glob(dirName + '/**', { nodir: true }, async (err, fileList) => {

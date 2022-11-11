@@ -49,10 +49,10 @@ const port: number = (process.env.PORT || 8080) as number;
 const host: string = process.env.HOST || '0.0.0.0';
 server.listen({ port, host }, function (err, address) {
   if (err) {
-    server.log.error(err);
+    server.errorLogger(err);
     process.exit(1);
   }
-  server.log.info(`Server running on; ${address}`);
+  console.log(`Server started on: ${address}`);
 });
 
 // global error handler
