@@ -18,7 +18,7 @@ export default fp(async function (server) {
     const sliceLength = dirName.length;
 
     glob(dirName + '/**', { nodir: true }, async (err, fileList) => {
-      if (err) this.errorLogger(err);
+      if (err) server.errorLogger(err);
 
       for (let fileName of fileList) {
         try {
@@ -26,7 +26,7 @@ export default fp(async function (server) {
           const uriPath = fileName.slice(sliceLength);
           await cache.set(uriPath, fileBody, { EX: expireAfter });
         } catch (err) {
-          this.errorLogger(err);
+          server.errorLogger(err);
         }
       }
     });
