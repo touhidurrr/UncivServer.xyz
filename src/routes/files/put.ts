@@ -24,17 +24,10 @@ const putFile: RouteHandlerMethod = async (
     return 'Empty request body at PUT!';
   }
 
-  writeFile(fileName, body as string, errorLogger);
-  server.UncivDropbox.upload(gameFileName, body).catch(errorLogger);
-  ServerList.forEach(api => {
-    fetch(`${api}/files/${gameFileName}`, { method: 'PATCH', body }).catch(errorLogger);
-  });
+  // update cache
   await server.redis.set(url, body as string).catch(errorLogger);
-  await server.db.UncivServer.updateOne(
-    { _id: gameFileName },
-    { $set: { timestamp: Date.now(), text: (body as Buffer).toString('utf8') } },
-    { upsert: true }
-  );
+  // try updating other file locations asynchronously for better performance
+  tryUpdatingGameDataSilently(req, gameFileName);
 
   // If fileName is game Preview type
   if (gameFileName.endsWith('_Preview')) {
@@ -45,6 +38,25 @@ const putFile: RouteHandlerMethod = async (
 };
 
 export default putFile;
+
+async function tryUpdatingGameDataSilently(req: FastifyRequest, gameFileName: string) {
+  const { fileName, body, server } = req;
+  writeFile(fileName, body as string, errorLogger);
+  server.UncivDropbox.upload(gameFileName, body).catch(errorLogger);
+  ServerList.forEach(api => {
+    fetch(`${api}/files/${gameFileName}`, { method: 'PATCH', body }).catch(errorLogger);
+  });
+  await server.db.UncivServer.updateOne(
+    { _id: gameFileName },
+    { $set: { timestamp: Date.now(), text: (body as Buffer).toString('utf8') } },
+    { upsert: true }
+  )
+    .then(() => console.log(`${gameFileName} updated on MongoDB successfully`))
+    .catch(err => {
+      console.log(`Err updating ${gameFileName} on MongoDB`);
+      server.errorLogger(err);
+    });
+}
 
 async function trySendNotification(req: FastifyRequest, gameFileName: string) {
   const { server, body } = req;

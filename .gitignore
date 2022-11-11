@@ -2,6 +2,7 @@
 *.js
 *.rdb
 test*
+/dist/
 /files/
 /assets/
 /public/files/
