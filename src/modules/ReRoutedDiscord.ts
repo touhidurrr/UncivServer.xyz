@@ -1,7 +1,13 @@
 const { ReRouteEndpoint } = process.env;
 const apiEndpoint = 'https://discord.com/api/v10';
 
-async function createMessage(channelId: string, message: object) {
+import {
+  type RESTPostAPIChannelMessageJSONBody,
+  type RESTPostAPIChannelMessageResult,
+  type RESTPostAPICurrentUserCreateDMChannelResult,
+} from 'discord-api-types/rest/v10';
+
+async function createMessage(channelId: string, message: RESTPostAPIChannelMessageJSONBody) {
   return fetch(ReRouteEndpoint, {
     method: 'POST',
     headers: {
@@ -16,12 +22,12 @@ async function createMessage(channelId: string, message: object) {
     console.log('ReRouted Discord:', {
       status: res.status,
       statusText: res.statusText,
-      body: await res.text(),
+      body: (await res.json()) as RESTPostAPIChannelMessageResult,
     });
   });
 }
 
-async function getDMChannel(discordId) {
+async function getDMChannel(discordId: string) {
   return fetch(ReRouteEndpoint, {
     method: 'POST',
     headers: {
@@ -34,7 +40,7 @@ async function getDMChannel(discordId) {
     body: JSON.stringify({ recipient_id: discordId }),
   })
     .then(res => res.json())
-    .then((ch: any) => ch.id);
+    .then((ch: RESTPostAPICurrentUserCreateDMChannelResult) => ch.id);
 }
 
 export default {

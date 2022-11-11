@@ -1,8 +1,12 @@
 import { writeFile } from 'fs';
-import Discord from '../../modules/Discord';
 import UncivParser from '../../modules/UncivParser';
 import { type FastifyRequest } from 'fastify/types/request';
 import { type RouteHandlerMethod } from 'fastify/types/route';
+
+// Discord
+import Discord from '../../modules/Discord';
+import ReRoutedDiscord from '../../modules/ReRoutedDiscord';
+const discord = process.env.RouteDiscord ? ReRoutedDiscord : Discord;
 
 const errorLogger = e => e && console.error(e?.stack);
 const ServerList = process.env.Servers.split(/[\n\s]+/);
@@ -80,7 +84,7 @@ async function trySendNotification(req: FastifyRequest, gameFileName: string) {
   if (queryResponse) {
     if (!queryResponse.dmChannel) {
       try {
-        const dmChannel = await Discord.getDMChannel(queryResponse._id.toString());
+        const dmChannel = await discord.getDMChannel(queryResponse._id.toString());
         await server.db.PlayerProfiles.updateOne(
           { _id: queryResponse._id },
           { $set: { dmChannel } }
@@ -111,40 +115,42 @@ async function trySendNotification(req: FastifyRequest, gameFileName: string) {
   ).value;
 
   if (!queryResponse.dmChannel || queryResponse.notifications !== 'enabled') return;
-  await Discord.createMessage(queryResponse.dmChannel, {
-    embeds: [
-      {
-        color: Math.floor(0x1000000 * Math.random()),
-        author: {
-          name: 'UncivServer.xyz Turn Notification',
-          icon_url: 'https://i.imgur.com/nf2lNl0.png',
+  await discord
+    .createMessage(queryResponse.dmChannel, {
+      embeds: [
+        {
+          color: Math.floor(0x1000000 * Math.random()),
+          author: {
+            name: 'UncivServer.xyz Turn Notification',
+            icon_url: 'https://i.imgur.com/nf2lNl0.png',
+          },
+          fields: [
+            {
+              name: !name ? 'game ID' : 'Name',
+              value: `\`\`\`${name || gameID}\`\`\``,
+              inline: false,
+            },
+            {
+              name: 'Your Civ',
+              value: `\`\`\`${currentPlayer}\`\`\``,
+              inline: true,
+            },
+            {
+              name: 'Current Turn',
+              value: `\`\`\`${turns || 0}\`\`\``,
+              inline: true,
+            },
+            {
+              name: 'Players',
+              value: `\`\`\`${civilizations
+                .filter(c => c.playerType === 'Human')
+                .map(c => c.civName)
+                .join(', ')}\`\`\``,
+              inline: false,
+            },
+          ],
         },
-        fields: [
-          {
-            name: !name ? 'game ID' : 'Name',
-            value: `\`\`\`${name || gameID}\`\`\``,
-            inline: false,
-          },
-          {
-            name: 'Your Civ',
-            value: `\`\`\`${currentPlayer}\`\`\``,
-            inline: true,
-          },
-          {
-            name: 'Current Turn',
-            value: `\`\`\`${turns || 0}\`\`\``,
-            inline: true,
-          },
-          {
-            name: 'Players',
-            value: `\`\`\`${civilizations
-              .filter(c => c.playerType === 'Human')
-              .map(c => c.civName)
-              .join(', ')}\`\`\``,
-            inline: false,
-          },
-        ],
-      },
-    ],
-  }).catch(errorLogger);
+      ],
+    })
+    .catch(errorLogger);
 }
