@@ -1,1 +1,1 @@
-web: node src/server.js
+web: (redis-server &) && node src/server.js
