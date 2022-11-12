@@ -1,6 +1,6 @@
 {
   "name": "uncivserver.xyz",
-  "version": "2.1.4",
+  "version": "2.1.5",
   "description": "An Open Source, Unciv Multiplayer Server written in Javascript",
   "main": "src/server.js",
   "scripts": {
@@ -36,15 +36,15 @@
     "bytes": "^3.1.2",
     "discord-api-types": "^0.37.17",
     "dotenv": "^16.0.3",
-    "dropbox": "^10.33.0",
+    "dropbox": "^10.34.0",
     "fastify": "^4.9.2",
     "fastify-plugin": "^4.3.0",
     "glob": "^8.0.3",
     "isomorphic-fetch": "^3.0.0",
     "mime-types": "^2.1.35",
     "mongodb": "^4.11.0",
-    "node-fetch": "^3.2.10",
-    "redis": "^4.4.0"
+    "node-fetch": "^3.3.0",
+    "redis": "^4.5.0"
   },
   "devDependencies": {
     "@types/glob": "^8.0.0",

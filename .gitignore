@@ -1,15 +1,31 @@
+# dotfiles and test files
 .*
-*.js
-*.rdb
 test*
+
+# typescript
+*.js
 /dist/
+
+#git
+!.gitignore
+
+# github
+!.github
+
+# prettier
+!.prettierignore
+!.prettierrc.yaml
+
+# nodejs
+node_modules/
+package-lock.json
+
+# redis
+*.rdb
+.rediscli_history
+
+# temp files
 /files/
 /assets/
 /public/files/
 /public/assets/
-!.github
-!.gitignore
-!.prettierignore
-!.prettierrc.yaml
-node_modules/
-package-lock.json
