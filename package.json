@@ -1,6 +1,6 @@
 {
   "name": "uncivserver.xyz",
-  "version": "2.1.3",
+  "version": "2.1.4",
   "description": "An Open Source, Unciv Multiplayer Server written in Javascript",
   "main": "src/server.js",
   "scripts": {
