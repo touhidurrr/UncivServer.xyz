@@ -1,7 +1,7 @@
 import glob = require('glob');
 import fp from 'fastify-plugin';
 import * as mime from 'mime-types';
-import { mkdir, readFile, stat, rm } from 'fs/promises';
+import { mkdir, readFile, stat } from 'fs/promises';
 
 // declare types
 declare module 'fastify' {
@@ -30,10 +30,6 @@ export default fp(async function (server) {
                   server.redis
                     .set(uriPath, fileBody, { PX: expireAfterMs })
                     .catch(server.errorLogger);
-                } else {
-                  const fileName = uriPath.slice(1);
-                  console.log('Removing cache for:', fileName);
-                  rm(fileSrc).catch(server.errorLogger);
                 }
               })
               .catch(server.errorLogger);
