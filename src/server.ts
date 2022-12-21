@@ -5,7 +5,7 @@ dotenv.config();
 // import dependencies
 import Fastify from 'fastify';
 import * as bytes from 'bytes';
-import { readdir, rm, stat } from 'fs';
+import { readdir, rm, stat } from 'fs/promises';
 
 // import plugins
 import Redis from './plugins/Redis';
@@ -60,22 +60,25 @@ process.on('error', errorLogger);
 
 // Periodical File Cleaner
 server.ready(err => {
-  const interval = 15 * 60 * 1000; // 15 minutes
-  const filesDir = `${server.filesDir}/files`;
+  if (err) errorLogger(err);
+  const interval = 1000 * server.expireAfter;
+  const filesDir = `${server.publicDir}/files`;
   setInterval(async () => {
-    readdir(filesDir, async (err, files) => {
-      if (err) errorLogger(err);
-      console.log('Cached Files:', files.length);
-      files.forEach(async fileName => {
-        const path = `${filesDir}/${fileName}`;
-        stat(path, async (err, { mtimeMs }) => {
-          if (err) errorLogger(err);
-          if (Date.now() - mtimeMs > interval) {
-            console.log('Removing cache for:', fileName);
-            rm(path, async err => err && errorLogger(err));
-          }
+    readdir(filesDir)
+      .then(files => {
+        console.log('Cached Files:', files.length);
+        files.forEach(fileName => {
+          const path = `${filesDir}/${fileName}`;
+          stat(path)
+            .then(({ mtimeMs }) => {
+              if (Date.now() - mtimeMs > interval) {
+                console.log('Removing cache for:', fileName);
+                rm(path).catch(errorLogger);
+              }
+            })
+            .catch(errorLogger);
         });
-      });
-    });
+      })
+      .catch(errorLogger);
   }, interval / 3);
 });

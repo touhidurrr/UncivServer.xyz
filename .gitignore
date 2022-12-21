@@ -29,3 +29,6 @@ package-lock.json
 /assets/
 /public/files/
 /public/assets/
+
+# yarn
+yarn.lock

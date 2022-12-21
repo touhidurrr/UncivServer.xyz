@@ -1,7 +1,7 @@
 import glob = require('glob');
 import fp from 'fastify-plugin';
 import * as mime from 'mime-types';
-import { existsSync, mkdir, readFileSync } from 'fs';
+import { mkdir, readFile, stat, rm } from 'fs/promises';
 
 // declare types
 declare module 'fastify' {
@@ -13,25 +13,38 @@ declare module 'fastify' {
 export default fp(async function (server) {
   // populate cache from 'public' directory once
   (function populateFromDirectory() {
-    const sliceLength = server.filesDir.length;
+    const sliceLength = server.publicDir.length;
 
-    glob(server.filesDir + '/**', { nodir: true }, async (err, fileList) => {
+    glob(server.publicDir + '/**', { nodir: true }, async (err, fileList) => {
       if (err) server.errorLogger(err);
 
-      for (let fileName of fileList) {
-        try {
-          const fileBody = readFileSync(fileName);
-          const uriPath = fileName.slice(sliceLength);
-          await server.redis.set(uriPath, fileBody, { EX: server.expireAfter });
-        } catch (err) {
-          server.errorLogger(err);
-        }
-      }
+      fileList.forEach(fileSrc => {
+        readFile(fileSrc)
+          .then(fileBody => {
+            stat(fileSrc)
+              .then(({ mtimeMs }) => {
+                const uriPath = fileSrc.slice(sliceLength);
+                // calculate expireAfter in milliseconds
+                const expireAfterMs = 1000 * server.expireAfter - (Date.now() - mtimeMs);
+                if (expireAfterMs > 0) {
+                  server.redis
+                    .set(uriPath, fileBody, { PX: expireAfterMs })
+                    .catch(server.errorLogger);
+                } else {
+                  const fileName = uriPath.slice(1);
+                  console.log('Removing cache for:', fileName);
+                  rm(fileSrc).catch(server.errorLogger);
+                }
+              })
+              .catch(server.errorLogger);
+          })
+          .catch(server.errorLogger);
+      });
     });
   })();
 
   // make directory 'files'
-  mkdir(`${server.filesDir}/files`, err => err && server.errorLogger(err));
+  mkdir(`${server.publicDir}/files`).catch(server.errorLogger);
 
   server.addHook('onRequest', async function (req, reply) {
     // set default contentType if none is available
@@ -42,7 +55,7 @@ export default fp(async function (server) {
 
     // set fileName & type
     // append 'index.html' if url ends with '/'
-    req.fileName = this.filesDir + req.url;
+    req.fileName = this.publicDir + req.url;
     if (req.url.at(-1) === '/') {
       req.fileName += 'index.html';
     }
@@ -60,10 +73,10 @@ export default fp(async function (server) {
         return reply;
       }
 
-      // if cache is in the local files
-      if (!req.url.startsWith('/files/') && existsSync(req.fileName)) {
+      // this serves files from publicDir
+      if (!req.url.startsWith('/files/')) {
         try {
-          const fileBody = readFileSync(req.fileName);
+          const fileBody = await readFile(req.fileName);
           await this.redis.set(req.url, fileBody, { EX: this.expireAfter });
           reply.send(fileBody);
           return reply;
