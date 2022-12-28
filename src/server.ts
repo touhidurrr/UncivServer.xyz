@@ -18,7 +18,7 @@ import UncivDropbox from './plugins/UncivDropbox';
 import getFile from './routes/files/get';
 import putFile from './routes/files/put';
 import patchFile from './routes/files/patch';
-import deleteFile from './routes/files/delete';
+// import deleteFile from './routes/files/delete';
 
 // errorLogger
 const errorLogger = e => e && console.error(e?.stack);
@@ -42,7 +42,7 @@ server.get('/files/:id', getFile);
 server.get('/isalive', async () => 'true');
 server.put('/files/:id', putFile);
 server.patch('/files/:id', patchFile);
-server.delete('/files/:id', deleteFile);
+// server.delete('/files/:id', deleteFile);
 
 // start server
 const port: number = (process.env.PORT || 8080) as number;
