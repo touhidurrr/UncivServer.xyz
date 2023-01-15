@@ -35,7 +35,6 @@ type FileRouteTypes = {
 
 const FileRouteOpts: RouteShorthandOptions = {
   schema: {
-    response: { type: 'string' },
     body: { type: 'string' },
   },
 };
@@ -48,7 +47,7 @@ server.register(Redis);
 server.register(FileServer);
 
 // register routes
-server.get('/files/:id', { schema: { response: { type: 'string' } } }, getFile);
+server.get('/files/:id', getFile);
 server.get('/isalive', async () => 'true');
 server.put<FileRouteTypes>('/files/:id', FileRouteOpts, putFile);
 server.patch<FileRouteTypes>('/files/:id', FileRouteOpts, patchFile);
