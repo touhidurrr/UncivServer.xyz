@@ -48,7 +48,7 @@ server.register(Redis);
 server.register(FileServer);
 
 // register routes
-server.get<FileRouteTypes>('/files/:id', FileRouteOpts, getFile);
+server.get('/files/:id', { schema: { response: { type: 'string' } } }, getFile);
 server.get('/isalive', async () => 'true');
 server.put<FileRouteTypes>('/files/:id', FileRouteOpts, putFile);
 server.patch<FileRouteTypes>('/files/:id', FileRouteOpts, patchFile);
