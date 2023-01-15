@@ -66,7 +66,7 @@ server.listen({ port, host }, function (err, address) {
 });
 
 // global error handler
-process.on('error', server.errorLogger);
+process.on('error', e => e && console.error(e?.stack));
 
 // Periodical File Cleaner
 server.ready(err => {
