@@ -1,5 +1,5 @@
+import type { FastifyReply } from 'fastify/types/reply';
 import type { FastifyRequest } from 'fastify/types/request';
-import type { RouteHandlerMethod } from 'fastify/types/route';
 import { writeFile } from 'fs';
 import UncivParser from '../../modules/UncivParser';
 
@@ -13,9 +13,8 @@ const ServerList = process.env.Servers!.split(/[\n\s]+/);
 
 type PutFileRequest = FastifyRequest<{ Params: { id: string }; Body: string }>;
 
-//@ts-ignore
-const putFile: RouteHandlerMethod = async (req: PutFileRequest, reply) => {
-  const { fileName, params, server, url, body } = req;
+const putFile = async (req: PutFileRequest, reply: FastifyReply) => {
+  const { params, server, url, body } = req;
   const gameFileName = params.id;
 
   if (!server.gameFileRegex.test(gameFileName)) {
@@ -29,7 +28,7 @@ const putFile: RouteHandlerMethod = async (req: PutFileRequest, reply) => {
   }
 
   // update cache
-  await server.redis.set(url, body as string, { EX: server.expireAfter }).catch(errorLogger);
+  await server.redis.set(url, body, { EX: server.expireAfter }).catch(errorLogger);
   // try updating other file locations asynchronously for better performance
   tryUpdatingGameDataSilently(req, gameFileName);
 
@@ -45,7 +44,7 @@ export default putFile;
 
 async function tryUpdatingGameDataSilently(req: PutFileRequest, gameFileName: string) {
   const { fileName, body, server } = req;
-  writeFile(fileName, body as string, errorLogger);
+  writeFile(fileName, body, errorLogger);
   server.UncivDropbox.upload(gameFileName, body).catch(errorLogger);
   ServerList.forEach(api => {
     fetch(`${api}/files/${gameFileName}`, { method: 'PATCH', body }).catch(errorLogger);
@@ -62,11 +61,11 @@ async function tryUpdatingGameDataSilently(req: PutFileRequest, gameFileName: st
     });
 }
 
-async function trySendNotification(req: FastifyRequest, gameFileName: string) {
+async function trySendNotification(req: PutFileRequest, gameFileName: string) {
   const { server, body } = req;
   const gameID = gameFileName.slice(0, -8);
 
-  const { civilizations, currentPlayer, turns, gameParameters } = UncivParser.parse(body as string);
+  const { civilizations, currentPlayer, turns, gameParameters } = UncivParser.parse(body);
 
   // Log & exit if invalid data
   console.dir({ turns, currentPlayer, civilizations, gameID }, { depth: null });
@@ -108,7 +107,7 @@ async function trySendNotification(req: FastifyRequest, gameFileName: string) {
     ),
   ];
 
-  const name = await server.db.UncivServer.findOneAndUpdate(
+  const name: string | undefined = await server.db.UncivServer.findOneAndUpdate(
     { _id: gameFileName },
     { $set: { currentPlayer, playerId, turns: turns || 0, players } },
     { projection: { _id: 0, name: 1 } }

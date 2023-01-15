@@ -1,12 +1,8 @@
+import type { FastifyReply } from 'fastify/types/reply';
 import type { FastifyRequest } from 'fastify/types/request';
-import type { RouteHandlerMethod } from 'fastify/types/route';
 import { rm } from 'fs';
 
-//@ts-ignore
-const deleteFile: RouteHandlerMethod = async (
-  req: FastifyRequest<{ Params: { id: string } }>,
-  reply
-) => {
+const deleteFile = async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
   const { fileName, params, server, url } = req;
   const gameFileName = params.id;
 

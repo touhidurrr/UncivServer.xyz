@@ -1,5 +1,5 @@
+import type { FastifyReply } from 'fastify/types/reply';
 import type { FastifyRequest } from 'fastify/types/request';
-import type { RouteHandlerMethod } from 'fastify/types/route';
 import { writeFile } from 'fs';
 
 async function saveFile(req: FastifyRequest, data: string) {
@@ -9,11 +9,7 @@ async function saveFile(req: FastifyRequest, data: string) {
   await server.redis.set(url, data, { EX: server.expireAfter }).catch(server.errorLogger);
 }
 
-//@ts-ignore
-const getFile: RouteHandlerMethod = async (
-  req: FastifyRequest<{ Params: { id: string } }>,
-  reply
-) => {
+const getFile = async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
   const { fileName, params, server } = req;
   const gameFileName = params.id;
 
