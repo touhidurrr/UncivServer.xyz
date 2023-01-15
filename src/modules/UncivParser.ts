@@ -1,8 +1,9 @@
 // a recursive json parser written by me for the game json output of unciv
 // doesn't support whitespaces
 
-import { gzipSync, gunzipSync } from 'zlib';
-import { readFileSync, existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
+import { gunzipSync, gzipSync } from 'zlib';
+import type { UncivJSON } from '../types/UncivJSON';
 
 function parseData(str: string) {
   if (typeof str == 'string') {
@@ -69,13 +70,13 @@ export default {
   parseUncivJson(s: string) {
     i = 0;
     str = s;
-    return parser();
+    return parser() as UncivJSON;
   },
   parse(gameData: string) {
     const jsonText = gunzipSync(Buffer.from(gameData, 'base64')).toString();
     return this.parseUncivJson(jsonText);
   },
-  stringify(json) {
+  stringify(json: any) {
     const jsonText = JSON.stringify(json);
     return gzipSync(jsonText).toString('base64');
   },

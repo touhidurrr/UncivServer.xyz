@@ -1,6 +1,8 @@
-const UncivParser = require('./UncivParser.js');
+import type { FastifyRequest } from 'fastify/types/request';
+import type { Position } from '../types/UncivJSON';
+import UncivParser from './UncivParser';
 
-function distanceToCenter(pos) {
+function distanceToCenter(pos: Position) {
   if (typeof pos !== 'object') return 0;
 
   pos.x = pos.x || 0;
@@ -9,7 +11,7 @@ function distanceToCenter(pos) {
   return Math.max(Math.abs(pos.x), Math.abs(pos.y), Math.abs(pos.x - pos.y));
 }
 
-exports.handleBRGame = req => {
+exports.handleBRGame = (req: FastifyRequest & { body: string }) => {
   let json = UncivParser.parse(req.body);
 
   let { radius } = json.tileMap.mapParameters.mapSize;
@@ -21,7 +23,7 @@ exports.handleBRGame = req => {
   let cut = 1 + 3 * radius * (radius - 1);
   json.tileMap.tileList = json.tileMap.tileList.slice(0, cut);
 
-  let unitCount = {};
+  let unitCount: { [civName: string]: number } = {};
 
   // Remove deleted tiles from exploredTiles of Civs
   json.civilizations = json.civilizations.map(civ => {
@@ -36,13 +38,13 @@ exports.handleBRGame = req => {
 
   // Remove deleted tiles from movementMemories
   json.tileMap.tileList = json.tileMap.tileList.map(t => {
-    if (t.militaryUnit && t.militaryUnit.movementMemories) {
+    if (t?.militaryUnit?.movementMemories) {
       ++unitCount[t.militaryUnit.owner];
       t.militaryUnit.movementMemories = t.militaryUnit.movementMemories.filter(
         m => distanceToCenter(m.position) < radius
       );
     }
-    if (t.civilianUnit && t.civilianUnit.movementMemories) {
+    if (t?.civilianUnit?.movementMemories) {
       ++unitCount[t.civilianUnit.owner];
       t.civilianUnit.movementMemories = t.civilianUnit.movementMemories.filter(
         m => distanceToCenter(m.position) < radius
@@ -52,13 +54,10 @@ exports.handleBRGame = req => {
   });
 
   // Remove Barbarians Camps in deleted tiles
-  if (json.barbarians && json.barbarians.camps) {
-    Object.entries(json.barbarians.camps).forEach((entry: [string, any]) => {
-      const [key, { position }] = entry;
-      if (distanceToCenter(position) >= radius) {
-        delete json.barbarians.camps[key];
-      }
-    });
+  if (json?.barbarians?.camps?.entries) {
+    json.barbarians.camps.entries = json.barbarians.camps.entries.filter(
+      ([pos]) => distanceToCenter(pos) < radius
+    );
   }
 
   // Decease radius by 1

@@ -1,21 +1,25 @@
-const { ReRouteEndpoint } = process.env;
-const apiEndpoint = 'https://discord.com/api/v10';
-
-import {
-  type RESTPostAPIChannelMessageJSONBody,
-  type RESTPostAPIChannelMessageResult,
-  type RESTPostAPICurrentUserCreateDMChannelResult,
+import type {
+  RESTPostAPIChannelMessageJSONBody,
+  RESTPostAPIChannelMessageResult,
+  RESTPostAPICurrentUserCreateDMChannelResult,
 } from 'discord-api-types/rest/v10';
 
-async function createMessage(channelId: string, message: RESTPostAPIChannelMessageJSONBody) {
-  return fetch(ReRouteEndpoint, {
+const apiEndpoint = 'https://discord.com/api/v10';
+const { ReRoute, ReRouteEndpoint, DISCORD_TOKEN } = process.env;
+
+if (!DISCORD_TOKEN) throw new Error('Missing DISCORD_TOKEN');
+if (!ReRouteEndpoint) throw new Error('Missing ReRouteEndpoint');
+if (!ReRoute) throw new Error('Missing ReRoute Token');
+
+function createMessage(channelId: string, message: RESTPostAPIChannelMessageJSONBody) {
+  return fetch(ReRouteEndpoint!, {
     method: 'POST',
     headers: {
       To: `${apiEndpoint}/channels/${channelId}/messages`,
-      'Api-Key': process.env.ReRoute,
+      'Api-Key': ReRoute!,
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
+      Authorization: `Bot ${DISCORD_TOKEN}`,
     },
     body: JSON.stringify(message),
   }).then(async res => {
@@ -27,20 +31,20 @@ async function createMessage(channelId: string, message: RESTPostAPIChannelMessa
   });
 }
 
-async function getDMChannel(discordId: string) {
-  return fetch(ReRouteEndpoint, {
+function getDMChannel(discordId: string) {
+  return fetch(ReRouteEndpoint!, {
     method: 'POST',
     headers: {
       To: `${apiEndpoint}/users/@me/channels`,
-      'Api-Key': process.env.ReRoute,
+      'Api-Key': ReRoute!,
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      Authorization: `Bot ${process.env.DISCORD_TOKEN}`,
+      Authorization: `Bot ${DISCORD_TOKEN}`,
     },
     body: JSON.stringify({ recipient_id: discordId }),
   })
-    .then(res => res.json())
-    .then((ch: RESTPostAPICurrentUserCreateDMChannelResult) => ch.id);
+    .then(res => res.json() as Promise<RESTPostAPICurrentUserCreateDMChannelResult>)
+    .then(ch => ch.id);
 }
 
 export default {

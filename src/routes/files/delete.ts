@@ -1,9 +1,10 @@
-import { type FastifyRequest } from 'fastify/types/request';
-import { type RouteHandlerMethod } from 'fastify/types/route';
+import type { FastifyRequest } from 'fastify/types/request';
+import type { RouteHandlerMethod } from 'fastify/types/route';
 import { rm } from 'fs';
 
+//@ts-ignore
 const deleteFile: RouteHandlerMethod = async (
-  req: FastifyRequest & { params: { id: string } },
+  req: FastifyRequest<{ Params: { id: string } }>,
   reply
 ) => {
   const { fileName, params, server, url } = req;

@@ -1,10 +1,12 @@
 import { REST } from '@discordjs/rest';
 import {
+  Routes,
   type RESTPostAPIChannelMessageJSONBody,
   type RESTPostAPIChannelMessageResult,
   type RESTPostAPICurrentUserCreateDMChannelResult,
-  Routes,
 } from 'discord-api-types/rest/v10';
+
+if (!process.env.DISCORD_TOKEN) throw new Error('Missing DISCORD_TOKEN');
 
 const discord = new REST({ version: '10' }).setToken(process.env.DISCORD_TOKEN);
 
@@ -18,9 +20,10 @@ async function createMessage(
 }
 
 async function getDMChannel(discordId: string) {
-  return discord
-    .post(Routes.userChannels(), { body: { recipient_id: discordId } })
-    .then((ch: RESTPostAPICurrentUserCreateDMChannelResult) => ch.id);
+  const res = (await discord.post(Routes.userChannels(), {
+    body: { recipient_id: discordId },
+  })) as RESTPostAPICurrentUserCreateDMChannelResult;
+  return res.id;
 }
 
 export default {

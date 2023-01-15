@@ -1,6 +1,6 @@
+import type { FastifyRequest } from 'fastify/types/request';
+import type { RouteHandlerMethod } from 'fastify/types/route';
 import { writeFile } from 'fs';
-import { type FastifyRequest } from 'fastify/types/request';
-import { type RouteHandlerMethod } from 'fastify/types/route';
 
 async function saveFile(req: FastifyRequest, data: string) {
   const { fileName, server, url } = req;
@@ -9,8 +9,9 @@ async function saveFile(req: FastifyRequest, data: string) {
   await server.redis.set(url, data, { EX: server.expireAfter }).catch(server.errorLogger);
 }
 
+//@ts-ignore
 const patchFile: RouteHandlerMethod = async (
-  req: FastifyRequest & { params: { id: string } },
+  req: FastifyRequest<{ Params: { id: string } }>,
   reply
 ) => {
   saveFile(req, req.body as string);

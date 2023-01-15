@@ -1,5 +1,5 @@
 import fp from 'fastify-plugin';
-import { type Collection, type Document, MongoClient } from 'mongodb';
+import { MongoClient, type Collection, type Document } from 'mongodb';
 
 // type definations
 declare module 'fastify' {

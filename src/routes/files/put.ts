@@ -1,20 +1,20 @@
+import type { FastifyRequest } from 'fastify/types/request';
+import type { RouteHandlerMethod } from 'fastify/types/route';
 import { writeFile } from 'fs';
 import UncivParser from '../../modules/UncivParser';
-import { type FastifyRequest } from 'fastify/types/request';
-import { type RouteHandlerMethod } from 'fastify/types/route';
 
 // Discord
 import Discord from '../../modules/Discord';
 import ReRoutedDiscord from '../../modules/ReRoutedDiscord';
 const discord = process.env.RouteDiscord ? ReRoutedDiscord : Discord;
 
-const errorLogger = e => e && console.error(e?.stack);
-const ServerList = process.env.Servers.split(/[\n\s]+/);
+const errorLogger = (e: any) => e && console.error(e?.stack);
+const ServerList = process.env.Servers!.split(/[\n\s]+/);
 
-const putFile: RouteHandlerMethod = async (
-  req: FastifyRequest & { params: { id: string } },
-  reply
-) => {
+type PutFileRequest = FastifyRequest<{ Params: { id: string }; Body: string }>;
+
+//@ts-ignore
+const putFile: RouteHandlerMethod = async (req: PutFileRequest, reply) => {
   const { fileName, params, server, url, body } = req;
   const gameFileName = params.id;
 
@@ -43,7 +43,7 @@ const putFile: RouteHandlerMethod = async (
 
 export default putFile;
 
-async function tryUpdatingGameDataSilently(req: FastifyRequest, gameFileName: string) {
+async function tryUpdatingGameDataSilently(req: PutFileRequest, gameFileName: string) {
   const { fileName, body, server } = req;
   writeFile(fileName, body as string, errorLogger);
   server.UncivDropbox.upload(gameFileName, body).catch(errorLogger);
@@ -52,7 +52,7 @@ async function tryUpdatingGameDataSilently(req: FastifyRequest, gameFileName: st
   });
   await server.db.UncivServer.updateOne(
     { _id: gameFileName },
-    { $set: { timestamp: Date.now(), text: (body as Buffer).toString('utf8') } },
+    { $set: { timestamp: Date.now(), text: body } },
     { upsert: true }
   )
     .then(() => console.log(`${gameFileName} updated on MongoDB successfully`))
@@ -73,8 +73,10 @@ async function trySendNotification(req: FastifyRequest, gameFileName: string) {
   if (!currentPlayer || !civilizations) return;
 
   // find currentPlayer's ID
-  const { playerId } = civilizations.find(c => c.civName === currentPlayer);
-  if (!playerId) return;
+  const currentCiv = civilizations.find(c => c.civName === currentPlayer);
+  if (!currentCiv?.playerId) return;
+  const { playerId } = currentCiv;
+
   // Check if the Player exists in DB
   const queryResponse = await server.db.PlayerProfiles.findOne(
     { uncivUserIds: playerId },
@@ -106,13 +108,11 @@ async function trySendNotification(req: FastifyRequest, gameFileName: string) {
     ),
   ];
 
-  const { name } = (
-    await server.db.UncivServer.findOneAndUpdate(
-      { _id: gameFileName },
-      { $set: { currentPlayer, playerId, turns: turns || 0, players } },
-      { projection: { _id: 0, name: 1 } }
-    )
-  ).value;
+  const name = await server.db.UncivServer.findOneAndUpdate(
+    { _id: gameFileName },
+    { $set: { currentPlayer, playerId, turns: turns || 0, players } },
+    { projection: { _id: 0, name: 1 } }
+  ).then(res => res.value);
 
   if (!queryResponse.dmChannel || queryResponse.notifications !== 'enabled') return;
   await discord
@@ -127,7 +127,7 @@ async function trySendNotification(req: FastifyRequest, gameFileName: string) {
           fields: [
             {
               name: !name ? 'game ID' : 'Name',
-              value: `\`\`\`${name || gameID}\`\`\``,
+              value: `\`\`\`${name ?? gameID}\`\`\``,
               inline: false,
             },
             {
@@ -137,7 +137,7 @@ async function trySendNotification(req: FastifyRequest, gameFileName: string) {
             },
             {
               name: 'Current Turn',
-              value: `\`\`\`${turns || 0}\`\`\``,
+              value: `\`\`\`${turns ?? 0}\`\`\``,
               inline: true,
             },
             {

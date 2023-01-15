@@ -1,7 +1,7 @@
-import glob = require('glob');
 import fp from 'fastify-plugin';
-import * as mime from 'mime-types';
 import { mkdir, readFile, stat } from 'fs/promises';
+import glob from 'glob';
+import * as mime from 'mime-types';
 
 // declare types
 declare module 'fastify' {
