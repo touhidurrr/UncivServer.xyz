@@ -112,7 +112,7 @@ async function trySendNotification(req: FastifyRequest, gameFileName: string) {
     { _id: gameFileName },
     { $set: { currentPlayer, playerId, turns: turns || 0, players } },
     { projection: { _id: 0, name: 1 } }
-  ).then(res => res.value);
+  ).then(res => res.value?.name);
 
   if (!queryResponse.dmChannel || queryResponse.notifications !== 'enabled') return;
   await discord
