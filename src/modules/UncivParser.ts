@@ -18,20 +18,6 @@ function parseData(str: string) {
   return str;
 }
 
-function stringHandler() {
-  const strChar = str.at(i);
-  if (strChar === '"' || strChar === "'") {
-    let string = '';
-    while (str.at(++i) != strChar) {
-      if (str.at(i) == '\\') i++;
-      string += str.at(i);
-    }
-    i++;
-    return string;
-  }
-  return '';
-}
-
 function parser(): {} | [] {
   if (str.at(i) == '[') {
     let array = [];
@@ -39,7 +25,7 @@ function parser(): {} | [] {
     while (str.at(++i) != ']') {
       if (str.at(i) == '[' || str.at(i) == '{') array.push(parser());
 
-      let value = stringHandler();
+      let value = '';
       while (str.at(i) != ',' && str.at(i) != ']') {
         value += str.at(i++);
       }
@@ -56,13 +42,13 @@ function parser(): {} | [] {
   let object: { [key: string | number]: any } = {};
 
   while (str.at(++i) != '}') {
-    let param = stringHandler();
+    let param = '';
     while (str.at(i) != ':') {
       param += str.at(i++);
     }
 
     ++i;
-    let value: any = stringHandler();
+    let value: any = '';
     if (str.at(i) == '[' || str.at(i) == '{') value = parser();
     while (str.at(i) && str.at(i) != ',' && str.at(i) != '}') {
       value += str.at(i++);
