@@ -1,7 +1,7 @@
 # UncivServer.xyz
 
 An Open Source, Unciv Multiplayer server written in TypeScript.
-The biggest server in the open source game **Unciv**.
+The biggest server for the open source game [**Unciv**](https://github.com/yairm210/Unciv).
 
 The server reached a record of serving more than **1M requests per day** on average during the preriod of December 6, 2022 to Januray 5, 2023 after nearly 9 months of it being opened for public.
 
