@@ -14,7 +14,9 @@ const deleteFile = async (req: FastifyRequest<{ Params: { id: string } }>, reply
   rm(fileName, { force: true }, server.errorLogger);
   server.UncivDropbox.delete(gameFileName).catch(server.errorLogger);
   await server.redis.del(url).catch(server.errorLogger);
-  await server.db.UncivServer.deleteOne({ _id: gameFileName }).catch(server.errorLogger);
+  await server.db.UncivServer.deleteOne({ _id: { equals: gameFileName } }).catch(
+    server.errorLogger
+  );
   return '200 OK!';
 };
 

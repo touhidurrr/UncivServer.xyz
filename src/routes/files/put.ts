@@ -50,7 +50,7 @@ async function tryUpdatingGameDataSilently(req: PutFileRequest, gameFileName: st
     fetch(`${api}/files/${gameFileName}`, { method: 'PATCH', body }).catch(errorLogger);
   });
   await server.db.UncivServer.updateOne(
-    { _id: gameFileName },
+    { _id: { equals: gameFileName } },
     { $set: { timestamp: Date.now(), text: body } },
     { upsert: true }
   )
@@ -108,7 +108,7 @@ async function trySendNotification(req: PutFileRequest, gameFileName: string) {
   ];
 
   const name: string | undefined = await server.db.UncivServer.findOneAndUpdate(
-    { _id: gameFileName },
+    { _id: { equals: gameFileName } },
     { $set: { currentPlayer, playerId, turns: turns || 0, players } },
     { projection: { _id: 0, name: 1 } }
   ).then(res => res.value?.name);
