@@ -20,7 +20,7 @@ const getFile = async (req: FastifyRequest<{ Params: { id: string } }>, reply: F
 
   // try getting the file from mongodb
   let fileData: any = await server.db.UncivServer.findOne(
-    { _id: { equals: gameFileName } },
+    { _id: gameFileName },
     { projection: { _id: 0, text: 1 } }
   ).catch(server.errorLogger);
 
