@@ -44,8 +44,7 @@
     "mime-types": "^2.1.35",
     "mongodb": "^5.0.1",
     "node-fetch": "^3.3.0",
-    "redis": "^4.6.4",
-    "yarn-upgrade-all": "^0.7.2"
+    "redis": "^4.6.4"
   },
   "devDependencies": {
     "@types/glob": "^8.0.1",
