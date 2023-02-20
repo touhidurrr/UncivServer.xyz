@@ -20,8 +20,7 @@ function validateBody(body: string) {
     return false;
   }
   try {
-    const gzipText = Buffer.from(body, 'base64').toString();
-    const jsonText = gunzipSync(gzipText).toString();
+    const jsonText = gunzipSync(Buffer.from(body, 'base64')).toString();
     // return jsonText.startsWith('{');
     console.log(jsonText.slice(0, 100));
     return true;
