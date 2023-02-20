@@ -2,5 +2,5 @@
 
 cd public
 mkdir assets
-curl https://c6.patreon.com/becomePatronButton.bundle.js -o assets/becomePatronButton.bundle.js
+curl https://c6.patreon.com/becomePatronButton.bundle.js -o assets/becomePatron.js
 curl https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js -o assets/buymeacoffeeButton.js
