@@ -40,7 +40,7 @@ const putFile = async (req: PutFileRequest, reply: FastifyReply) => {
   if (!validateBody(body)) {
     reply.status(400);
     tryLogSenderInfo(req);
-    return 'Empty request body at PUT!';
+    return 'Bad Request!';
   }
 
   // update cache
