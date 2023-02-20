@@ -21,12 +21,10 @@ function validateBody(body: string) {
   }
   try {
     const jsonText = gunzipSync(Buffer.from(body, 'base64')).toString();
-    // return jsonText.startsWith('{');
-    console.log(jsonText.slice(0, 100));
-    return true;
+    return jsonText.startsWith('{');
   } catch (e) {
     console.error(e);
-    return true;
+    return false;
   }
 }
 
