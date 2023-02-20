@@ -16,7 +16,7 @@ const ServerList = process.env.Servers!.split(/[\n\s]+/);
 type PutFileRequest = FastifyRequest<{ Params: { id: string }; Body: string }>;
 
 function validateBody(body: string) {
-  if (!body || !isBase64(body)) {
+  if (!body || body.length < 50 || !isBase64(body)) {
     return false;
   }
   try {
