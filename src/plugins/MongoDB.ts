@@ -6,6 +6,7 @@ declare module 'fastify' {
   interface FastifyInstance {
     mongoClient: MongoClient;
     db: {
+      ErrorLogs: Collection<ErrorLog>;
       UncivServer: Collection<UncivGame>;
       PlayerProfiles: Collection<PlayerProfile>;
     };
@@ -37,11 +38,18 @@ interface PlayerProfile {
   dmChannel?: string;
 }
 
+interface ErrorLog {
+  type: string;
+  timestamp: number;
+  data: any;
+}
+
 export default fp(async function MongoDB(server) {
   const mongoClient = new MongoClient(process.env.MongoURL!);
   await mongoClient.connect();
 
   const db = {
+    ErrorLogs: await mongoClient.db('unciv').collection<ErrorLog>('ErrorLogs'),
     UncivServer: await mongoClient.db('unciv').collection<UncivGame>('UncivServer'),
     PlayerProfiles: await mongoClient.db('unciv').collection<PlayerProfile>('PlayerProfiles'),
   };

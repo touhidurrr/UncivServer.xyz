@@ -1,6 +1,8 @@
 import type { FastifyReply } from 'fastify/types/reply';
 import type { FastifyRequest } from 'fastify/types/request';
 import { writeFile } from 'fs';
+import isBase64 from 'is-base64';
+import { gunzipSync } from 'zlib';
 import UncivParser from '../../modules/UncivParser';
 
 // Discord
@@ -13,6 +15,19 @@ const ServerList = process.env.Servers!.split(/[\n\s]+/);
 
 type PutFileRequest = FastifyRequest<{ Params: { id: string }; Body: string }>;
 
+function validateBody(body: string) {
+  if (!body || !isBase64(body)) {
+    return false;
+  }
+  try {
+    const text = Buffer.from(body, 'base64').toString();
+    const json = gunzipSync(Buffer.from(text, 'base64')).toString();
+    return json.startsWith('{');
+  } catch (e) {
+    return false;
+  }
+}
+
 const putFile = async (req: PutFileRequest, reply: FastifyReply) => {
   const { params, server, url, body } = req;
   const gameFileName = params.id;
@@ -22,8 +37,9 @@ const putFile = async (req: PutFileRequest, reply: FastifyReply) => {
     return 'Invalid game ID!';
   }
 
-  if (!body) {
+  if (!validateBody(body)) {
     reply.status(400);
+    tryLogSenderInfo(req);
     return 'Empty request body at PUT!';
   }
 
@@ -41,6 +57,22 @@ const putFile = async (req: PutFileRequest, reply: FastifyReply) => {
 };
 
 export default putFile;
+
+async function tryLogSenderInfo(req: PutFileRequest) {
+  const { server, ip, hostname, protocol, url, fileName, headers } = req;
+  await server.db.ErrorLogs.insertOne({
+    type: 'InvalidPutBody',
+    timestamp: Date.now(),
+    data: {
+      ip,
+      url,
+      protocol,
+      hostname,
+      fileName,
+      headers,
+    },
+  }).catch(errorLogger);
+}
 
 async function tryUpdatingGameDataSilently(req: PutFileRequest, gameFileName: string) {
   const { fileName, body, server } = req;
