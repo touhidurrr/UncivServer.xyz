@@ -1,6 +1,6 @@
 {
   "name": "uncivserver.xyz",
-  "version": "2.4.4",
+  "version": "2.4.5",
   "description": "An Open Source, Unciv Multiplayer Server written in Javascript",
   "main": "src/server.js",
   "scripts": {
@@ -29,7 +29,7 @@
   },
   "homepage": "https://github.com/touhidurrr/UncivServer.xyz#readme",
   "engines": {
-    "node": ">=18"
+    "node": "18.x"
   },
   "dependencies": {
     "@discordjs/rest": "^1.5.0",
