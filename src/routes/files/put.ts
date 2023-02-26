@@ -1,9 +1,9 @@
 import type { FastifyReply } from 'fastify/types/reply';
 import type { FastifyRequest } from 'fastify/types/request';
 import { writeFile } from 'fs';
-import isBase64 from 'is-base64';
-import { gunzipSync } from 'zlib';
 import UncivParser from '../../modules/UncivParser';
+import { validateBody } from '../../modules/Validation';
+const { PATCH_KEY } = process.env;
 
 // Discord
 import Discord from '../../modules/Discord';
@@ -14,19 +14,6 @@ const errorLogger = (e: any) => e && console.error(e?.stack);
 const ServerList = process.env.Servers!.split(/[\n\s]+/);
 
 type PutFileRequest = FastifyRequest<{ Params: { id: string }; Body: string }>;
-
-function validateBody(body: string) {
-  if (!body || body.length < 50 || !isBase64(body)) {
-    return false;
-  }
-  try {
-    const jsonText = gunzipSync(Buffer.from(body, 'base64')).toString();
-    return jsonText.startsWith('{');
-  } catch (e) {
-    console.error(e);
-    return false;
-  }
-}
 
 const putFile = async (req: PutFileRequest, reply: FastifyReply) => {
   const { params, server, url, body } = req;
@@ -74,13 +61,24 @@ async function tryLogSenderInfo(req: PutFileRequest) {
   }).catch(errorLogger);
 }
 
+function sendGameToOtherServers(gameFileName: string, body: string) {
+  ServerList.length &&
+    ServerList.forEach(api => {
+      fetch(`${api}/files/${gameFileName}`, {
+        method: 'PATCH',
+        body,
+        headers: {
+          'uncivserver-patch-key': PATCH_KEY!,
+        },
+      }).catch(errorLogger);
+    });
+}
+
 async function tryUpdatingGameDataSilently(req: PutFileRequest, gameFileName: string) {
   const { fileName, body, server } = req;
   writeFile(fileName, body, errorLogger);
   server.UncivDropbox.upload(gameFileName, body).catch(errorLogger);
-  ServerList.forEach(api => {
-    fetch(`${api}/files/${gameFileName}`, { method: 'PATCH', body }).catch(errorLogger);
-  });
+  sendGameToOtherServers(gameFileName, body);
   await server.db.UncivServer.updateOne(
     { _id: gameFileName },
     { $set: { timestamp: Date.now(), text: body } },

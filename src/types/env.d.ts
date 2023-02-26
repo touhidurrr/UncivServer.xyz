@@ -10,5 +10,6 @@ declare namespace NodeJS {
     ReRoute?: string;
     ReRouteEndpoint?: string;
     PRODUCTION?: string;
+    PATCH_KEY?: string;
   }
 }
