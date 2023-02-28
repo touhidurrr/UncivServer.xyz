@@ -1,6 +1,7 @@
 *.js
 *.md
 *.html
+test*
 /files/
 /assets/
 node_modules/

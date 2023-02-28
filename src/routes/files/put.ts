@@ -31,7 +31,7 @@ const putFile = async (req: PutFileRequest, reply: FastifyReply) => {
   }
 
   // update cache
-  await server.redis.set(url, body, { EX: server.expireAfter }).catch(errorLogger);
+  await server.cache.files.set(url, body);
   // try updating other file locations asynchronously for better performance
   tryUpdatingGameDataSilently(req, gameFileName);
 

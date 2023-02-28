@@ -27,8 +27,8 @@ export default fp(async function (server) {
                 // calculate expireAfter in milliseconds
                 const expireAfterMs = 1000 * server.expireAfter - (Date.now() - mtimeMs);
                 if (expireAfterMs > 0) {
-                  server.redis
-                    .set(uriPath, fileBody, { PX: expireAfterMs })
+                  server.cache.files
+                    .set(uriPath, fileBody, { ms: expireAfterMs })
                     .catch(server.errorLogger);
                 }
               })
@@ -43,6 +43,12 @@ export default fp(async function (server) {
   mkdir(`${server.publicDir}/files`).catch(server.errorLogger);
 
   server.addHook('onRequest', async function (req, reply) {
+    // return if request is for auth
+    if (req.url.startsWith('/auth')) {
+      req.raw.headers['content-type'] = this.defaultType;
+      return;
+    }
+
     // set default contentType if none is available
     // or the app sends some silly header in PUT requests
     if (!req.raw.headers['content-type'] || req.method === 'PUT') {
@@ -61,7 +67,7 @@ export default fp(async function (server) {
 
     if (req.method === 'GET') {
       // lookup in redis cache
-      const cachedBody = await this.redis.get(req.url).catch(this.errorLogger);
+      const cachedBody = await this.cache.files.get(req.url);
 
       // if cache is found then return it
       if (cachedBody) {
@@ -73,7 +79,7 @@ export default fp(async function (server) {
       if (!req.url.startsWith('/files/')) {
         try {
           const fileBody = await readFile(req.fileName);
-          await this.redis.set(req.url, fileBody, { EX: this.expireAfter });
+          await this.cache.files.set(req.url, fileBody);
           reply.send(fileBody);
           return reply;
         } catch (err) {

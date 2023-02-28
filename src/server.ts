@@ -7,7 +7,7 @@ import Fastify, { type RouteShorthandOptions } from 'fastify';
 import { readdir, rm, stat } from 'fs/promises';
 
 // import plugins
-import Constants from './plugins/Constants';
+import Constants, { isAliveText } from './plugins/Constants';
 import FileServer from './plugins/FileServer';
 import MongoDB from './plugins/MongoDB';
 import Redis from './plugins/Redis';
@@ -47,7 +47,7 @@ server.register(FileServer);
 
 // register routes
 server.get('/files/:id', getFile);
-server.get('/isalive', async () => 'true');
+server.get('/isalive', async () => isAliveText);
 server.put<FileRouteTypes>('/files/:id', FileRouteOpts, putFile);
 server.patch<FileRouteTypes>('/files/:id', FileRouteOpts, patchFile);
 // server.delete<FileRouteTypes>('/files/:id', FileRouteOpts, deleteFile);

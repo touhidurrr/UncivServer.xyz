@@ -12,7 +12,7 @@ async function saveFile(req: FastifyRequest, data: string) {
   const { fileName, server, url } = req;
 
   writeFile(fileName, data, server.errorLogger);
-  await server.redis.set(url, data, { EX: server.expireAfter }).catch(server.errorLogger);
+  await server.cache.files.set(url, data).catch(server.errorLogger);
 }
 
 type PatchFileRequest = FastifyRequest<{ Params: { id: string }; Body: string }>;
