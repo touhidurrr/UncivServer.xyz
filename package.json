@@ -39,7 +39,7 @@
     "dropbox": "^10.34.0",
     "fastify": "^4.13.0",
     "fastify-plugin": "^4.5.0",
-    "glob": "^8.1.0",
+    "glob": "^9.1.2",
     "is-base64": "^1.1.0",
     "isomorphic-fetch": "^3.0.0",
     "mime-types": "^2.1.35",
