@@ -7,6 +7,7 @@ import Fastify, { type RouteShorthandOptions } from 'fastify';
 import { readdir, rm, stat } from 'fs/promises';
 
 // import plugins
+import Auth from './plugins/Auth';
 import Constants, { isAliveText } from './plugins/Constants';
 import FileServer from './plugins/FileServer';
 import MongoDB from './plugins/MongoDB';
@@ -14,6 +15,8 @@ import Redis from './plugins/Redis';
 import UncivDropbox from './plugins/UncivDropbox';
 
 // import routes
+import getAuth from './routes/auth/get';
+import putAuth from './routes/auth/put';
 import getFile from './routes/files/get';
 import patchFile from './routes/files/patch';
 import putFile from './routes/files/put';
@@ -44,6 +47,7 @@ server.register(UncivDropbox);
 server.register(MongoDB);
 server.register(Redis);
 server.register(FileServer);
+server.register(Auth);
 
 // register routes
 server.get('/files/:id', getFile);
@@ -51,6 +55,8 @@ server.get('/isalive', async () => isAliveText);
 server.put<FileRouteTypes>('/files/:id', FileRouteOpts, putFile);
 server.patch<FileRouteTypes>('/files/:id', FileRouteOpts, patchFile);
 // server.delete<FileRouteTypes>('/files/:id', FileRouteOpts, deleteFile);
+server.get('/auth', getAuth);
+server.put('/auth', putAuth);
 
 // start server
 const port: number = (process.env.PORT ?? 8080) as number;

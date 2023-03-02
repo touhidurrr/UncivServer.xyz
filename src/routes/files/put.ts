@@ -19,11 +19,6 @@ const putFile = async (req: PutFileRequest, reply: FastifyReply) => {
   const { params, server, url, body } = req;
   const gameFileName = params.id;
 
-  if (!server.gameFileRegex.test(gameFileName)) {
-    reply.status(400);
-    return 'Invalid game ID!';
-  }
-
   if (!validateBody(body)) {
     reply.status(400);
     tryLogSenderInfo(req);
@@ -129,12 +124,7 @@ async function trySendNotification(req: PutFileRequest, gameFileName: string) {
 
   // Unique list of Players
   const players = [
-    ...new Set(
-      gameParameters.players
-        .concat(civilizations)
-        .map(c => c.playerId)
-        .filter(id => id)
-    ),
+    ...new Set(gameParameters.players.map(c => c.playerId).filter(id => id)),
   ] as string[];
 
   const name: string | undefined = await server.db.UncivServer.findOneAndUpdate(

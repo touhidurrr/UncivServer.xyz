@@ -12,8 +12,14 @@ const authCacheClient = createClient({
   database: 1,
 });
 
+const playerIdsCacheClient = createClient({
+  url: process.env.REDIS_URL,
+  database: 2,
+});
+
 filesCacheClient.on('error', err => console.log('Redis Client Error', err));
 authCacheClient.on('error', err => console.log('Redis Client Error', err));
+playerIdsCacheClient.on('error', err => console.log('Redis Client Error', err));
 
 // type definations
 declare module 'fastify' {
@@ -22,48 +28,38 @@ declare module 'fastify' {
   }
 }
 
-function getCachedFile(url: string) {
-  return filesCacheClient.get(url);
-}
-
-function setCachedFile(
-  url: string,
-  data: string | Buffer,
-  { sec, ms }: { sec?: number; ms?: number } = {}
-) {
-  return filesCacheClient.set(url, data, ms ? { PX: ms } : { EX: sec ?? expireAfter });
-}
-
-function deleteCachedFile(url: string) {
-  return filesCacheClient.del(url);
-}
-
-function getAuth(userId: string) {
-  return authCacheClient.get(userId);
-}
-
-function setAuth(userId: string, hash: string) {
-  return authCacheClient.set(userId, hash);
-}
-
 const cache = {
   files: {
-    get: getCachedFile,
-    set: setCachedFile,
-    del: deleteCachedFile,
+    get: (url: string) => filesCacheClient.get(url),
+    del: (url: string) => filesCacheClient.del(url),
+    set: (url: string, data: string | Buffer, { sec, ms }: { sec?: number; ms?: number } = {}) =>
+      filesCacheClient.set(url, data, ms ? { PX: ms } : { EX: sec ?? expireAfter }),
     client: filesCacheClient,
   },
   auth: {
-    get: getAuth,
-    set: setAuth,
+    get: (userId: string) => authCacheClient.get(userId),
+    set: (userId: string, hash: string) => authCacheClient.set(userId, hash),
     client: authCacheClient,
+  },
+  playerId: {
+    get: (gameId: string) => playerIdsCacheClient.get(gameId),
+    del: (gameId: string) => playerIdsCacheClient.del(gameId),
+    set: (gameId: string, playerId: string) => playerIdsCacheClient.set(gameId, playerId),
+    client: playerIdsCacheClient,
   },
 };
 
-export default fp(async function (server) {
-  // connect redis clients
-  await Promise.all([filesCacheClient.connect(), await authCacheClient.connect()]);
+export default fp(
+  async function (server) {
+    // connect redis clients
+    await Promise.all([
+      filesCacheClient.connect(),
+      authCacheClient.connect(),
+      playerIdsCacheClient.connect(),
+    ]);
 
-  server.decorate('cache', cache);
-  console.log('Loaded Redis Plugin!');
-});
+    server.decorate('cache', cache);
+    console.log('Loaded Redis Plugin!');
+  },
+  { name: 'Redis' }
+);
