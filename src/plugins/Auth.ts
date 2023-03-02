@@ -93,7 +93,6 @@ export default fp(
 
       // return if not /auth or /files or not a GET or PUT request
       if (!(isAuthRoute || isFilesRoute) || !['GET', 'PUT'].includes(req.method)) return;
-      console.log('Auth', req.url);
 
       // if /files, parse game and get playerId
       if (isFilesRoute) {
@@ -121,14 +120,11 @@ export default fp(
       }
 
       const [type, auth] = req.headers.authorization!.split(' ');
-      console.log({ type, auth });
       if (type === 'Basic') {
         const userPass = Buffer.from(auth, 'base64').toString('utf8');
         const colonIdx = userPass.indexOf(':');
         const userId = userPass.slice(0, colonIdx);
         const password = userPass.slice(colonIdx + 1);
-
-        console.log({ userId, password, playerId: req.playerId });
 
         // no userId or userId != playerId, validation fails
         if (
@@ -145,8 +141,6 @@ export default fp(
         // if no hash is found, validation ok
         const hash = await getHashWithCache(userId);
         if (!hash) return;
-
-        console.log({ hash, userId, password });
 
         if (await argon2.verify(hash, password)) return;
         else return reply.code(401).send('401 Unauthorized!');

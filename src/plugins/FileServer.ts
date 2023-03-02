@@ -58,8 +58,6 @@ export default fp(
         return;
       }
 
-      console.log('FileServer', req.url);
-
       // set default contentType if none is available
       // or the app sends some silly header in PUT requests
       if (!req.raw.headers['content-type'] || req.method === 'PUT') {
