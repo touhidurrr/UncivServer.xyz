@@ -1,16 +1,14 @@
 import type { FastifyReply } from 'fastify/types/reply';
 import type { FastifyRequest } from 'fastify/types/request';
 import { writeFile } from 'fs';
+import Discord from '../../modules/Discord';
+import ReRoutedDiscord from '../../modules/ReRoutedDiscord';
 import { validateBody } from '../../modules/Validation';
+import { getPlayers } from '../../plugins/Auth';
 import { errorLogger } from '../../plugins/Constants';
 import type { FileRouteType } from '../../server';
 
 const { PATCH_KEY } = process.env;
-
-// Discord
-import Discord from '../../modules/Discord';
-import ReRoutedDiscord from '../../modules/ReRoutedDiscord';
-import { getPlayers } from '../../plugins/Auth';
 const discord = process.env.RouteDiscord ? ReRoutedDiscord : Discord;
 
 type PutFileRequest = FastifyRequest<FileRouteType>;
