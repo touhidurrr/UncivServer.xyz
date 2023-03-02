@@ -94,8 +94,5 @@ export default fp(
 
     console.log('Loaded FileServer Plugin!');
   },
-  {
-    name: 'FileServer',
-    dependencies: ['Constants', 'Redis'],
-  }
+  { name: 'FileServer', dependencies: ['Constants', 'Redis'] }
 );
