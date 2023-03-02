@@ -1,19 +1,19 @@
 import type { FastifyReply } from 'fastify/types/reply';
 import type { FastifyRequest } from 'fastify/types/request';
 import { writeFile } from 'fs';
-import UncivParser from '../../modules/UncivParser';
 import { validateBody } from '../../modules/Validation';
+import { errorLogger } from '../../plugins/Constants';
+import type { FileRouteType } from '../../server';
+
 const { PATCH_KEY } = process.env;
 
 // Discord
 import Discord from '../../modules/Discord';
 import ReRoutedDiscord from '../../modules/ReRoutedDiscord';
+import { getPlayers } from '../../plugins/Auth';
 const discord = process.env.RouteDiscord ? ReRoutedDiscord : Discord;
 
-const errorLogger = (e: any) => e && console.error(e?.stack);
-const ServerList = process.env.Servers!.split(/[\n\s]+/);
-
-type PutFileRequest = FastifyRequest<{ Params: { id: string }; Body: string }>;
+type PutFileRequest = FastifyRequest<FileRouteType>;
 
 const putFile = async (req: PutFileRequest, reply: FastifyReply) => {
   const { params, server, url, body } = req;
@@ -56,6 +56,7 @@ async function tryLogSenderInfo(req: PutFileRequest) {
   }).catch(errorLogger);
 }
 
+const ServerList = process.env.Servers!.split(/[\n\s]+/);
 function sendGameToOtherServers(gameFileName: string, body: string) {
   ServerList.length &&
     ServerList.forEach(api => {
@@ -87,19 +88,13 @@ async function tryUpdatingGameDataSilently(req: PutFileRequest, gameFileName: st
 }
 
 async function trySendNotification(req: PutFileRequest, gameFileName: string) {
-  const { server, game } = req;
+  const { server, game, playerId } = req;
   const gameID = gameFileName.slice(0, -8);
 
   const { civilizations, currentPlayer, turns, gameParameters } = game!;
 
   // Log & exit if invalid data
   console.dir({ turns, currentPlayer, civilizations, gameID }, { depth: null });
-  if (!currentPlayer || !civilizations) return;
-
-  // find currentPlayer's ID
-  const currentCiv = civilizations.find(c => c.civName === currentPlayer);
-  if (!currentCiv?.playerId) return;
-  const { playerId } = currentCiv;
 
   // Check if the Player exists in DB
   const queryResponse = await server.db.PlayerProfiles.findOne(
@@ -123,9 +118,7 @@ async function trySendNotification(req: PutFileRequest, gameFileName: string) {
   } else return;
 
   // Unique list of Players
-  const players = [
-    ...new Set(gameParameters.players.map(c => c.playerId).filter(id => id)),
-  ] as string[];
+  const players = getPlayers(game!);
 
   const name: string | undefined = await server.db.UncivServer.findOneAndUpdate(
     { _id: gameFileName },

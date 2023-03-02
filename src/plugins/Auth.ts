@@ -22,6 +22,18 @@ async function saveFile({ fileName, url, server }: FastifyRequest, data: string)
   await server.cache.files.set(url, data);
 }
 
+export function getPlayers(game: UncivJSON) {
+  const { gameParameters, civilizations } = game;
+  return [
+    ...new Set(
+      [
+        ...gameParameters.players.map(c => c.playerId),
+        ...civilizations.map(c => c.playerId),
+      ].filter(id => id)
+    ),
+  ] as string[];
+}
+
 async function setGameAndplayerIdWithCache(req: FilesRequest) {
   const {
     server,
@@ -61,20 +73,18 @@ async function setGameAndplayerIdWithCache(req: FilesRequest) {
   // if no cached file, MongoDB file, or UncivDropbox file, return
   if (!file) return;
 
-  let playerId: string | null = null;
-  // if file is cached, look for if playerId in cache
-  if (isCached) playerId = await server.cache.playerId.get(gameFileName);
-  // if file not in cache, update playerId cache. recalculate if playerId if not cached
-  if (!isCached || !playerId) {
-    const game = UncivParser.parse(file as string);
-    req.game = game;
-
-    const { currentPlayer, civilizations } = game;
-    playerId = civilizations.find(civ => civ.civName === currentPlayer)!.playerId!;
-    await server.cache.playerId.set(gameFileName, playerId);
+  const preview = file;
+  if (!req.url.endsWith('_Preview')) {
+    const url = req.url + '_Preview';
+    const preview = await server.cache.files.get(url);
+    if (!preview) throw new Error(`No preview found for game: ${url.slice(8)}`);
   }
 
-  Object.assign(req, { file, playerId });
+  const game = UncivParser.parse(preview);
+  const { currentPlayer, civilizations } = game;
+  const playerId = civilizations.find(civ => civ.civName === currentPlayer)!.playerId!;
+
+  Object.assign(req, { file, game, playerId });
 }
 
 export default fp(
@@ -118,13 +128,13 @@ export default fp(
         if (isAuthRoute) return reply.code(401).send('401 Unauthorized!');
         else {
           const hash = await getHashWithCache(req.playerId!);
-          console.log(hash);
           // if no auth header but hash is found, validation fails
           if (hash) return reply.code(401).send('401 Unauthorized!');
         }
+        return;
       }
 
-      const [type, auth] = req.headers.authorization!.split(' ');
+      const [type, auth] = req.headers.authorization.split(' ');
       if (type === 'Basic') {
         const userPass = Buffer.from(auth, 'base64').toString('utf8');
         const colonIdx = userPass.indexOf(':');
@@ -135,9 +145,8 @@ export default fp(
         if (
           !userId ||
           (isFilesRoute &&
-            ((req.method === 'GET' && userId !== req.playerId) ||
-              (req.method === 'PUT' &&
-                req.game!.gameParameters.players.some(p => p.playerId === userId))))
+            ((req.method === 'PUT' && userId !== req.playerId) ||
+              (req.method === 'GET' && !getPlayers(req.game!).some(id => id === userId))))
         ) {
           return reply.code(401).send('401 Unauthorized!');
         }
@@ -147,11 +156,13 @@ export default fp(
         const hash = await getHashWithCache(userId);
         if (!hash) return;
 
+        console.log('==>', 2);
         if (await argon2.verify(hash, password)) return;
         else return reply.code(401).send('401 Unauthorized!');
       }
 
       // cannot recognize auth type
+      console.log('==>', 3);
       return reply.code(400).send('400 Bad Request!');
     });
 

@@ -54,7 +54,7 @@ export default fp(
     server.addHook('onRequest', async function (req, reply) {
       // return if request is for auth
       if (req.url.startsWith('/auth')) {
-        req.raw.headers['content-type'] = this.defaultType;
+        req.raw.headers['content-type'] ??= this.defaultType;
         return;
       }
 

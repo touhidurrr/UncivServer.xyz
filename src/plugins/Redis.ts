@@ -12,14 +12,8 @@ const authCacheClient = createClient({
   database: 1,
 });
 
-const playerIdsCacheClient = createClient({
-  url: process.env.REDIS_URL,
-  database: 2,
-});
-
 filesCacheClient.on('error', err => console.log('Redis Client Error', err));
 authCacheClient.on('error', err => console.log('Redis Client Error', err));
-playerIdsCacheClient.on('error', err => console.log('Redis Client Error', err));
 
 // type definations
 declare module 'fastify' {
@@ -41,22 +35,12 @@ const cache = {
     set: (userId: string, hash: string) => authCacheClient.set(userId, hash),
     client: authCacheClient,
   },
-  playerId: {
-    get: (gameId: string) => playerIdsCacheClient.get(gameId),
-    del: (gameId: string) => playerIdsCacheClient.del(gameId),
-    set: (gameId: string, playerId: string) => playerIdsCacheClient.set(gameId, playerId),
-    client: playerIdsCacheClient,
-  },
 };
 
 export default fp(
   async function (server) {
     // connect redis clients
-    await Promise.all([
-      filesCacheClient.connect(),
-      authCacheClient.connect(),
-      playerIdsCacheClient.connect(),
-    ]);
+    await Promise.all([filesCacheClient.connect(), authCacheClient.connect()]);
 
     server.decorate('cache', cache);
     console.log('Loaded Redis Plugin!');

@@ -1,6 +1,4 @@
-import type { FastifyRequest } from 'fastify/types/request';
-
-const getAuth = async (req: FastifyRequest) => {
+const getAuth = async () => {
   return '200 OK!';
 };
 
