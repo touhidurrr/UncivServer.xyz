@@ -87,10 +87,10 @@ async function tryUpdatingGameDataSilently(req: PutFileRequest, gameFileName: st
 }
 
 async function trySendNotification(req: PutFileRequest, gameFileName: string) {
-  const { server, body } = req;
+  const { server, game } = req;
   const gameID = gameFileName.slice(0, -8);
 
-  const { civilizations, currentPlayer, turns, gameParameters } = UncivParser.parse(body);
+  const { civilizations, currentPlayer, turns, gameParameters } = game!;
 
   // Log & exit if invalid data
   console.dir({ turns, currentPlayer, civilizations, gameID }, { depth: null });
