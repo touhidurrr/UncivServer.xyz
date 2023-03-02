@@ -61,10 +61,14 @@ async function setGameAndplayerIdWithCache(req: FilesRequest) {
   // if no cached file, MongoDB file, or UncivDropbox file, return
   if (!file) return;
 
-  let playerId: string | null;
+  let playerId: string | null = null;
+  // if file is cached, look for if playerId in cache
   if (isCached) playerId = await server.cache.playerId.get(gameFileName);
-  else {
+  // if file not in cache, update playerId cache. recalculate if playerId if not cached
+  if (!isCached || !playerId) {
     const game = UncivParser.parse(file as string);
+    req.game = game;
+
     const { currentPlayer, civilizations } = game;
     playerId = civilizations.find(civ => civ.civName === currentPlayer)!.playerId!;
     await server.cache.playerId.set(gameFileName, playerId);
