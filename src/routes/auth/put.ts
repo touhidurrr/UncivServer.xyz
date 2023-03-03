@@ -21,6 +21,13 @@ function sendHashToOtherServers(userId: string, hash: string) {
 }
 
 const putAuth = async (req: FastifyRequest<{ Body: string }>) => {
+  const userAgent = req.headers['user-agent'];
+  const buildNumber = +userAgent.match(/(?<=\(build )\d+/i);
+  if (buildNumber < 825) {
+    return reply.code(426).send('426 Upgrade Required!'
+           + '\nYou need Unciv 4.5.2 or above to set passwords.');
+  }
+
   const { userId, body, server } = req;
   const newPassword = Buffer.from(body, 'base64').toString('utf8');
   const hash = await argon2.hash(newPassword);
