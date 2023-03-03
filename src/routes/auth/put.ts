@@ -1,4 +1,5 @@
 import * as argon2 from 'argon2';
+import type { FastifyReply } from 'fastify/types/reply';
 import type { FastifyRequest } from 'fastify/types/request';
 import { errorLogger } from '../../plugins/Constants';
 const { Servers, PATCH_KEY } = process.env;
