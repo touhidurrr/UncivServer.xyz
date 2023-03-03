@@ -6,6 +6,7 @@ declare module 'fastify' {
   interface FastifyInstance {
     mongoClient: MongoClient;
     db: {
+      Auth: Collection<Auth>;
       ErrorLogs: Collection<ErrorLog>;
       UncivServer: Collection<UncivGame>;
       PlayerProfiles: Collection<PlayerProfile>;
@@ -38,24 +39,35 @@ interface PlayerProfile {
   dmChannel?: string;
 }
 
+interface Auth {
+  _id: string;
+  type: 'discord' | 'client';
+  hash: string;
+  timestamp: number;
+}
+
 interface ErrorLog {
   type: string;
   timestamp: number;
   data: any;
 }
 
-export default fp(async function MongoDB(server) {
-  const mongoClient = new MongoClient(process.env.MongoURL!);
-  await mongoClient.connect();
+export default fp(
+  async function MongoDB(server) {
+    const mongoClient = new MongoClient(process.env.MongoURL!);
+    await mongoClient.connect();
 
-  const db = {
-    ErrorLogs: await mongoClient.db('unciv').collection<ErrorLog>('ErrorLogs'),
-    UncivServer: await mongoClient.db('unciv').collection<UncivGame>('UncivServer'),
-    PlayerProfiles: await mongoClient.db('unciv').collection<PlayerProfile>('PlayerProfiles'),
-  };
+    const db = {
+      Auth: await mongoClient.db('unciv').collection<Auth>('Auth'),
+      ErrorLogs: await mongoClient.db('unciv').collection<ErrorLog>('ErrorLogs'),
+      UncivServer: await mongoClient.db('unciv').collection<UncivGame>('UncivServer'),
+      PlayerProfiles: await mongoClient.db('unciv').collection<PlayerProfile>('PlayerProfiles'),
+    };
 
-  server.decorate('mongoClient', mongoClient);
-  server.decorate('db', db);
+    server.decorate('mongoClient', mongoClient);
+    server.decorate('db', db);
 
-  console.log('Loaded MongoDB Plugin!');
-});
+    console.log('Loaded MongoDB Plugin!');
+  },
+  { name: 'MongoDB' }
+);

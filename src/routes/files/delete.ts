@@ -1,6 +1,6 @@
 import type { FastifyReply } from 'fastify/types/reply';
 import type { FastifyRequest } from 'fastify/types/request';
-import { rm } from 'fs';
+import { rm } from 'fs/promises';
 
 const deleteFile = async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
   const { fileName, params, server, url } = req;
@@ -11,10 +11,12 @@ const deleteFile = async (req: FastifyRequest<{ Params: { id: string } }>, reply
     return 'Invalid game ID!';
   }
 
-  rm(fileName, { force: true }, server.errorLogger);
+  rm(fileName, { force: true }).catch(server.errorLogger);
   server.UncivDropbox.delete(gameFileName).catch(server.errorLogger);
-  await server.redis.del(url).catch(server.errorLogger);
-  await server.db.UncivServer.deleteOne({ _id: gameFileName }).catch(server.errorLogger);
+  await Promise.all([
+    server.cache.files.del(url),
+    server.db.UncivServer.deleteOne({ _id: gameFileName }),
+  ]).catch(server.errorLogger);
   return '200 OK!';
 };
 

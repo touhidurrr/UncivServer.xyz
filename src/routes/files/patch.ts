@@ -1,7 +1,7 @@
 import type { FastifyReply } from 'fastify/types/reply';
 import type { FastifyRequest } from 'fastify/types/request';
-import { writeFile } from 'fs';
-import { validateBody } from '../../modules/Validation';
+import { writeFile } from 'fs/promises';
+import { tryLogSenderInfo, validateBody } from '../../modules/Validation';
 const { PATCH_KEY } = process.env;
 
 if (!PATCH_KEY) {
@@ -11,8 +11,8 @@ if (!PATCH_KEY) {
 async function saveFile(req: FastifyRequest, data: string) {
   const { fileName, server, url } = req;
 
-  writeFile(fileName, data, server.errorLogger);
-  await server.redis.set(url, data, { EX: server.expireAfter }).catch(server.errorLogger);
+  writeFile(fileName, data).catch(server.errorLogger);
+  await server.cache.files.set(url, data).catch(server.errorLogger);
 }
 
 type PatchFileRequest = FastifyRequest<{ Params: { id: string }; Body: string }>;
@@ -35,24 +35,5 @@ const patchFile = async (req: PatchFileRequest, reply: FastifyReply) => {
   saveFile(req, body);
   return '200 OK!';
 };
-
-async function tryLogSenderInfo(
-  req: PatchFileRequest,
-  type: 'InvalidPatchBody' | 'InvalidPatchKey'
-) {
-  const { server, ip, hostname, protocol, url, fileName, headers } = req;
-  await server.db.ErrorLogs.insertOne({
-    type,
-    timestamp: Date.now(),
-    data: {
-      ip,
-      url,
-      protocol,
-      hostname,
-      fileName,
-      headers,
-    },
-  }).catch(server.errorLogger);
-}
 
 export default patchFile;

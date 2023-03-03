@@ -7,13 +7,17 @@ import Fastify, { type RouteShorthandOptions } from 'fastify';
 import { readdir, rm, stat } from 'fs/promises';
 
 // import plugins
-import Constants from './plugins/Constants';
+import Auth from './plugins/Auth';
+import Constants, { isAliveText } from './plugins/Constants';
 import FileServer from './plugins/FileServer';
 import MongoDB from './plugins/MongoDB';
 import Redis from './plugins/Redis';
 import UncivDropbox from './plugins/UncivDropbox';
 
 // import routes
+import getAuth from './routes/auth/get';
+import patchAuth from './routes/auth/patch';
+import putAuth from './routes/auth/put';
 import getFile from './routes/files/get';
 import patchFile from './routes/files/patch';
 import putFile from './routes/files/put';
@@ -26,7 +30,7 @@ const server = Fastify({
   // bodyLimit: bytes.parse('1MB')!,
 });
 
-type FileRouteTypes = {
+export type FileRouteType = {
   Params: { id: string };
   Body: string;
   Response: string;
@@ -38,19 +42,34 @@ const FileRouteOpts: RouteShorthandOptions = {
   },
 };
 
+export type AuthPatchType = {
+  Body: { userId: string; hash: string };
+  Response: string;
+};
+
+const AuthPatchOpts: RouteShorthandOptions = {
+  schema: {
+    body: { type: 'object', properties: { userId: { type: 'string' }, hash: { type: 'string' } } },
+  },
+};
+
 // register plugins
 server.register(Constants);
 server.register(UncivDropbox);
 server.register(MongoDB);
 server.register(Redis);
 server.register(FileServer);
+server.register(Auth);
 
 // register routes
 server.get('/files/:id', getFile);
-server.get('/isalive', async () => 'true');
-server.put<FileRouteTypes>('/files/:id', FileRouteOpts, putFile);
-server.patch<FileRouteTypes>('/files/:id', FileRouteOpts, patchFile);
+server.get('/isalive', async () => isAliveText);
+server.put<FileRouteType>('/files/:id', FileRouteOpts, putFile);
+server.patch<FileRouteType>('/files/:id', FileRouteOpts, patchFile);
 // server.delete<FileRouteTypes>('/files/:id', FileRouteOpts, deleteFile);
+server.get('/auth', getAuth);
+server.put('/auth', putAuth);
+server.patch<AuthPatchType>('/auth', AuthPatchOpts, patchAuth);
 
 // start server
 const port: number = (process.env.PORT ?? 8080) as number;

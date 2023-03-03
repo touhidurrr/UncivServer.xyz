@@ -92,7 +92,7 @@ export interface UncivJSON {
   };
   gameParameters: {
     difficulty: GameDifficulty;
-    players: { playerType?: 'Human'; playerId?: string }[];
+    players: { playerType: 'Human'; playerId: string }[];
     numberOfCityStates: number;
     ragingBarbarians: boolean;
     victoryTypes: VictoryType[];

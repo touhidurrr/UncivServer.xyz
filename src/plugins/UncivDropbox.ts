@@ -56,6 +56,9 @@ const UncivDropbox = {
 };
 */
 
-export default fp(async function (server) {
-  server.decorate('UncivDropbox', Dropbox);
-});
+export default fp(
+  async function (server) {
+    server.decorate('UncivDropbox', Dropbox);
+  },
+  { name: 'UncivDropbox' }
+);
