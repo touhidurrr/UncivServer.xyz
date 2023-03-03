@@ -85,7 +85,8 @@ export default fp(
           return reply.send(fileBody);
         } catch (err: any) {
           if (err?.code !== 'ENOENT') this.errorLogger(err);
-          return reply.code(404).send('404 Not Found!');
+          if (req.url !== '/isalive')
+            return reply.code(404).send('404 Not Found!');
         }
       }
     });
