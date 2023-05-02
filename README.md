@@ -5,7 +5,7 @@ The biggest server for the open source game [**Unciv**](https://github.com/yairm
 
 The server reached a record of serving more than **1M requests per day** on average during the preriod of December 6, 2022 to Januray 5, 2023 after nearly 9 months of it being opened for public.
 
-As of February 21, 2023. The server serves **60M+ requests per month**, a growth that came with the server being made the default multiplayer server for many reasons like rate limiting of Dropbox and many users already using the server as their go to multiplayer server for a while for it's performance and reliability and also for many additional features that enriches the gameplay.
+As of May 2, 2023. The server serves **80M+ requests** from **400k+ unique visitors, per month**, a growth that came with the server being made the default multiplayer server for many reasons like rate limiting of Dropbox and many users already using the server as their go to multiplayer server for a while for it's performance and reliability and also for many additional features that enriches the gameplay.
 
 The graph below shows request served by the server from November 29, 2022 to April 18, 2023.
 
