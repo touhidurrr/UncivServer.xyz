@@ -65,6 +65,7 @@ export default fp(async function (server) {
 
       // if cache is found then return it
       if (cachedBody) {
+        this.redis.expire(req.url, this.expireAfter).catch(this.errorLogger);
         reply.send(cachedBody);
         return reply;
       }
