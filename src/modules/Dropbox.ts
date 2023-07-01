@@ -26,7 +26,7 @@ export default {
       method: 'POST',
       body: data,
     });
-    console.log(res.status, await res.json());
+    if (!res.ok) console.log(res.status, await res.json());
   },
   async delete(gameFileName: string) {
     const res = await fetch('https://api.dropboxapi.com/2/files/delete_v2', {
