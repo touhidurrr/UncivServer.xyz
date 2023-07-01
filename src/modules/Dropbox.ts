@@ -37,6 +37,7 @@ export default {
       method: 'POST',
       body: `{"path":"/MultiplayerGames/${gameFileName}"}`,
     });
+    console.log(`Warning! A game with id ${gameFileName} has been requested for deletion from Dropbox!`);
     console.log(res.status, await res.json());
   },
 };
