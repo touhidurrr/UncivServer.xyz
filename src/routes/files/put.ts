@@ -98,8 +98,10 @@ async function trySendNotification(req: PutFileRequest, gameFileName: string) {
   const { civilizations, currentPlayer, turns, gameParameters } = UncivParser.parse(body);
 
   // Log & exit if invalid data
-  console.dir({ turns, currentPlayer, civilizations, gameID }, { depth: null });
-  if (!currentPlayer || !civilizations) return;
+  if (!currentPlayer || !civilizations) {
+    console.dir({ turns, currentPlayer, civilizations, gameID }, { depth: null });
+    return;
+  }
 
   // find currentPlayer's ID
   const currentCiv = civilizations.find(c => c.civName === currentPlayer);
