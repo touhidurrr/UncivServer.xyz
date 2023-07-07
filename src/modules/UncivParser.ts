@@ -67,6 +67,7 @@ var i = 0;
 var str = '';
 
 export default {
+  // deprecated, and suspected of memory leak
   parseUncivJson(s: string) {
     i = 0;
     str = s;
@@ -74,7 +75,7 @@ export default {
   },
   parse(gameData: string) {
     const jsonText = gunzipSync(Buffer.from(gameData, 'base64')).toString();
-    return this.parseUncivJson(jsonText);
+    return JSON.parse(jsonText);
   },
   stringify(json: any) {
     const jsonText = JSON.stringify(json);
