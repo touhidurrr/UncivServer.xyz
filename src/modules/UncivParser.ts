@@ -75,7 +75,7 @@ export default {
   },
   parse(gameData: string) {
     const jsonText = gunzipSync(Buffer.from(gameData, 'base64')).toString();
-    return JSON.parse(jsonText);
+    return JSON.parse(jsonText) as UncivJSON;
   },
   stringify(json: any) {
     const jsonText = JSON.stringify(json);
