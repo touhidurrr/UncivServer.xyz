@@ -33,7 +33,7 @@
   },
   "dependencies": {
     "@discordjs/rest": "^2.0.1",
-    "bun": "^1.0.1",
+    "bun": "latest",
     "bytes": "^3.1.2",
     "discord-api-types": "^0.37.56",
     "dotenv": "^16.3.1",
