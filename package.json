@@ -29,7 +29,7 @@
   },
   "homepage": "https://github.com/touhidurrr/UncivServer.xyz#readme",
   "engines": {
-    "node": "18.x"
+    "node": "20.x"
   },
   "dependencies": {
     "@discordjs/rest": "^2.2.0",
