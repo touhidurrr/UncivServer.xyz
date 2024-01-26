@@ -32,7 +32,7 @@
     "node": "20.x"
   },
   "dependencies": {
-    "@discordjs/rest": "^2.2.0",	
+    "@discordjs/rest": "^2.2.0",
     "bun": "latest",
     "bytes": "^3.1.2",
     "discord-api-types": "^0.37.66",
@@ -44,7 +44,7 @@
     "is-base64": "^1.1.0",
     "isomorphic-fetch": "^3.0.0",
     "mime-types": "^2.1.35",
-    "mongodb": "^5.9.2",
+    "mongodb": "^6.3.0 ",
     "node-fetch": "^3.3.2",
     "redis": "^4.6.12"
   },
