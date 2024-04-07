@@ -12,7 +12,6 @@ import Constants, { isAliveText } from './plugins/Constants';
 import FileServer from './plugins/FileServer';
 import MongoDB from './plugins/MongoDB';
 import Redis from './plugins/Redis';
-import UncivDropbox from './plugins/UncivDropbox';
 
 // import routes
 import getAuth from './routes/auth/get';
@@ -55,7 +54,6 @@ const AuthPatchOpts: RouteShorthandOptions = {
 
 // register plugins
 server.register(Constants);
-server.register(UncivDropbox);
 server.register(MongoDB);
 server.register(Redis);
 server.register(FileServer);

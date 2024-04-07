@@ -71,7 +71,6 @@ function sendGameToOtherServers(gameFileName: string, body: string) {
 async function tryUpdatingGameDataSilently(req: PutFileRequest, gameFileName: string) {
   const { fileName, body, server } = req;
   writeFile(fileName, body, errorLogger);
-  server.UncivDropbox.upload(gameFileName, body).catch(errorLogger);
   sendGameToOtherServers(gameFileName, body);
   await server.db.UncivServer.updateOne(
     { _id: gameFileName },
