@@ -3,7 +3,6 @@ import { createClient } from 'redis';
 
 const client = createClient({
   url: process.env.REDISCLOUD_URL || process.env.REDIS_URL,
-  legacyMode: true,
 });
 
 client.on('error', err => console.log('Redis Client Error', err));
