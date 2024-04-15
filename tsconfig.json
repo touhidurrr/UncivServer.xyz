@@ -1,4 +1,7 @@
 {
+  // include paths
+  "include": ["src", "tests"],
+
   "compilerOptions": {
     "lib": ["ESNext"],
     "target": "ESNext",
@@ -40,8 +43,5 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noPropertyAccessFromIndexSignature": true
-  },
-
-  // exclude patterns
-  "exclude": ["node_modules", "test*"]
+  }
 }
