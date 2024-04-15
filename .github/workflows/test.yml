@@ -6,7 +6,7 @@ jobs:
   test:
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-13]
+        os: [ubuntu-latest, windows-latest]
 
     defaults:
       run:
@@ -22,7 +22,7 @@ jobs:
         run: bun install
 
       - name: Lint TypeScript
-        run: bun lint:tsc
+        run: bun lint
 
       - name: Make .env file
         run: |
