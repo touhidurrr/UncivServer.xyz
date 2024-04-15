@@ -2,14 +2,20 @@ import { Elysia } from 'elysia';
 import { staticPlugin } from '@elysiajs/static';
 import { filesRoute } from '@routes/files';
 import { infoPlugin } from '@routes/info';
-import { DEFAULT_HOST, DEFAULT_PORT, MAX_CONTENT_LENGTH, MIN_CONTENT_LENGTH } from '@constants';
+import {
+  DEFAULT_HOST,
+  DEFAULT_PORT,
+  isDevelopment,
+  MAX_CONTENT_LENGTH,
+  MIN_CONTENT_LENGTH,
+} from '@constants';
 
 const port = process.env.PORT ?? DEFAULT_PORT;
 const hostname = process.env.HOST ?? DEFAULT_HOST;
 
 export const app = new Elysia()
   .onRequest(({ request, error }) => {
-    console.info(`${request.method} ${request.url}`);
+    if (isDevelopment) console.info(`${request.method} ${request.url}`);
     if (request.body !== null) {
       const contentLen = Number(request.headers.get('content-length'));
       if (!contentLen || contentLen < MIN_CONTENT_LENGTH) return error(400);

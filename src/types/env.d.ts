@@ -2,6 +2,7 @@ declare namespace NodeJS {
   export interface ProcessEnv {
     PORT?: string;
     HOST?: string;
+    NODE_ENV?: 'development' | 'production';
     REDIS_URL?: string;
     REDISCLOUD_URL?: string;
     MONGO_URL?: string;

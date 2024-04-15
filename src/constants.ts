@@ -1,5 +1,9 @@
 import bytes from 'bytes';
 
+// utils
+export const isProduction = process.env.NODE_ENV === 'production';
+export const isDevelopment = !isProduction;
+
 // server
 export const DEFAULT_PORT = '3000';
 export const DEFAULT_HOST = '0.0.0.0';

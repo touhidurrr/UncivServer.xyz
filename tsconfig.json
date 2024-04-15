@@ -40,5 +40,8 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noPropertyAccessFromIndexSignature": true
-  }
+  },
+
+  // exclude patterns
+  "exclude": ["node_modules", "test*"]
 }
