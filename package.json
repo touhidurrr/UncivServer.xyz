@@ -1,7 +1,7 @@
 {
   "name": "uncivserver.xyz",
   "version": "4.0.0",
-  "description": "An Open Source, Unciv Multiplayer Server written in Javascript",
+  "description": "An Open Source, Free to Play, Unciv Multiplayer Server written in Javascript",
   "author": "Md. Touhidur Rahman",
   "license": "BSD-3-Clause",
   "repository": "touhidurrr/UncivServer.xyz",
@@ -26,9 +26,8 @@
     "test": "bun test",
     "dev": "bun --watch src/index.ts",
     "start": "bun src/index.ts",
-    "lint:tsc": "tsc --noEmit",
-    "lint:prettier": "prettier --check '**/?*.*'",
-    "fix:prettier": "prettier --write '**/?*.*'",
+    "lint": "tsc --noEmit",
+    "format": "prettier --write '**/?*.*'",
     "wc": "find src tests -type f -exec wc {} +"
   },
   "dependencies": {

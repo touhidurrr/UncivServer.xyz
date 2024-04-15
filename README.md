@@ -1,19 +1,31 @@
 # Elysia with Bun runtime
 
-## Getting Started
+An open source, free to play, Unciv multiplayer server written in TypeScript.
 
-To get started with this template, simply paste this command into your terminal:
+## To run locally
+
+Install bun from https://bun.sh/ then run:
 
 ```bash
-bun create elysia ./elysia-example
+bun install
+bun start
 ```
+
+If any error is thrown because of missing environment variables, create a `.env` file at the root
+directory and add missing environment variables.
 
 ## Development
 
 To start the development server run:
 
 ```bash
-bun run dev
+bun dev
 ```
 
-Open http://localhost:3000/ with your browser to see the result.
+Don't forget to lint, format and test the code before submitting a pull request.
+
+```bash
+bun lint
+bun format
+bun test
+```
