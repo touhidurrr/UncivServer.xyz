@@ -17,7 +17,7 @@ export const REDIS_DEFAULT_URL = '0.0.0.0:6379';
 export const CACHE_MAX_ITEMS = 1000;
 export const CACHE_MAX_SIZE = bytes.parse('100mb');
 export const FILES_CACHE_MAX_ITEMS = 1000;
-export const FILES_CACHE_MAX_SIZE = bytes.parse('100mb');
+export const FILES_CACHE_MAX_SIZE = bytes.parse('50mb');
 
 // files
 export const MIN_FILE_SIZE = Math.max(MIN_CONTENT_LENGTH, bytes.parse('10b'));
