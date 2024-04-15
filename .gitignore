@@ -32,3 +32,6 @@ package-lock.json
 
 # yarn
 yarn.lock
+
+# bun
+bun.lockb

@@ -53,7 +53,7 @@ export interface UncivJSON {
           class: 'com.unciv.logic.Encampment';
           position: Position;
           spawnedUnits: number;
-        }
+        },
       ][];
     };
   };
