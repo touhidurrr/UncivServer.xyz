@@ -1,6 +1,9 @@
-# dotfiles and test files
+# dotfiles and test scripts
 .*
 test*
+
+# test
+!tests/
 
 # typescript
 *.js
@@ -11,6 +14,7 @@ test*
 
 # github
 !.github
+!.github/*/*
 
 # prettier
 !.prettierignore
@@ -24,11 +28,8 @@ package-lock.json
 *.rdb
 .rediscli_history
 
-# temp files
-/files/
-/assets/
-/public/files/
-/public/assets/
-
 # yarn
 yarn.lock
+
+# bun
+bun.lockb

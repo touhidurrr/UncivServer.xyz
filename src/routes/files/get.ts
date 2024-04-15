@@ -1,8 +1,25 @@
-import type { FastifyRequest } from 'fastify/types/request';
-import type { FileRouteType } from '../../server';
+import { db } from '@services/mongodb';
+import { cache } from '@services/lrucache';
+import type { Elysia } from 'elysia';
 
-const getFile = async (req: FastifyRequest<FileRouteType>) => {
-  return req.file!;
-};
+export const getFile = (app: Elysia) =>
+  app.get(
+    '/:gameId',
+    async ({ error, params: { gameId } }) => {
+      const game = await db.UncivServer.findOne(
+        { _id: gameId },
+        { projection: { _id: 0, text: 1 } }
+      );
 
-export default getFile;
+      if (!game) return error(404);
+
+      await cache.set(gameId, game.text);
+      return game.text;
+    },
+    {
+      beforeHandle: async ({ params: { gameId } }) => {
+        const cachedResponse = await cache.get(gameId);
+        if (cachedResponse) return cachedResponse;
+      },
+    }
+  );

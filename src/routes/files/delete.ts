@@ -1,23 +1,9 @@
-import type { FastifyReply } from 'fastify/types/reply';
-import type { FastifyRequest } from 'fastify/types/request';
-import { rm } from 'fs/promises';
+import { db } from '@services/mongodb';
+import { cache } from '@services/lrucache';
+import type { Elysia } from 'elysia';
 
-const deleteFile = async (req: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) => {
-  const { fileName, params, server, url } = req;
-  const gameFileName = params.id;
-
-  if (!server.gameFileRegex.test(gameFileName)) {
-    reply.status(400);
-    return 'Invalid game ID!';
-  }
-
-  rm(fileName, { force: true }).catch(server.errorLogger);
-  server.UncivDropbox.delete(gameFileName).catch(server.errorLogger);
-  await Promise.all([
-    server.cache.files.del(url),
-    server.db.UncivServer.deleteOne({ _id: gameFileName }),
-  ]).catch(server.errorLogger);
-  return '200 OK!';
-};
-
-export default deleteFile;
+export const deleteFile = (app: Elysia) =>
+  app.delete('/:gameId', async ({ params: { gameId } }) => {
+    await Promise.all([cache.delete(gameId), db.UncivServer.deleteOne({ _id: gameId })]);
+    return 'Done!';
+  });
