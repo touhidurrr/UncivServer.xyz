@@ -1,3 +1,4 @@
+import bytes from 'bytes';
 import { LRUCache } from 'lru-cache';
 import { FILES_CACHE_MAX_ITEMS, FILES_CACHE_MAX_SIZE } from '@constants';
 
@@ -11,7 +12,8 @@ setInterval(
   () => {
     console.info('[Cache] Stats:', {
       size: cache.size,
-      calculatedSize: cache.calculatedSize,
+      maxSize: bytes.parse(cache.maxSize),
+      calculatedSize: bytes.parse(cache.calculatedSize),
     });
   },
   1000 * 60 * 5
