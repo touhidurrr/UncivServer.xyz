@@ -6,3 +6,13 @@ export const cache = new LRUCache<string, string>({
   maxSize: FILES_CACHE_MAX_SIZE,
   sizeCalculation: val => val.length,
 });
+
+setInterval(
+  () => {
+    console.info('[Cache] Stats:', {
+      size: cache.size,
+      calculatedSize: cache.calculatedSize,
+    });
+  },
+  1000 * 60 * 5
+);
