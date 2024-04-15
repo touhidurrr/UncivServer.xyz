@@ -1,10 +1,6 @@
-*.js
-*.md
-*.html
-test*
-/files/
-/assets/
+*.png
+*.txt
 node_modules/
-/public/files/
-/public/assets/
+bun.lockb
+yarn.lock
 package-lock.json

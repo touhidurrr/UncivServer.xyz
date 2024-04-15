@@ -27,6 +27,12 @@ export type MapShape = 'Hexagonal' | 'Flat Earth Hexagonal' | 'Rectangular';
 
 export type WorldSize = 'Tiny' | 'Small' | 'Medium' | 'Large' | 'Huge' | 'Custom';
 
+export interface Player {
+  chosenCiv?: string;
+  playerId: string;
+  playerType: string;
+}
+
 export interface UncivJSON {
   version: {
     number: number;
@@ -40,7 +46,6 @@ export interface UncivJSON {
     playerId?: string;
     gold: number;
     civName: string;
-    civName: string;
     tech: { techsResearched: string[] };
     exploredTiles: Position[];
   }[];
@@ -53,7 +58,7 @@ export interface UncivJSON {
           class: 'com.unciv.logic.Encampment';
           position: Position;
           spawnedUnits: number;
-        }
+        },
       ][];
     };
   };
@@ -92,11 +97,14 @@ export interface UncivJSON {
   };
   gameParameters: {
     difficulty: GameDifficulty;
-    players: { playerType: 'Human'; playerId: string }[];
+    players: Player[];
     numberOfCityStates: number;
     ragingBarbarians: boolean;
     victoryTypes: VictoryType[];
     isOnlineMultiplayer: boolean;
+    enableRandomNationsPool: boolean;
+    multiplayerServerUrl: string;
+    randomNationsPool: string[];
   };
   turns: number;
   currentPlayer: string;

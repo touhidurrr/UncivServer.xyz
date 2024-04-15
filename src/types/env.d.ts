@@ -1,15 +1,12 @@
 declare namespace NodeJS {
   export interface ProcessEnv {
-    BRAuth?: string;
-    CF_ACCOUNT_ID?: string;
-    CF_KV_AUTH?: string;
-    CF_KV_NAMESPACE?: string;
-    MongoURL?: string;
-    Servers?: string;
+    PORT?: string;
+    HOST?: string;
+    REDIS_URL?: string;
+    REDISCLOUD_URL?: string;
+    MONGO_URL?: string;
+    SYNC_TOKEN?: string;
+    SYNC_SERVERS?: string;
     DISCORD_TOKEN?: string;
-    ReRoute?: string;
-    ReRouteEndpoint?: string;
-    PRODUCTION?: string;
-    PATCH_KEY?: string;
   }
 }
