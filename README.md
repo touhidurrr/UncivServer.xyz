@@ -1,4 +1,4 @@
-# Elysia with Bun runtime
+# UncivServer.xyz
 
 An open source, free to play, Unciv multiplayer server written in TypeScript.
 
