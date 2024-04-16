@@ -1,7 +1,7 @@
 import type { Elysia } from 'elysia';
 import { db } from '@services/mongodb';
 import { syncGame } from '@services/sync';
-import { cache } from '@services/lrucache';
+import cache from '@services/cache';
 import { isDiscordTokenValid, sendNewTurnNotification } from '@services/discord';
 
 export const putFile = (app: Elysia) =>

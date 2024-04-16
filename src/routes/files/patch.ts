@@ -1,6 +1,6 @@
 import bearer from '@elysiajs/bearer';
 import { isValidBearer } from '@lib';
-import { cache } from '@services/lrucache';
+import cache from '@services/cache';
 import type { Elysia } from 'elysia';
 
 // for syncing with other servers

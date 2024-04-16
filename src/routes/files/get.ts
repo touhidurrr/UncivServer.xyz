@@ -1,5 +1,5 @@
 import { db } from '@services/mongodb';
-import { cache } from '@services/lrucache';
+import cache from '@services/cache';
 import type { Elysia } from 'elysia';
 
 export const getFile = (app: Elysia) =>

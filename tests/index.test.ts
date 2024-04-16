@@ -1,7 +1,7 @@
 import { app } from '@index';
 import { treaty } from '@elysiajs/eden';
 import { randomUUID } from 'node:crypto';
-import { cache } from '@services/lrucache';
+import cache from '@services/cache';
 import { describe, expect, test } from 'bun:test';
 import { MAX_FILE_SIZE, TEST_GAME_ID } from '@constants';
 import { getRandomBase64String } from '@lib/getRandomBase64String';
