@@ -1,4 +1,4 @@
-import cache from './lrucache';
+import cache from './nodeCache';
 
 await cache.ready();
 
