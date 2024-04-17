@@ -7,6 +7,7 @@ import {
   type RESTPostAPICurrentUserCreateDMChannelResult,
 } from 'discord-api-types/rest/v10';
 import { db } from './mongodb';
+import type { UncivJSON } from '@localTypes/unciv';
 
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 
@@ -47,7 +48,14 @@ async function getDMChannel(discordId: string) {
 }
 
 export async function sendNewTurnNotification(gameData: string) {
-  const game = parseUncivGameData(gameData);
+  let game: UncivJSON;
+  try {
+    game = parseUncivGameData(gameData);
+  } catch (err) {
+    console.error('[TurnNotifier] error parsing game data:', err);
+    return;
+  }
+
   const { turns, gameId, civilizations, currentPlayer, gameParameters } = game;
 
   // find currentPlayer's ID
