@@ -7,6 +7,8 @@ An open source, free to play, Unciv multiplayer server written in TypeScript.
 Install bun from https://bun.sh/ then run:
 
 ```bash
+git clone https://github.com/touhidurrr/UncivServer.xyz.git
+cd UncivServer.xyz
 bun install
 bun start
 ```
