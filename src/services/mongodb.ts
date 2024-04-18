@@ -32,7 +32,8 @@ interface ErrorLog {
 }
 
 if (!process.env.MONGO_URL) {
-  throw new Error('MongoDB: MONGO_URL not set.');
+  console.error('[MongoDB] MONGO_URL not set.');
+  process.exit(1);
 }
 
 const _client = new MongoClient(process.env.MONGO_URL);
