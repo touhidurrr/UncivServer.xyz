@@ -13,7 +13,6 @@ export async function syncGame(gameId: string, body: string) {
       body,
       headers: {
         Authorization: `Bearer ${SYNC_TOKEN}`,
-        'Accept-Encoding': 'gzip, deflate',
         'Content-Length': body.length.toString(),
         'Content-Type': 'text/plain; charset=utf-8',
       },
