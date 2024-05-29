@@ -11,16 +11,15 @@ console.info('[Sync] Servers:', Servers);
 
 export async function syncGame(gameId: string, body: string) {
   if (!SYNC_TOKEN || !Servers.length) return;
+
+  const headers = {
+    Authorization: `Bearer ${SYNC_TOKEN}`,
+    'Content-Length': Buffer.byteLength(body).toString(),
+    'Content-Type': 'text/plain; charset=utf-8',
+  };
+
   Servers.forEach(api => {
-    fetch(`${api}/files/${gameId}`, {
-      method: 'PATCH',
-      body,
-      headers: {
-        Authorization: `Bearer ${SYNC_TOKEN}`,
-        'Content-Length': body.length.toString(),
-        'Content-Type': 'text/plain; charset=utf-8',
-      },
-    })
+    fetch(`${api}/files/${gameId}`, { method: 'PATCH', body, headers })
       .then(async res => !res.ok && console.error('[Sync] Error:', await res.text()))
       .catch(err => console.error('[Sync] Error:', err));
   });

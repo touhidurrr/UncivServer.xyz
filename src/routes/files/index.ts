@@ -16,6 +16,7 @@ export const filesRoute = new Elysia({ prefix: '/files' }).guard(
         body: t.String({
           minLength: MIN_FILE_SIZE,
           maxLength: MAX_FILE_SIZE,
+          format: 'byte',
         }),
       },
       app => app.use(putFile).use(patchFile)
