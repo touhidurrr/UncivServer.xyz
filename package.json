@@ -36,17 +36,17 @@
     "@elysiajs/html": "^1.0.2",
     "@elysiajs/static": "^1.0.3",
     "bytes": "^3.1.2",
-    "elysia": "^1.0.17",
+    "elysia": "^1.0.22",
     "ioredis": "^5.4.1",
     "lru-cache": "^10.2.2",
-    "mongodb": "^6.6.1",
+    "mongodb": "^6.6.2",
     "node-cache": "^5.1.2"
   },
   "devDependencies": {
-    "@elysiajs/eden": "^1.0.13",
+    "@elysiajs/eden": "^1.0.14",
     "@types/bun": "latest",
     "@types/bytes": "^3.1.4",
-    "discord-api-types": "^0.37.83",
+    "discord-api-types": "^0.37.86",
     "prettier": "^3.2.5",
     "typescript": "^5.4.5"
   }
