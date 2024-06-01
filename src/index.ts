@@ -10,8 +10,6 @@ import {
   MIN_CONTENT_LENGTH,
 } from '@constants';
 
-Bun.gc(true);
-
 const port = process.env.PORT ?? DEFAULT_PORT;
 const hostname = process.env.HOST ?? DEFAULT_HOST;
 
