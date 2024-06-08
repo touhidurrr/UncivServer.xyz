@@ -1,5 +1,7 @@
+*.sh
 *.png
 *.txt
+*.service
 node_modules/
 bun.lockb
 yarn.lock
