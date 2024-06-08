@@ -3,10 +3,6 @@ const SYNC_SERVERS = process.env.SYNC_SERVERS;
 
 const Servers = (SYNC_SERVERS ?? '').split(/[\n\s]+/).filter(Boolean);
 
-Servers.forEach(server => {
-  Bun.dns.prefetch(server);
-});
-
 console.info('[Sync] Servers:', Servers);
 
 export async function syncGame(gameId: string, body: string) {
