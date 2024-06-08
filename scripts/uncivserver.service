@@ -1,0 +1,14 @@
+[Unit]
+Description=UncivServer.xyz
+
+[Service]
+ExecStart=bun start
+Restart=always
+User=uncivserver
+Group=uncivserver
+# replace the line below with the output of `echo $PATH` on your system
+Environment=PATH=/echo/path/here
+WorkingDirectory=/path/to/home/UncivServer.xyz
+
+[Install]
+WantedBy=multi-user.target
