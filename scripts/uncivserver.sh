@@ -1,29 +1,41 @@
 #!/bin/bash
 
-# restart server if health check fails
 URL="http://localhost:3000/isalive"
+# add your repository path here
+REPO_PATH="/path/to/home/UncivServer.xyz"
+SERVICES=("caddy" "uncivserver")
 
+restart_services() {
+    for service in "${SERVICES[@]}"; do
+        echo "Restarting $service..."
+        sudo systemctl restart "$service"
+    done
+}
+
+# Health check
 if ! curl -s --max-time 5 "$URL" > /dev/null; then
-  sudo systemctl restart caddy
-  sudo systemctl restart uncivserver
+    echo "Health check failed. Restarting services..."
+    restart_services
 fi
 
 # Navigate to your repository
-cd /path/to/home/UncivServer.xyz
+cd "$REPO_PATH" || exit
 
 # Fetch the latest changes from the remote repository
 git fetch
 
 # Check if there are any new changes
-if [ $(git rev-parse HEAD) != $(git rev-parse @{u}) ]; then
-    # There are new changes
+if [ "$(git rev-parse HEAD)" != "$(git rev-parse @{u})" ]; then
+    echo "New changes detected."
 
     # Pull the latest changes
     git pull
 
     # Install any new dependencies
-    bun install
+    bun install -f
 
-    # Restart the service
-    sudo systemctl restart uncivserver
+    # Restart the services
+    restart_services
+else
+    echo "No new changes detected."
 fi
