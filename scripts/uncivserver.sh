@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# restart server if health check fails
+URL="http://localhost:3000/isalive"
+
+if ! curl -s --max-time 5 "$URL" > /dev/null; then
+  sudo systemctl restart caddy
+  sudo systemctl restart uncivserver
+fi
+
 # Navigate to your repository
 cd /path/to/home/UncivServer.xyz
 

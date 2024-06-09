@@ -2,12 +2,16 @@
 Description=UncivServer.xyz
 
 [Service]
-ExecStart=bun start
+# Replace `/bun/directory` with `which bun` output
+ExecStart=/bun/directory/bun start
 Restart=always
-User=uncivserver
-Group=uncivserver
-# replace the line below with the output of `echo $PATH` on your system
+RestartSec=5s
+StartLimitBurst=1000000
+User=nobody
+Group=nogroup
+# replace `/echo/path/here` with `echo $PATH` output
 Environment=PATH=/echo/path/here
+# replace `/path/to/home/UncivServer.xyz` with server repo path
 WorkingDirectory=/path/to/home/UncivServer.xyz
 
 [Install]
