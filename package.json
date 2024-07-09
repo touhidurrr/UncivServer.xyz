@@ -38,7 +38,7 @@
     "date-fns": "^3.6.0",
     "elysia": "^1.0.27",
     "ioredis": "^5.4.1",
-    "lru-cache": "^10.3.0",
+    "lru-cache": "^11.0.0",
     "mongodb": "^6.8.0",
     "node-cache": "^5.1.2"
   },
