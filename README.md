@@ -20,8 +20,11 @@ directory and make a file named `.env`.
 git clone https://github.com/touhidurrr/UncivServer.xyz.git
 cd UncivServer.xyz
 
-# if running via docker, should be "MONGO_URL=mongodb://localhost"
+# if running via docker, should be `echo "MONGO_URL=mongodb://localhost" > .env`
 echo "MONGO_URL=<Your MongoDB URL>" > .env
+
+# Required for sync tests to pass
+echo "SYNC_TOKEN=$(openssl rand -base64 32)" >> .env
 ```
 
 Now run the following commands to start your server! By default, the server will start at
