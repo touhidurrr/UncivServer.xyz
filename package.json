@@ -32,22 +32,22 @@
   },
   "dependencies": {
     "@discordjs/rest": "^2.3.0",
-    "@elysiajs/bearer": "^1.0.2",
-    "@elysiajs/static": "^1.0.3",
+    "@elysiajs/bearer": "^1.1.1",
+    "@elysiajs/static": "^1.1.0",
     "bytes": "^3.1.2",
     "date-fns": "^3.6.0",
-    "elysia": "^1.0.27",
+    "elysia": "^1.1.6",
     "ioredis": "^5.4.1",
     "lru-cache": "^11.0.0",
     "mongodb": "^6.8.0",
     "node-cache": "^5.1.2"
   },
   "devDependencies": {
-    "@elysiajs/eden": "^1.0.14",
+    "@elysiajs/eden": "^1.1.2",
     "@types/bun": "^1.1.6",
     "@types/bytes": "^3.1.4",
-    "discord-api-types": "^0.37.92",
-    "prettier": "^3.3.2",
-    "typescript": "^5.5.3"
+    "discord-api-types": "^0.37.94",
+    "prettier": "^3.3.3",
+    "typescript": "^5.5.4"
   }
 }
