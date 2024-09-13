@@ -1,12 +1,12 @@
 # UncivServer.xyz
 
-An open source, free to play, Unciv multiplayer server written in TypeScript.
+An open source, free-to-play, Unciv multiplayer server written in TypeScript.
 
 ## To run locally
 
 To run UncivServer.xyz locally, you would need:
 
-1. Git: If you are on linux then git should be installed by default. On windows, install from
+1. Git: If you are on Linux then Git should be installed by default. On Windows, install from
    [here](https://git-scm.com/download/win).
 2. Bun: Install from https://bun.sh/
 3. MongoDB: You can run a local MongoDB instance with `docker run -d --name some-mongo -e MONGO_INITDB_DATABASE=unciv -p 27017:27017 mongo`. Alternatively, you can make a free MongoDB instance with the database name `unciv` from
@@ -20,7 +20,7 @@ directory and make a file named `.env`.
 git clone https://github.com/touhidurrr/UncivServer.xyz.git
 cd UncivServer.xyz
 
-# if running via docker, should be `echo "MONGO_URL=mongodb://localhost" > .env`
+# If running via docker, should be `echo "MONGO_URL=mongodb://localhost" > .env`
 echo "MONGO_URL=<Your MongoDB URL>" > .env
 
 # Required for sync tests to pass
@@ -46,7 +46,7 @@ To start the development server run:
 bun dev
 ```
 
-Don't forget to lint, format and test the code before submitting a pull request.
+Don't forget to lint, format, and test the code before submitting a pull request.
 
 ```bash
 bun lint
