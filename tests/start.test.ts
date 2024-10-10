@@ -30,7 +30,6 @@ describe('App Start Test', () => {
     const res = await fetch(baseURL);
     expect(res.ok).toBeTrue();
     expect(res.status).not.toBe(404);
-    console.log(await res.text());
   });
 
   test('App is still running', () => {
