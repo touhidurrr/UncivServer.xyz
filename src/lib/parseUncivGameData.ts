@@ -6,4 +6,3 @@ export function parseUncivGameData(data: string): UncivJSON {
   const jsonArray = Bun.gunzipSync(Buffer.from(data, 'base64').toString('utf8'));
   return JSON.parse(dec.decode(jsonArray));
 }
-
