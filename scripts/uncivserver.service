@@ -1,12 +1,14 @@
 [Unit]
 Description=UncivServer.xyz
+After=network-online.target
+Wants=network-online.target
 
 [Service]
 # Replace `/bun/directory` with `which bun` output
 ExecStart=/bun/directory/bun start
 Restart=always
-RestartSec=5s
-StartLimitBurst=1000000
+RestartSec=1
+StartLimitBurst=3600
 User=nobody
 Group=nogroup
 # replace `/echo/path/here` with `echo $PATH` output
