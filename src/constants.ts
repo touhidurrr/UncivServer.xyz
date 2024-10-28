@@ -5,7 +5,7 @@ export const isProduction = process.env.NODE_ENV === 'production';
 export const isDevelopment = !isProduction;
 
 // server
-export const DEFAULT_PORT = '3000';
+export const DEFAULT_PORT = '1557';
 export const DEFAULT_HOST = '0.0.0.0';
 export const MIN_CONTENT_LENGTH = bytes.parse('10b');
 export const MAX_CONTENT_LENGTH = bytes.parse('1mb');
