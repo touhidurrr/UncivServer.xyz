@@ -140,6 +140,12 @@ export async function sendNewTurnNotification(gameData: string) {
           },
         ],
       },
+      {
+        title: "Support the Project",
+        description:
+          "If you enjoy using UncivServer.xyz, consider supporting the project by buying me a coffee at [Buy Me A Coffee](https://buymeacoffee.com/touhidurrr)",
+        color: 0xffdd00,
+      },
     ],
   }).catch(err => {
     console.error('[TurnNotifier] error sending notification:', {
