@@ -8,6 +8,7 @@ import {
 } from 'discord-api-types/rest/v10';
 import { db } from './mongodb';
 import type { UncivJSON } from '@localTypes/unciv';
+import type { APIEmbed } from 'discord-api-types/v10';
 
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 
@@ -46,6 +47,13 @@ async function getDMChannel(discordId: string) {
   })) as RESTPostAPICurrentUserCreateDMChannelResult;
   return res.id;
 }
+
+const supportEmbed: Readonly<APIEmbed> = Object.freeze({
+  title: 'Support the Project',
+  description:
+    'Enjoying **UncivServer.xyz**? Consider supporting the project at [Buy Me A Coffee](https://buymeacoffee.com/touhidurrr)',
+  color: 0xffdd00,
+});
 
 export async function sendNewTurnNotification(gameData: string) {
   let game: UncivJSON;
@@ -140,12 +148,7 @@ export async function sendNewTurnNotification(gameData: string) {
           },
         ],
       },
-      {
-        title: "Support the Project",
-        description:
-          "Enjoying **UncivServer.xyz**? Consider supporting the project at [Buy Me A Coffee](https://buymeacoffee.com/touhidurrr)",
-        color: 0xffdd00,
-      },
+      supportEmbed,
     ],
   }).catch(err => {
     console.error('[TurnNotifier] error sending notification:', {
