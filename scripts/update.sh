@@ -8,7 +8,7 @@ echo "Checking for updates..."
 git fetch origin
 
 # If diff avaiable
-if [[ `git status --porcelain` ]]; then
+if ! git diff --quiet origin/main; then
     echo "Updates found! Restarting..."
     git pull origin main
     systemctl restart uncivserver
