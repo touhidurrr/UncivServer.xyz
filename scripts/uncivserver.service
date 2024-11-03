@@ -4,15 +4,14 @@ After=network-online.target
 Wants=network-online.target
 
 [Service]
-# Replace `/bun/directory` with `which bun` output
-ExecStart=/bun/directory/bun start
+ExecStart=bun start
 Restart=always
 RestartSec=1
 StartLimitBurst=3600
 User=nobody
 Group=nogroup
-# replace `/echo/path/here` with `echo $PATH` output
-Environment=PATH=/echo/path/here
+# Replace `/bun/directory` with `which bun` output
+ExecSearchPath=`/bun/directory`
 # replace `/path/to/home/UncivServer.xyz` with server repo path
 WorkingDirectory=/path/to/home/UncivServer.xyz
 
