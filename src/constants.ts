@@ -14,14 +14,14 @@ export const MAX_CONTENT_LENGTH = bytes.parse('1mb');
 export const REDIS_DEFAULT_URL = '0.0.0.0:6379';
 
 // cache
-export const CACHE_MAX_ITEMS = 1000;
-export const CACHE_MAX_SIZE = bytes.parse('100mb');
+export const CACHE_MAX_ITEMS = 10_000;
+export const CACHE_MAX_SIZE = bytes.parse('150mb');
 export const CACHE_TTL_SECONDS = 30 * 60;
 export const CACHE_TTL_MILLISECONDS = CACHE_TTL_SECONDS * 1000;
 export const CACHE_TTL_CHECK_INTERVAL_SECONDS = 60;
 export const CACHE_TTL_CHECK_INTERVAL_MILLISECONDS = CACHE_TTL_CHECK_INTERVAL_SECONDS * 1000;
-export const FILES_CACHE_MAX_ITEMS = 1000;
-export const FILES_CACHE_MAX_SIZE = bytes.parse('50mb');
+export const FILES_CACHE_MAX_ITEMS = 10_000;
+export const FILES_CACHE_MAX_SIZE = bytes.parse('150mb');
 
 // files
 export const MIN_FILE_SIZE = Math.max(MIN_CONTENT_LENGTH, bytes.parse('10b'));
