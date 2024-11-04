@@ -11,7 +11,7 @@ RUN cd /temp/install && bun install --frozen-lockfile --production
 # copy node_modules from temp directory
 # then copy all (non-ignored) project files into the image
 FROM base AS release
-COPY COPY --from=install /temp/install/node_modules node_modules
+COPY --from=install /temp/install/node_modules node_modules
 COPY public .
 COPY src .
 COPY . .
