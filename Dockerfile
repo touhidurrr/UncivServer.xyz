@@ -1,7 +1,10 @@
-# use the official Bun image
-# see all versions at https://hub.docker.com/r/oven/bun/tags
 FROM oven/bun:1
-WORKDIR /usr/src/app
+RUN ls
+WORKDIR /usr
+RUN ls
+WORKDIR /src
+RUN ls
+WORKDIR /app
 RUN ls
 
 # install dependencies into temp directory
@@ -12,7 +15,7 @@ RUN cd /temp/install && bun install --frozen-lockfile --production
 
 # copy node_modules from temp directory
 # then copy all (non-ignored) project files into the image
-COPY /temp/dev/node_modules node_modules
+COPY /temp/install/node_modules node_modules
 COPY . .
 
 COPY /usr/src/index.ts .
