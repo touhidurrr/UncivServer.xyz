@@ -13,8 +13,7 @@ RUN cd /temp/install && bun install --frozen-lockfile --production
 FROM base AS release
 COPY --from=install /temp/install/node_modules node_modules
 COPY package.json .
-COPY public .
-COPY src .
+COPY public/ src/ ./
 
 # run the app
 USER bun
