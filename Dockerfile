@@ -13,10 +13,10 @@ RUN cd /temp/install && bun install --frozen-lockfile --production
 FROM base AS release
 COPY --from=install /temp/install/node_modules node_modules
 COPY package.json package.json
+COPY tsconfig.json tsconfig.json
 COPY public public
 COPY src src
 
 # run the app
-USER bun
 EXPOSE 1557/tcp
 ENTRYPOINT [ "bun", "start" ]
