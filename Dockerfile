@@ -12,9 +12,9 @@ RUN cd /temp/install && bun install --frozen-lockfile --production
 # then copy all (non-ignored) project files into the image
 FROM base AS release
 COPY --from=install /temp/install/node_modules node_modules
-COPY package.json .
-COPY public .
-COPY src .
+COPY package.json package.json
+COPY public public
+COPY src src
 
 # run the app
 USER bun
