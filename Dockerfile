@@ -1,5 +1,5 @@
 FROM oven/bun:1 AS base
-WORKDIR /usr/local/app
+WORKDIR /usr/touhidurrr/app
 
 # install dependencies into temp directory
 # this will cache them and speed up future builds
@@ -11,11 +11,10 @@ RUN cd /temp/install && bun install --frozen-lockfile --production
 # copy node_modules from temp directory
 # then copy all (non-ignored) project files into the image
 FROM base AS release
+COPY --from=install /temp/install/node_modules node_modules
 COPY package.json .
 COPY public .
 COPY src .
-RUN ls -R /usr/local/app
-COPY --from=install /temp/install/node_modules node_modules
 
 # run the app
 USER bun
