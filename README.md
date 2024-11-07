@@ -29,7 +29,7 @@ echo "SYNC_TOKEN=$(openssl rand -base64 32)" >> .env
 ```
 
 Now run the following commands to start your server! By default, the server will start at
-`http://0.0.0.0:3000`, which you can access from `http://localhost:3000` from your browser. However,
+`http://0.0.0.0:1557`, which you can access from `http://localhost:1557` from your browser. However,
 you can change this behavior setting `PORT` and `HOST` environment variables in the `.env` file you
 just made. Note that both of these variables are optional.
 
