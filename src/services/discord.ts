@@ -1,5 +1,5 @@
 import { REST } from '@discordjs/rest';
-import { getRandomColor, parseUncivGameData } from '@lib';
+import { getRandomColor } from '@lib';
 import {
   Routes,
   type RESTPostAPIChannelMessageJSONBody,
@@ -9,6 +9,7 @@ import {
 import { db } from './mongodb';
 import type { UncivJSON } from '@localTypes/unciv';
 import type { APIEmbed } from 'discord-api-types/v10';
+import { unpack } from './uncivGame';
 
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 
@@ -58,7 +59,7 @@ const supportEmbed: Readonly<APIEmbed> = Object.freeze({
 export async function sendNewTurnNotification(gameData: string) {
   let game: UncivJSON;
   try {
-    game = parseUncivGameData(gameData);
+    game = unpack(gameData);
   } catch (err) {
     console.error('[TurnNotifier] error parsing game data:', err);
     return;
