@@ -1,5 +1,5 @@
-import { db } from '@services/mongodb';
 import cache from '@services/cache';
+import { db } from '@services/mongodb';
 import type { Elysia } from 'elysia';
 
 export const deleteFile = (app: Elysia) =>

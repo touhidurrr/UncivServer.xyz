@@ -1,5 +1,7 @@
+import { SUPPORT_EMBED } from '@constants';
 import { REST } from '@discordjs/rest';
 import { getRandomColor } from '@lib';
+import type { UncivJSON } from '@localTypes/unciv';
 import {
   Routes,
   type RESTPostAPIChannelMessageJSONBody,
@@ -7,9 +9,6 @@ import {
   type RESTPostAPICurrentUserCreateDMChannelResult,
 } from 'discord-api-types/rest/v10';
 import { db } from './mongodb';
-import type { UncivJSON } from '@localTypes/unciv';
-import type { APIEmbed } from 'discord-api-types/v10';
-import { unpack } from './uncivGame';
 
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 
@@ -49,22 +48,7 @@ async function getDMChannel(discordId: string) {
   return res.id;
 }
 
-const supportEmbed: Readonly<APIEmbed> = Object.freeze({
-  title: 'Support the Project',
-  description:
-    'Enjoying **UncivServer.xyz**? Consider supporting the project at [Buy Me A Coffee](https://buymeacoffee.com/touhidurrr)',
-  color: 0xffdd00,
-});
-
-export async function sendNewTurnNotification(gameData: string) {
-  let game: UncivJSON;
-  try {
-    game = unpack(gameData);
-  } catch (err) {
-    console.error('[TurnNotifier] error parsing game data:', err);
-    return;
-  }
-
+export async function sendNewTurnNotification(game: UncivJSON) {
   const { turns, gameId, civilizations, currentPlayer, gameParameters } = game;
 
   // find currentPlayer's ID
@@ -149,7 +133,7 @@ export async function sendNewTurnNotification(gameData: string) {
           },
         ],
       },
-      supportEmbed,
+      SUPPORT_EMBED,
     ],
   }).catch(err => {
     console.error('[TurnNotifier] error sending notification:', {

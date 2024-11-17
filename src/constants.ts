@@ -1,4 +1,5 @@
 import bytes from 'bytes';
+import type { APIEmbed } from 'discord-api-types/v10';
 
 // utils
 export const isProduction = process.env.NODE_ENV === 'production';
@@ -34,3 +35,14 @@ export const GAME_ID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}(_Preview)?
 export const START_TEST_TIMEOUT = 30_000;
 export const START_TEST_FETCH_TIMEOUT = 5_000;
 export const TEST_GAME_ID = '00000000-0000-0000-0000-000000000000';
+
+// support
+export const SUPPORT_CHANNEL_NAME = 'Buy Me A Coffee';
+export const SUPPORT_URL = 'https://buymeacoffee.com/touhidurrr';
+export const SUPPORT_MESSAGE = `Enjoying **UncivServer.xyz**? Consider supporting the project at [${SUPPORT_CHANNEL_NAME}](${SUPPORT_URL})!`;
+
+export const SUPPORT_EMBED: Readonly<APIEmbed> = Object.freeze({
+  title: 'Support the Project',
+  description: SUPPORT_MESSAGE,
+  color: 0xffdd00,
+});

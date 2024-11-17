@@ -1,3 +1,5 @@
+import random from 'random';
+
 export function getRandomColor() {
-  return Math.floor(0x1000000 * Math.random());
+  return random.int(0x000000, 0xffffff);
 }
