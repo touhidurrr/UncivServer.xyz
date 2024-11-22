@@ -1,6 +1,5 @@
 import { SUPPORT_MESSAGE } from '@constants';
 import type { Notification, UncivJSON } from '@localTypes/unciv';
-import { te } from 'date-fns/locale';
 import random from 'random';
 
 const defaultNotification = 'Welcome to UncivServer.xyz!';
