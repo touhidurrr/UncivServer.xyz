@@ -1,5 +1,6 @@
 import { SUPPORT_MESSAGE } from '@constants';
 import type { Notification, UncivJSON } from '@localTypes/unciv';
+import { te } from 'date-fns/locale';
 import random from 'random';
 
 const defaultNotification = 'Welcome to UncivServer.xyz!';
@@ -20,18 +21,22 @@ const supportNotificationsProbability = 0.2;
 
 export function generateRandomNotification(gameData: UncivJSON): Notification {
   let text = defaultNotification;
+  let icons = ['StatIcons/Happiness'];
 
   if (gameData.turns) {
-    text =
-      random.float() < supportNotificationsProbability
-        ? random.choice(randomSupportNotifications)!
-        : random.choice(randomNotifications)!;
+    if (random.float() < supportNotificationsProbability) {
+      text = random.choice(randomSupportNotifications)!;
+      icons[0] = 'NotificationIcons/DollarSign';
+    } else {
+      text = random.choice(randomNotifications)!;
+      icons[0] = random.choice(['NotificationIcons/RobotArm', 'NotificationIcons/ServerRack'])!;
+    }
   }
 
   return {
     text,
+    icons,
     category: 'General',
-    icons: ['StatIcons/Happiness'],
     actions: [],
   };
 }
