@@ -1,14 +1,15 @@
-import { Elysia } from 'elysia';
-import { staticPlugin } from '@elysiajs/static';
-import { filesRoute } from '@routes/files';
-import { infoPlugin } from '@routes/info';
 import {
   DEFAULT_HOST,
   DEFAULT_PORT,
   isDevelopment,
   MAX_CONTENT_LENGTH,
   MIN_CONTENT_LENGTH,
+  SUPPORT_URL,
 } from '@constants';
+import { staticPlugin } from '@elysiajs/static';
+import { filesRoute } from '@routes/files';
+import { infoPlugin } from '@routes/info';
+import { Elysia } from 'elysia';
 
 const port = process.env.PORT ?? DEFAULT_PORT;
 const hostname = process.env.HOST ?? DEFAULT_HOST;
@@ -25,6 +26,7 @@ export const app = new Elysia()
   .use(staticPlugin({ prefix: '/' }))
   .use(infoPlugin)
   .get('/isalive', true)
+  .all('/support', ctx => ctx.redirect(SUPPORT_URL, 303))
   .use(filesRoute)
   .listen({ port, hostname });
 

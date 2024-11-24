@@ -1,6 +1,6 @@
-import { describe, expect, test } from 'bun:test';
-import { getAppBaseURL } from '@lib/getAppBaseURL';
 import { START_TEST_FETCH_TIMEOUT, START_TEST_TIMEOUT } from '@constants';
+import { getAppBaseURL } from '@lib/getAppBaseURL';
+import { describe, expect, test } from 'bun:test';
 
 describe('App Start Test', () => {
   const proc = Bun.spawn(['bun', 'start']);

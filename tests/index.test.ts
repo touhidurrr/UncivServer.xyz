@@ -1,10 +1,10 @@
-import { app } from '@index';
+import { MAX_FILE_SIZE, TEST_GAME_ID } from '@constants';
 import { treaty } from '@elysiajs/eden';
-import { randomUUID } from 'node:crypto';
+import { app } from '@index';
+import { getRandomBase64String } from '@lib/getRandomBase64String';
 import cache from '@services/cache';
 import { describe, expect, test } from 'bun:test';
-import { MAX_FILE_SIZE, TEST_GAME_ID } from '@constants';
-import { getRandomBase64String } from '@lib/getRandomBase64String';
+import { randomUUID } from 'node:crypto';
 
 const api = treaty(app, {
   onRequest: (_path, init) => {
