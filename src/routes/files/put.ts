@@ -5,7 +5,6 @@ import { isDiscordTokenValid, sendNewTurnNotification } from '@services/discord'
 import { db } from '@services/mongodb';
 import { syncGame } from '@services/sync';
 import { pack, unpack } from '@services/uncivGame';
-import { version } from 'bun';
 import { type Elysia } from 'elysia';
 
 export const putFile = (app: Elysia) =>
