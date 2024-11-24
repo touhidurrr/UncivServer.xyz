@@ -49,7 +49,7 @@ export const putFile = (app: Elysia) =>
         // but current tests are not good enough to ensure this
         try {
           ctx.store.game = unpack(ctx.body as string);
-          if (ctx.store.game.version.number == 4) {
+          if (ctx.store.game.version.number >= 4 && ctx.store.game.version.number > 1074) {
             const targetCiv = ctx.store.game.civilizations.find(
               civ => civ.civName == ctx.store.game!.currentPlayer
             );
