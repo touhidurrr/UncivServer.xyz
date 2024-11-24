@@ -36,11 +36,11 @@
     "@elysiajs/static": "1.0.3",
     "bytes": "^3.1.2",
     "date-fns": "^4.1.0",
-    "discord-api-types": "^0.37.105",
+    "discord-api-types": "^0.37.107",
     "elysia": "^1.1.25",
     "ioredis": "^5.4.1",
     "lru-cache": "^11.0.2",
-    "mongodb": "^6.10.0",
+    "mongodb": "^6.11.0",
     "node-cache": "^5.1.2",
     "random": "^5.1.1"
   },
@@ -49,6 +49,6 @@
     "@types/bun": "^1.1.13",
     "@types/bytes": "^3.1.4",
     "prettier": "^3.3.3",
-    "typescript": "^5.6.3"
+    "typescript": "^5.7.2"
   }
 }
