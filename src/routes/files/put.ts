@@ -5,6 +5,7 @@ import { isDiscordTokenValid, sendNewTurnNotification } from '@services/discord'
 import { db } from '@services/mongodb';
 import { syncGame } from '@services/sync';
 import { pack, unpack } from '@services/uncivGame';
+import { version } from 'bun';
 import { type Elysia } from 'elysia';
 
 export const putFile = (app: Elysia) =>
@@ -42,6 +43,7 @@ export const putFile = (app: Elysia) =>
       // used for injecting notifications
       // in case an injection is possible, we need to repack the body to update it
       transform: ctx => {
+        if (ctx.params.gameId.endsWith('_Preview')) return;
         // need to think of a better way of doing this
         // ideally there should be no try-catch here
         // if parsing fails then we should just let it happen
@@ -49,7 +51,10 @@ export const putFile = (app: Elysia) =>
         // but current tests are not good enough to ensure this
         try {
           ctx.store.game = unpack(ctx.body as string);
-          if (ctx.store.game.version.number >= 4 && ctx.store.game.version.number > 1074) {
+          if (
+            ctx.store.game.version.number >= 4 &&
+            ctx.store.game.version.createdWith.number > 1074
+          ) {
             const targetCiv = ctx.store.game.civilizations.find(
               civ => civ.civName == ctx.store.game!.currentPlayer
             );
