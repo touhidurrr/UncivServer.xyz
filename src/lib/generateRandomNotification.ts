@@ -1,3 +1,4 @@
+import { SUPPORT_URL } from '@constants';
 import * as notificationsData from '@data/notifications';
 import type { Notification, UncivJSON } from '@localTypes/unciv';
 import random from 'random';
@@ -5,7 +6,7 @@ import random from 'random';
 const DEFAULT_NOTIFICATION = 'Welcome to UncivServer.xyz!';
 const DEFAULT_NOTIFICATION_ICON = 'NotificationIcons/RobotArm';
 
-const SUPPORT_NOTIFICATION_PROBABILITY = 0.2;
+const SUPPORT_NOTIFICATION_PROBABILITY = 1;
 
 export function generateRandomNotification(gameData: UncivJSON): Notification {
   let text = DEFAULT_NOTIFICATION;
@@ -16,6 +17,13 @@ export function generateRandomNotification(gameData: UncivJSON): Notification {
     if (random.float() < SUPPORT_NOTIFICATION_PROBABILITY) {
       text = random.choice(notificationsData.support)!;
       icons[0] = random.choice(notificationsData.icons.support)!;
+      if (gameData.version.createdWith.number > 1076) {
+        actions[0] = {
+          LinkAction: {
+            url: SUPPORT_URL,
+          },
+        };
+      }
     } else {
       text = random.choice(notificationsData.classic)!;
       icons[0] = random.choice(notificationsData.icons.classic)!;

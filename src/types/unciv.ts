@@ -303,11 +303,16 @@ export interface NotificationsLog {
   turn: number;
 }
 
+export interface LinkAction {
+  url: string;
+}
+
 export interface Action {
   LocationAction?: LocationAction;
   MapUnitAction?: Location;
   CivilopediaAction?: CivilopediaAction;
   TechAction?: TechAction;
+  LinkAction?: LinkAction;
 }
 
 export interface CivilopediaAction {
