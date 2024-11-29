@@ -11,5 +11,6 @@ git fetch origin
 if ! git diff --quiet origin/main; then
     echo "Updates found! Restarting..."
     git pull origin main
+    bun upgrade && bun install --frozen-lockfile
     systemctl restart uncivserver
 fi
