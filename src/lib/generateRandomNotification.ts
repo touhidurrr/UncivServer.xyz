@@ -6,7 +6,7 @@ import random from 'random';
 const DEFAULT_NOTIFICATION = 'Welcome to UncivServer.xyz!';
 const DEFAULT_NOTIFICATION_ICON = 'NotificationIcons/RobotArm';
 
-const SUPPORT_NOTIFICATION_PROBABILITY = 1;
+const SUPPORT_NOTIFICATION_PROBABILITY = 0.2;
 
 export function generateRandomNotification(gameData: UncivJSON): Notification {
   let text = DEFAULT_NOTIFICATION;
