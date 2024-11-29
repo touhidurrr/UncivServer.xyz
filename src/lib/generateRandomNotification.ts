@@ -1,46 +1,31 @@
-import { SUPPORT_MESSAGE } from '@constants';
+import * as notificationsData from '@data/notifications';
 import type { Notification, UncivJSON } from '@localTypes/unciv';
 import random from 'random';
 
-const defaultNotification = 'Welcome to UncivServer.xyz!';
-const defaultNotificationIcon = 'NotificationIcons/RobotArm';
+const DEFAULT_NOTIFICATION = 'Welcome to UncivServer.xyz!';
+const DEFAULT_NOTIFICATION_ICON = 'NotificationIcons/RobotArm';
 
-const notificationIcons = [defaultNotificationIcon, 'NotificationIcons/ServerRack'];
-
-const randomNotifications = [
-  `${defaultNotification} Again!`,
-  "It's your turn!",
-  'Time to make some moves!',
-  'Hi! Server here. Have a nice day!',
-  "Don't forget to press 'Next Turn' when you're done!",
-  "Hi, there! @touhidurrr here from UncivServer.xyz. Don't forget I might be watching your every move...",
-  "Let's speed through some turns!",
-];
-
-const supportNotificationIcons = ['NotificationIcons/DollarSign'];
-
-const randomSupportNotifications = [SUPPORT_MESSAGE];
-
-const supportNotificationsProbability = 0.2;
+const SUPPORT_NOTIFICATION_PROBABILITY = 0.2;
 
 export function generateRandomNotification(gameData: UncivJSON): Notification {
-  let text = defaultNotification;
-  let icons = [defaultNotificationIcon];
+  let text = DEFAULT_NOTIFICATION;
+  const icons = [DEFAULT_NOTIFICATION_ICON];
+  const actions: Notification['actions'] = [];
 
   if (gameData.turns) {
-    if (random.float() < supportNotificationsProbability) {
-      text = random.choice(randomSupportNotifications)!;
-      icons[0] = random.choice(supportNotificationIcons)!;
+    if (random.float() < SUPPORT_NOTIFICATION_PROBABILITY) {
+      text = random.choice(notificationsData.support)!;
+      icons[0] = random.choice(notificationsData.icons.support)!;
     } else {
-      text = random.choice(randomNotifications)!;
-      icons[0] = random.choice(notificationIcons)!;
+      text = random.choice(notificationsData.classic)!;
+      icons[0] = random.choice(notificationsData.icons.classic)!;
     }
   }
 
   return {
     text,
     icons,
+    actions,
     category: 'General',
-    actions: [],
   };
 }

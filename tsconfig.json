@@ -21,6 +21,7 @@
       "@constants": ["./src/constants"],
 
       "@lib/*": ["./src/lib/*"],
+      "@data/*": ["./src/data/*"],
       "@routes/*": ["./src/routes/*"],
       "@localTypes/*": ["./src/types/*"],
       "@services/*": ["./src/services/*"]
