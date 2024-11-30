@@ -17,7 +17,8 @@ export function generateRandomNotification(gameData: UncivJSON): Notification {
     if (random.float() < SUPPORT_NOTIFICATION_PROBABILITY) {
       text = random.choice(notificationsData.support)!;
       icons[0] = random.choice(notificationsData.icons.support)!;
-      if (gameData.version.createdWith.number > 1076) {
+      // disable for now because this might not be in the next version
+      if (false && gameData.version.createdWith.number > 1076) {
         actions[0] = {
           LinkAction: {
             url: SUPPORT_URL,
