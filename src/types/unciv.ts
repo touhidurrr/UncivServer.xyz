@@ -81,7 +81,7 @@ export interface Civilization {
   notifications?: Notification[];
   notificationsLog?: NotificationsLog[];
   playerId?: string;
-  playerType?: string;
+  playerType?: 'Human' | 'AI';
   popupAlerts?: PopupAlert[];
   proximity?: Proximity;
   statsHistory?: StatsHistory;

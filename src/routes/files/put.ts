@@ -1,4 +1,5 @@
 import { generateRandomNotification } from '@lib';
+import { getCurrentPlayerCivilization } from '@lib/getCurrentPlayerCivilization';
 import type { UncivJSON } from '@localTypes/unciv';
 import cache from '@services/cache';
 import { isDiscordTokenValid, sendNewTurnNotification } from '@services/discord';
@@ -54,9 +55,7 @@ export const putFile = (app: Elysia) =>
             ctx.store.game.version.number >= 4 &&
             ctx.store.game.version.createdWith.number > 1074
           ) {
-            const targetCiv = ctx.store.game.civilizations.find(
-              civ => civ.civName == ctx.store.game!.currentPlayer
-            );
+            const targetCiv = getCurrentPlayerCivilization(ctx.store.game);
             if (targetCiv) {
               const newNotification = generateRandomNotification(ctx.store.game);
               if (targetCiv.notifications) targetCiv.notifications.push(newNotification);

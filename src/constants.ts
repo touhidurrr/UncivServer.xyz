@@ -8,8 +8,8 @@ export const isDevelopment = !isProduction;
 // server
 export const DEFAULT_PORT = '1557';
 export const DEFAULT_HOST = '0.0.0.0';
-export const MIN_CONTENT_LENGTH = bytes.parse('10b');
-export const MAX_CONTENT_LENGTH = bytes.parse('1mb');
+export const MIN_CONTENT_LENGTH = bytes.parse('10b')!;
+export const MAX_CONTENT_LENGTH = bytes.parse('1mb')!;
 
 // redis
 export const REDIS_DEFAULT_URL = '0.0.0.0:6379';
@@ -22,11 +22,11 @@ export const CACHE_TTL_MILLISECONDS = CACHE_TTL_SECONDS * 1000;
 export const CACHE_TTL_CHECK_INTERVAL_SECONDS = 60;
 export const CACHE_TTL_CHECK_INTERVAL_MILLISECONDS = CACHE_TTL_CHECK_INTERVAL_SECONDS * 1000;
 export const FILES_CACHE_MAX_ITEMS = 10_000;
-export const FILES_CACHE_MAX_SIZE = bytes.parse('150mb');
+export const FILES_CACHE_MAX_SIZE = bytes.parse('150mb')!;
 
 // files
-export const MIN_FILE_SIZE = Math.max(MIN_CONTENT_LENGTH, bytes.parse('10b'));
-export const MAX_FILE_SIZE = Math.min(MAX_CONTENT_LENGTH, bytes.parse('1mb'));
+export const MIN_FILE_SIZE = Math.max(MIN_CONTENT_LENGTH, bytes.parse('10b')!);
+export const MAX_FILE_SIZE = Math.min(MAX_CONTENT_LENGTH, bytes.parse('1mb')!);
 
 // auth
 export const GAME_ID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}(_Preview)?$/;
