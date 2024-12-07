@@ -45,6 +45,9 @@ export const putFile = (app: Elysia) =>
       // in case an injection is possible, we need to repack the body to update it
       transform: ctx => {
         if (ctx.params.gameId.endsWith('_Preview')) return;
+        // 52.5% chance of a notification being shown per turn
+        // weighted average of a poll in Unciv the discord server
+        if (random.float() < 0.525) return;
         // need to think of a better way of doing this
         // ideally there should be no try-catch here
         // if parsing fails then we should just let it happen
