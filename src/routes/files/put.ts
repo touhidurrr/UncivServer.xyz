@@ -1,14 +1,11 @@
-import {
-  gameDataSecurityProvider,
-  generateRandomNotification,
-  getCurrentPlayerCivilization,
-} from '@lib';
+import { generateRandomNotification, getCurrentPlayerCivilization } from '@lib';
 import type { UncivJSON } from '@localTypes/unciv';
 import cache from '@services/cache';
 import { isDiscordTokenValid, sendNewTurnNotification } from '@services/discord';
 import { db } from '@services/mongodb';
 import { syncGame } from '@services/sync';
 import { pack, unpack } from '@services/uncivGame';
+import { gameDataSecurityModifier } from '@services/uncivGameSecurity';
 import { type Elysia } from 'elysia';
 import random from 'random';
 
@@ -59,7 +56,7 @@ export const putFile = (app: Elysia) =>
         try {
           ctx.store.game = unpack(ctx.body as string);
           // apply security provider modifications
-          ctx.store.game = gameDataSecurityProvider(ctx.store.game);
+          ctx.store.game = gameDataSecurityModifier(ctx.store.game);
           if (
             ctx.store.game.version.number >= 4 &&
             ctx.store.game.version.createdWith.number > 1074

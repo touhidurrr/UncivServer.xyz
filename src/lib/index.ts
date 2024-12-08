@@ -1,4 +1,3 @@
-export { gameDataSecurityProvider } from './gameDataSecurityProvider';
 export { generateRandomNotification } from './generateRandomNotification';
 export { getAppBaseURL } from './getAppBaseURL';
 export { getCurrentPlayerCivilization } from './getCurrentPlayerCivilization';
