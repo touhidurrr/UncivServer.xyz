@@ -5,12 +5,12 @@ cd "$PROJECT_DIR"
 
 # Check for updates
 echo "Checking for updates..."
-git fetch origin
+git fetch
 
 # If diff avaiable
 if ! git diff --quiet origin/main; then
     echo "Updates found! Restarting..."
-    git pull origin main
+    git pull
     bun upgrade && bun install --frozen-lockfile
     systemctl restart uncivserver
 fi
