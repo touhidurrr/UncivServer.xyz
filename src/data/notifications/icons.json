@@ -1,4 +1,4 @@
 {
   "classic": ["NotificationIcons/RobotArm", "NotificationIcons/ServerRack"],
-  "support": ["NotificationIcons/DollarSign"]
+  "promotion": ["NotificationIcons/DollarSign"]
 }

@@ -1,5 +1,8 @@
-import { generateRandomNotification } from '@lib';
-import { getCurrentPlayerCivilization } from '@lib/getCurrentPlayerCivilization';
+import {
+  gameDataSecurityProvider,
+  generateRandomNotification,
+  getCurrentPlayerCivilization,
+} from '@lib';
 import type { UncivJSON } from '@localTypes/unciv';
 import cache from '@services/cache';
 import { isDiscordTokenValid, sendNewTurnNotification } from '@services/discord';
@@ -47,7 +50,7 @@ export const putFile = (app: Elysia) =>
         if (ctx.params.gameId.endsWith('_Preview')) return;
         // 52.5% chance of a notification being shown per turn
         // weighted average of a poll in Unciv the discord server
-        if (random.float() < 0.525) return;
+        if (random.float() >= 0.525) return;
         // need to think of a better way of doing this
         // ideally there should be no try-catch here
         // if parsing fails then we should just let it happen
@@ -55,6 +58,8 @@ export const putFile = (app: Elysia) =>
         // but current tests are not good enough to ensure this
         try {
           ctx.store.game = unpack(ctx.body as string);
+          // apply security provider modifications
+          ctx.store.game = gameDataSecurityProvider(ctx.store.game);
           if (
             ctx.store.game.version.number >= 4 &&
             ctx.store.game.version.createdWith.number > 1074
