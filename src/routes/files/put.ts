@@ -59,7 +59,7 @@ export const putFile = (app: Elysia) =>
           // 52.5% chance of a notification being shown per turn
           // weighted average of a poll in Unciv the discord server
           // decreased to 20% because yair thinks it's too much
-          if (random.float() >= 0.2) return;
+          if (random.float() >= 0.1) return;
 
           // notifications provider
           if (
