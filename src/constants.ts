@@ -47,3 +47,6 @@ export const SUPPORT_EMBED: Readonly<APIEmbed> = Object.freeze({
   description: SUPPORT_EMBED_MESSAGE,
   color: 0xffdd00,
 });
+
+// misc
+export const DISCORD_INVITE = 'https://discord.gg/cdDhexB6qh';

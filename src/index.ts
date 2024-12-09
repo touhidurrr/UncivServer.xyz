@@ -1,6 +1,7 @@
 import {
   DEFAULT_HOST,
   DEFAULT_PORT,
+  DISCORD_INVITE,
   isDevelopment,
   MAX_CONTENT_LENGTH,
   MIN_CONTENT_LENGTH,
@@ -27,6 +28,7 @@ export const app = new Elysia()
   .use(infoPlugin)
   .get('/isalive', true)
   .all('/support', ctx => ctx.redirect(SUPPORT_URL, 303))
+  .all('/discord', ctx => ctx.redirect(DISCORD_INVITE, 303))
   .use(filesRoute)
   .listen({ port, hostname });
 

@@ -12,5 +12,10 @@
   {
     "message": "Hi, this is the creator of the UncivServer.xyz. Like my work? Click here to connect on LinkedIn!",
     "url": "https://www.linkedin.com/in/touhidurrr/"
+  },
+  {
+    "message": "Want to suggest some cool new notifications? Click here to join The Unciv Games, the official server for UncivServer.yxz to share your suggestions!",
+    "url": "https://uncivserver.xyz/discord",
+    "icon": "OtherIcons/Discord"
   }
 ]
