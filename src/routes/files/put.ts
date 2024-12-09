@@ -45,7 +45,6 @@ export const putFile = (app: Elysia) =>
       // used for notifications, security provider and discord notifications
       // in case an injection is possible, we need to repack the body to update it
       transform: ctx => {
-        if (ctx.params.gameId.endsWith('_Preview')) return;
         // need to think of a better way of doing this
         // ideally there should be no try-catch here
         // if parsing fails then we should just let it happen
@@ -53,26 +52,33 @@ export const putFile = (app: Elysia) =>
         // but current tests are not good enough to ensure this
         try {
           ctx.store.game = unpack(ctx.body as string);
-          // apply security provider modifications
-          ctx.store.game = gameDataSecurityModifier(ctx.store.game);
 
-          // 52.5% chance of a notification being shown per turn
-          // weighted average of a poll in Unciv the discord server
-          // decreased to 10% at least for this year because yair thinks it's too much
-          if (random.float() >= 0.1) return;
+          // run security modifier on game data
+          const hasModifications = gameDataSecurityModifier(ctx.store.game);
 
           // notifications provider
+          let hasNotifications = false;
           if (
+            !ctx.params.gameId.endsWith('_Preview') &&
             ctx.store.game.version.number >= 4 &&
-            ctx.store.game.version.createdWith.number > 1074
+            ctx.store.game.version.createdWith.number > 1074 &&
+            // 52.5% chance of a notification being shown per turn
+            // weighted average of a poll in Unciv the discord server
+            // decreased to 10% at least for this year because yair thinks it's too much
+            random.float() < 0.1
           ) {
+            hasNotifications = true;
             const targetCiv = getCurrentPlayerCivilization(ctx.store.game);
             if (targetCiv) {
               const newNotification = generateRandomNotification(ctx.store.game);
               if (targetCiv.notifications) targetCiv.notifications.push(newNotification);
               else targetCiv.notifications = [newNotification];
-              ctx.body = pack(ctx.store.game);
             }
+          }
+
+          // repack game data if there are modifications or notifications
+          if (hasModifications || hasNotifications) {
+            ctx.body = pack(ctx.store.game);
           }
         } catch (err) {
           console.error(`[PutBodyTransformError]:\n`, err);

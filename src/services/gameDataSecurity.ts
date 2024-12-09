@@ -26,7 +26,11 @@ export function isAllowedURL(candidateURL: string): boolean {
   return true;
 }
 
-export function gameDataSecurityModifier(game: UncivJSON): UncivJSON {
+// run security checks and returns true if game data is modified
+// game data should be modified in place
+export function gameDataSecurityModifier(game: UncivJSON): boolean {
+  let hasModifications = false;
+
   // LinkAction security
   game.civilizations.forEach(civ => {
     if (!civ.notifications) return;
@@ -38,11 +42,12 @@ export function gameDataSecurityModifier(game: UncivJSON): UncivJSON {
         if (!action.LinkAction) return;
 
         if (!isAllowedURL(action.LinkAction.url)) {
+          hasModifications = true;
           delete action.LinkAction;
         }
       });
     });
   });
 
-  return game;
+  return hasModifications;
 }
