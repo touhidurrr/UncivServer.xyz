@@ -47,7 +47,8 @@ export const putFile = (app: Elysia) =>
         if (ctx.params.gameId.endsWith('_Preview')) return;
         // 52.5% chance of a notification being shown per turn
         // weighted average of a poll in Unciv the discord server
-        if (random.float() >= 0.525) return;
+        // decreased to 20% because yair thinks it's too much
+        if (random.float() >= 0.2) return;
         // need to think of a better way of doing this
         // ideally there should be no try-catch here
         // if parsing fails then we should just let it happen
