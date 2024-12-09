@@ -4,7 +4,7 @@ import { URL } from 'node:url';
 
 const allowedDomainsSet = new Set(allowedDomains);
 
-export function isSecureURL(candidateURL: string): boolean {
+export function isAllowedURL(candidateURL: string): boolean {
   if (!candidateURL) return false;
 
   let url: URL | null = null;
@@ -37,7 +37,7 @@ export function gameDataSecurityModifier(game: UncivJSON): UncivJSON {
       ntf.actions.forEach(action => {
         if (!action.LinkAction) return;
 
-        if (!isSecureURL(action.LinkAction.url)) {
+        if (!isAllowedURL(action.LinkAction.url)) {
           delete action.LinkAction;
         }
       });

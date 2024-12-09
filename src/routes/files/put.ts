@@ -5,7 +5,7 @@ import { isDiscordTokenValid, sendNewTurnNotification } from '@services/discord'
 import { db } from '@services/mongodb';
 import { syncGame } from '@services/sync';
 import { pack, unpack } from '@services/uncivGame';
-import { gameDataSecurityModifier } from '@services/uncivGameSecurity';
+import { gameDataSecurityModifier } from '@services/gameDataSecurity';
 import { type Elysia } from 'elysia';
 import random from 'random';
 
