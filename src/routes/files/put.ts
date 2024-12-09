@@ -41,7 +41,8 @@ export const putFile = (app: Elysia) =>
         }
       },
 
-      // used for injecting notifications
+      // parsing game data to populate ctx.store.game
+      // used for notifications, security provider and discord notifications
       // in case an injection is possible, we need to repack the body to update it
       transform: ctx => {
         if (ctx.params.gameId.endsWith('_Preview')) return;
