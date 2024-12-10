@@ -15,11 +15,11 @@ export function isAllowedURL(candidateURL: string): boolean {
       (!allowedDomainsSet.has(url.hostname) &&
         !allowedDomains.some(domain => url!.hostname.endsWith(`.${domain}`)))
     ) {
-      console.error(`[SecurityProvider] Insecure LinkAction URL: ${candidateURL}`);
+      console.error(`[SecurityProvider] Insecure LinkAction URL: *${candidateURL}*`);
       return false;
     }
   } catch {
-    console.error(`[SecurityProvider] Invalid LinkAction URL: ${candidateURL}`);
+    console.error(`[SecurityProvider] Invalid LinkAction URL: *${candidateURL}*`);
     return false;
   }
 
