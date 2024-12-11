@@ -1,10 +1,21 @@
-import { format } from 'bytes';
+import { parse, format } from 'bytes';
 import { LRUCache } from 'lru-cache';
 import { FILES_CACHE_MAX_ITEMS, FILES_CACHE_MAX_SIZE } from '@constants';
 
+let maxCacheSize = FILES_CACHE_MAX_SIZE;
+
+if (process.env.MAX_CACHE_SIZE) {
+  console.info('[Cache] MAX_CACHE_SIZE:', process.env.MAX_CACHE_SIZE);
+  const parsedMaxCacheSize = parse(process.env.MAX_CACHE_SIZE);
+  if (parsedMaxCacheSize === null) {
+    throw new Error(`Invalid MAX_CACHE_SIZE: ${process.env.MAX_CACHE_SIZE}`);
+  }
+  maxCacheSize = parsedMaxCacheSize;
+}
+
 const lruCache = new LRUCache<string, string>({
   max: FILES_CACHE_MAX_ITEMS,
-  maxSize: FILES_CACHE_MAX_SIZE,
+  maxSize: maxCacheSize,
   // according to stackoverflow, any character is stored as utf-16
   // utf-16 is 2 bytes per character
   sizeCalculation: (val, key) => 2 * (key.length + val.length),

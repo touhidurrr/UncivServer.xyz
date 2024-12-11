@@ -9,5 +9,6 @@ declare namespace NodeJS {
     SYNC_TOKEN?: string;
     SYNC_SERVERS?: string;
     DISCORD_TOKEN?: string;
+    MAX_CACHE_SIZE?: string;
   }
 }
