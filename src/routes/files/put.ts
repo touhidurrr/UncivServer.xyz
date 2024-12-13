@@ -2,10 +2,10 @@ import { generateRandomNotification, getCurrentPlayerCivilization } from '@lib';
 import type { UncivJSON } from '@localTypes/unciv';
 import cache from '@services/cache';
 import { isDiscordTokenValid, sendNewTurnNotification } from '@services/discord';
+import { gameDataSecurityModifier } from '@services/gameDataSecurity';
 import { db } from '@services/mongodb';
 import { syncGame } from '@services/sync';
 import { pack, unpack } from '@services/uncivGame';
-import { gameDataSecurityModifier } from '@services/gameDataSecurity';
 import { type Elysia } from 'elysia';
 import random from 'random';
 
@@ -24,7 +24,7 @@ export const putFile = (app: Elysia) =>
       // afterHandle is called after the route handler is executed but before the response is sent
       // do not use any synchronous code here as it will block the response
       // this notice is only valid for this file, not for the entire project
-      afterHandle: async ({ body, params: { gameId }, store: { game } }) => {
+      afterHandle: async ({ body, server, params: { gameId }, store: { game } }) => {
         // save on mongodb
         db.UncivServer.updateOne(
           { _id: gameId },
@@ -35,9 +35,20 @@ export const putFile = (app: Elysia) =>
         // sync with other servers
         syncGame(gameId, body as string);
 
-        // send turn notification
-        if (game !== null && isDiscordTokenValid && gameId.endsWith('_Preview')) {
-          sendNewTurnNotification(game!);
+        if (game !== null) {
+          // send turn notification
+          if (isDiscordTokenValid && gameId.endsWith('_Preview')) {
+            sendNewTurnNotification(game!);
+          }
+
+          // publish game data to connected clients
+          const wsMsg = JSON.stringify({
+            type: 'GameUpdate',
+            data: { gameId, content: body },
+          });
+          game.gameParameters.players.forEach(({ playerId }) => {
+            server!.publish(`user:${playerId}`, wsMsg);
+          });
         }
       },
 
