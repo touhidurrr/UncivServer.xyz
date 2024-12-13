@@ -1,5 +1,7 @@
 import { MAX_FILE_SIZE } from '@constants';
 import { Elysia, t } from 'elysia';
+import { db } from '@services/mongodb';
+import cache from '@services/cache';
 
 const WS_UNKNOWN_MESSAGE = {
   type: 'Error',
@@ -15,6 +17,24 @@ const WS_INVALID_MESSAGE = {
   },
 } as const;
 
+const WS_GAME_NOT_FOUND = {
+  type: 'Error',
+  data: {
+    message: 'Game not found',
+  },
+} as const;
+
+async function getGameDataWithCache(gameId: string): Promise<string | null> {
+  const cachedData = await cache.get(gameId);
+  if (cachedData) return cachedData;
+
+  const game = await db.UncivServer.findOne({ _id: gameId }, { projection: { _id: 0, text: 1 } });
+  if (!game) return null;
+
+  await cache.set(gameId, game.text);
+  return game.text;
+}
+
 export const websocketsRoute = new Elysia({
   websocket: {
     idleTimeout: 30,
@@ -22,6 +42,7 @@ export const websocketsRoute = new Elysia({
   },
 }).ws('/ws', {
   body: t.Object({ type: t.String(), data: t.Optional(t.Object(t.Unknown())) }),
+  response: t.Object({ type: t.String(), data: t.Optional(t.Object(t.Unknown())) }),
   open: ws => {
     try {
       // Decode userId from authorization header
@@ -53,10 +74,21 @@ export const websocketsRoute = new Elysia({
           ws.send(WS_INVALID_MESSAGE);
           break;
         }
-        //@ts-ignore
         const gameId: string = data['gameId'];
         // send game data here
         // type is { type: 'GameData', data: { gameId: string, content: string } }
+        const gameData = await getGameDataWithCache(gameId);
+        if (!gameData) {
+          ws.send(WS_GAME_NOT_FOUND);
+          break;
+        }
+        ws.send({
+          type: 'GameData',
+          data: {
+            gameId,
+            content: gameData,
+          },
+        });
         break;
       default:
         ws.send(WS_UNKNOWN_MESSAGE);
