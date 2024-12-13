@@ -53,6 +53,7 @@ export const websocketsRoute = new Elysia({
           ws.send(WS_INVALID_MESSAGE);
           break;
         }
+        //@ts-ignore
         const gameId: string = data['gameId'];
         // send game data here
         // type is { type: 'GameData', data: { gameId: string, content: string } }

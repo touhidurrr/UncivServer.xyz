@@ -36,19 +36,23 @@ export const putFile = (app: Elysia) =>
         syncGame(gameId, body as string);
 
         if (game !== null) {
+          const isPreview = gameId.endsWith('_Preview');
           // send turn notification
-          if (isDiscordTokenValid && gameId.endsWith('_Preview')) {
+          if (isDiscordTokenValid && isPreview) {
             sendNewTurnNotification(game!);
           }
 
           // publish game data to connected clients
-          const wsMsg = JSON.stringify({
-            type: 'GameUpdate',
-            data: { gameId, content: body },
-          });
-          game.gameParameters.players.forEach(({ playerId }) => {
-            server!.publish(`user:${playerId}`, wsMsg);
-          });
+          if (!isPreview) {
+            const wsMsg = JSON.stringify({
+              type: 'GameUpdate',
+              data: { gameId, content: body },
+            });
+
+            game.gameParameters.players.forEach(({ playerId }) => {
+              server!.publish(`user:${playerId}`, wsMsg);
+            });
+          }
         }
       },
 
