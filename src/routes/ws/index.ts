@@ -1,9 +1,9 @@
-import { MAX_FILE_SIZE } from '@constants';
 import { getGameDataWithCache } from '@lib/getGameDataWithCache';
-import { Elysia } from 'elysia';
+import { Elysia, t } from 'elysia';
 import {
   WS_BODY_SCHEMA,
   WS_GAME_NOT_FOUND,
+  WS_MAX_PAYLOAD_LENGTH,
   WS_RESPONSE_SCHEMA,
   WS_UNKNOWN_MESSAGE,
 } from './constants';
@@ -11,16 +11,16 @@ import {
 export const websocketsRoute = new Elysia({
   websocket: {
     idleTimeout: 30,
-    maxPayloadLength: MAX_FILE_SIZE,
+    maxPayloadLength: WS_MAX_PAYLOAD_LENGTH,
   },
 }).ws('/ws', {
   body: WS_BODY_SCHEMA,
   response: WS_RESPONSE_SCHEMA,
+  headers: t.Object({ authorization: t.String() }),
   open: ws => {
     try {
       // Decode userId from authorization header
-      const authorization = ws.data.headers['authorization']!;
-      const [userId] = Buffer.from(authorization.split(' ')[1], 'base64')
+      const [userId] = Buffer.from(ws.data.headers.authorization.split(' ')[1], 'base64')
         .toString('utf-8')
         .split(':');
 

@@ -1,5 +1,7 @@
-import { GAME_ID_REGEX } from '@constants';
+import { GAME_ID_REGEX, MAX_FILE_SIZE } from '@constants';
 import { t } from 'elysia';
+
+export const WS_MAX_PAYLOAD_LENGTH = MAX_FILE_SIZE + 100;
 
 export const WS_UNKNOWN_MESSAGE = {
   type: 'Error',
