@@ -1,4 +1,4 @@
-import { getGameDataWithCache } from '@lib/getGameDataWithCache';
+import { app } from '@index';
 import { Elysia, t } from 'elysia';
 import {
   WS_BODY_SCHEMA,
@@ -7,6 +7,8 @@ import {
   WS_RESPONSE_SCHEMA,
   WS_UNKNOWN_MESSAGE,
 } from './constants';
+
+const FILES_BASE_URL = `http://[::1]:1557/files`;
 
 export const websocketsRoute = new Elysia({
   websocket: {
@@ -43,19 +45,40 @@ export const websocketsRoute = new Elysia({
         ws.send({ type: 'Pong' });
         break;
       case 'GameInfo':
-        const { gameId } = data;
-        const gameData = await getGameDataWithCache(gameId);
-        if (!gameData) {
+        // internally fetch game data and send it to the client
+        // no outgoing traffic to other services
+        const getResponse = await app.handle(new Request(`${FILES_BASE_URL}/${data.gameId}`));
+        if (!getResponse.ok) {
           ws.send(WS_GAME_NOT_FOUND);
           break;
         }
         ws.send({
           type: 'GameData',
           data: {
-            gameId,
-            content: gameData,
+            gameId: data.gameId,
+            content: await getResponse.text(),
           },
         });
+        break;
+      case 'GameUpdate':
+        const putResponse = await app.handle(
+          new Request(`${FILES_BASE_URL}/${data.gameId}`, {
+            method: 'PUT',
+            body: data.content,
+            headers: {
+              'content-length': data.content.length.toString(),
+            },
+          })
+        );
+        if (!putResponse.ok) {
+          ws.send({
+            type: 'Error',
+            data: {
+              message: 'Error updating game data',
+            },
+          });
+          break;
+        }
         break;
       default:
         ws.send(WS_UNKNOWN_MESSAGE);

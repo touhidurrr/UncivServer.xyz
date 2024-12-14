@@ -38,12 +38,21 @@ export const WS_BODY_GAME_INFO_SCHEMA = t.Object({
   data: t.Object({ gameId: t.RegExp(GAME_ID_REGEX) }),
 });
 
+export const WS_BODY_GAME_UPDATE_SCHEMA = t.Object({
+  type: t.Literal('GameUpdate'),
+  data: t.Object({ gameId: t.RegExp(GAME_ID_REGEX), content: t.String() }),
+});
+
 export const WS_RESPONSE_GAME_DATA_SCHEMA = t.Object({
   type: t.Literal('GameData'),
   data: t.Object({ gameId: t.RegExp(GAME_ID_REGEX), content: t.String() }),
 });
 
-export const WS_BODY_SCHEMA = t.Union([WS_BODY_PING_SCHEMA, WS_BODY_GAME_INFO_SCHEMA]);
+export const WS_BODY_SCHEMA = t.Union([
+  WS_BODY_PING_SCHEMA,
+  WS_BODY_GAME_INFO_SCHEMA,
+  WS_BODY_GAME_UPDATE_SCHEMA,
+]);
 
 export const WS_RESPONSE_SCHEMA = t.Union([
   WS_RESPONSE_ERROR_SCHEMA,
