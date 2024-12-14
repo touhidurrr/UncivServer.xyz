@@ -1,3 +1,4 @@
+import { DEFAULT_PORT } from '@constants';
 import { app } from '@index';
 import { Elysia, t } from 'elysia';
 import {
@@ -8,7 +9,8 @@ import {
   WS_UNKNOWN_MESSAGE,
 } from './constants';
 
-const FILES_BASE_URL = `http://[::1]:1557/files`;
+const port = process.env.PORT || DEFAULT_PORT;
+const FILES_BASE_URL = `http://[::1]:${port}/files`;
 
 export const websocketsRoute = new Elysia({
   websocket: {
