@@ -1,39 +1,12 @@
 import { MAX_FILE_SIZE } from '@constants';
-import { Elysia, t } from 'elysia';
-import { db } from '@services/mongodb';
-import cache from '@services/cache';
-
-const WS_UNKNOWN_MESSAGE = {
-  type: 'Error',
-  data: {
-    message: 'Unknown message type',
-  },
-} as const;
-
-const WS_INVALID_MESSAGE = {
-  type: 'Error',
-  data: {
-    message: 'Invalid message',
-  },
-} as const;
-
-const WS_GAME_NOT_FOUND = {
-  type: 'Error',
-  data: {
-    message: 'Game not found',
-  },
-} as const;
-
-async function getGameDataWithCache(gameId: string): Promise<string | null> {
-  const cachedData = await cache.get(gameId);
-  if (cachedData) return cachedData;
-
-  const game = await db.UncivServer.findOne({ _id: gameId }, { projection: { _id: 0, text: 1 } });
-  if (!game) return null;
-
-  await cache.set(gameId, game.text);
-  return game.text;
-}
+import { getGameDataWithCache } from '@lib/getGameDataWithCache';
+import { Elysia } from 'elysia';
+import {
+  WS_BODY_SCHEMA,
+  WS_GAME_NOT_FOUND,
+  WS_RESPONSE_SCHEMA,
+  WS_UNKNOWN_MESSAGE,
+} from './constants';
 
 export const websocketsRoute = new Elysia({
   websocket: {
@@ -41,8 +14,8 @@ export const websocketsRoute = new Elysia({
     maxPayloadLength: MAX_FILE_SIZE,
   },
 }).ws('/ws', {
-  body: t.Object({ type: t.String(), data: t.Optional(t.Object(t.Unknown())) }),
-  response: t.Object({ type: t.String(), data: t.Optional(t.Object(t.Unknown())) }),
+  body: WS_BODY_SCHEMA,
+  response: WS_RESPONSE_SCHEMA,
   open: ws => {
     try {
       // Decode userId from authorization header
@@ -70,13 +43,7 @@ export const websocketsRoute = new Elysia({
         ws.send({ type: 'Pong' });
         break;
       case 'GameInfo':
-        if (!data || !data['gameId']) {
-          ws.send(WS_INVALID_MESSAGE);
-          break;
-        }
-        const gameId: string = data['gameId'];
-        // send game data here
-        // type is { type: 'GameData', data: { gameId: string, content: string } }
+        const { gameId } = data;
         const gameData = await getGameDataWithCache(gameId);
         if (!gameData) {
           ws.send(WS_GAME_NOT_FOUND);

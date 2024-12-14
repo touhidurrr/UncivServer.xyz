@@ -1,4 +1,5 @@
 import { generateRandomNotification, getCurrentPlayerCivilization } from '@lib';
+import { getWSMessageString } from '@lib/getWSMessageString';
 import type { UncivJSON } from '@localTypes/unciv';
 import cache from '@services/cache';
 import { isDiscordTokenValid, sendNewTurnNotification } from '@services/discord';
@@ -44,9 +45,9 @@ export const putFile = (app: Elysia) =>
 
           // publish game data to connected clients
           if (!isPreview) {
-            const wsMsg = JSON.stringify({
-              type: 'GameUpdate',
-              data: { gameId, content: body },
+            const wsMsg = getWSMessageString({
+              type: 'GameData',
+              data: { gameId, content: body as string },
             });
 
             game.gameParameters.players.forEach(({ playerId }) => {
