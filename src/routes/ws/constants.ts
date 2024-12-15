@@ -1,4 +1,4 @@
-import { GAME_ID_REGEX, MAX_FILE_SIZE } from '@constants';
+import { GAME_ID_WITH_PREVIEW_REGEX, MAX_FILE_SIZE } from '@constants';
 import { t } from 'elysia';
 
 export const WS_MAX_PAYLOAD_LENGTH = MAX_FILE_SIZE + 100;
@@ -35,17 +35,17 @@ export const WS_RESPONSE_PONG_SCHEMA = t.Object({ type: t.Literal('Pong') });
 
 export const WS_BODY_GAME_INFO_SCHEMA = t.Object({
   type: t.Literal('GameInfo'),
-  data: t.Object({ gameId: t.RegExp(GAME_ID_REGEX) }),
+  data: t.Object({ gameId: t.RegExp(GAME_ID_WITH_PREVIEW_REGEX) }),
 });
 
 export const WS_BODY_GAME_UPDATE_SCHEMA = t.Object({
   type: t.Literal('GameUpdate'),
-  data: t.Object({ gameId: t.RegExp(GAME_ID_REGEX), content: t.String() }),
+  data: t.Object({ gameId: t.RegExp(GAME_ID_WITH_PREVIEW_REGEX), content: t.String() }),
 });
 
 export const WS_RESPONSE_GAME_DATA_SCHEMA = t.Object({
   type: t.Literal('GameData'),
-  data: t.Object({ gameId: t.RegExp(GAME_ID_REGEX), content: t.String() }),
+  data: t.Object({ gameId: t.RegExp(GAME_ID_WITH_PREVIEW_REGEX), content: t.String() }),
 });
 
 export const WS_BODY_SCHEMA = t.Union([
