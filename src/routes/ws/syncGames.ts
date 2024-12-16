@@ -33,7 +33,7 @@ export async function syncGames(
           );
 
           // if such a game is not found then we return
-          // this allows us not to populated cache with games that are not required at this moment
+          // this allows us to prevent polluting cache with games that are not required at this moment
           if (!game) return;
 
           // if found, set cachedGame and return
