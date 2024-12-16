@@ -1,7 +1,7 @@
+import { promotion } from '@data/notifications';
+import { isAllowedURL } from '@services/gameDataSecurity';
 import { pack, unpack } from '@services/uncivGame';
 import { describe, expect, test } from 'bun:test';
-import { isAllowedURL } from '@services/gameDataSecurity';
-import { promotion } from '@data/notifications';
 
 describe('uncivGame', () => {
   test('Pack and Unpack', () => {

@@ -1,6 +1,6 @@
-import { parse, format } from 'bytes';
-import { LRUCache } from 'lru-cache';
 import { FILES_CACHE_MAX_ITEMS, FILES_CACHE_MAX_SIZE } from '@constants';
+import { format, parse } from 'bytes';
+import { LRUCache } from 'lru-cache';
 
 let maxCacheSize = FILES_CACHE_MAX_SIZE;
 

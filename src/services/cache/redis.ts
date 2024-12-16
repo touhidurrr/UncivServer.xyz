@@ -1,5 +1,5 @@
-import Redis from 'ioredis';
 import { REDIS_DEFAULT_URL } from '@constants';
+import Redis from 'ioredis';
 
 const REDIS_URL = process.env.REDISCLOUD_URL || process.env.REDIS_URL || REDIS_DEFAULT_URL;
 

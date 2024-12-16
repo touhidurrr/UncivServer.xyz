@@ -1,6 +1,6 @@
+import { CACHE_TTL_CHECK_INTERVAL_SECONDS, CACHE_TTL_SECONDS } from '@constants';
 import { format } from 'bytes';
 import NodeCache from 'node-cache';
-import { CACHE_TTL_CHECK_INTERVAL_SECONDS, CACHE_TTL_SECONDS } from '@constants';
 
 const nodeCache = new NodeCache({
   stdTTL: CACHE_TTL_SECONDS,
