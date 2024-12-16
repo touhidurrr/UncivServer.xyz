@@ -10,8 +10,8 @@ export async function getCachedGame(gameId: string): Promise<CachedGame | null> 
     { _id: gameId },
     { projection: { _id: 0, text: 1, timestamp: 1 } }
   )) as CachedGame;
-  if (!cachedGame) return null;
 
+  if (!cachedGame) return null;
   await cache.set(gameId, cachedGame);
   return cachedGame;
 }
