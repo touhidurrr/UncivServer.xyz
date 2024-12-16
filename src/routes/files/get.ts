@@ -1,5 +1,5 @@
-import { db } from '@services/mongodb';
 import cache from '@services/cache';
+import { db } from '@services/mongodb';
 import type { Elysia } from 'elysia';
 
 export const getFile = (app: Elysia) =>
@@ -8,18 +8,20 @@ export const getFile = (app: Elysia) =>
     async ({ error, params: { gameId } }) => {
       const game = await db.UncivServer.findOne(
         { _id: gameId },
-        { projection: { _id: 0, text: 1 } }
+        { projection: { _id: 0, text: 1, timestamp: 1 } }
       );
 
       if (!game) return error(404);
 
-      await cache.set(gameId, game.text);
-      return game.text;
+      const { text, timestamp } = game;
+
+      await cache.set(gameId, { text, timestamp });
+      return text;
     },
     {
       beforeHandle: async ({ params: { gameId } }) => {
         const cachedResponse = await cache.get(gameId);
-        if (cachedResponse) return cachedResponse;
+        if (cachedResponse) return cachedResponse.text;
       },
     }
   );

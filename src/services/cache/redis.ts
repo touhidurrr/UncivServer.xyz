@@ -1,5 +1,6 @@
-import Redis from 'ioredis';
 import { REDIS_DEFAULT_URL } from '@constants';
+import Redis from 'ioredis';
+import type { CachedGame, CacheService } from '../../models/cache';
 
 const REDIS_URL = process.env.REDISCLOUD_URL || process.env.REDIS_URL || REDIS_DEFAULT_URL;
 
@@ -19,12 +20,14 @@ class RedisCacheService implements CacheService {
     await redis.ping();
   }
 
-  async get(key: string): Promise<string | null> {
-    return redis.get(key);
+  async get(key: string): Promise<CachedGame | null> {
+    const json = await redis.get(key);
+    return json ? JSON.parse(json) : null;
   }
 
-  async set(key: string, value: string): Promise<void> {
-    await redis.set(key, value);
+  async set(key: string, value: CachedGame): Promise<void> {
+    const json = JSON.stringify(value);
+    await redis.set(key, json);
   }
 
   async del(key: string): Promise<number> {

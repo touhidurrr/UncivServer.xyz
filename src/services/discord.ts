@@ -108,9 +108,18 @@ export async function sendNewTurnNotification(game: UncivJSON) {
           icon_url: 'https://i.imgur.com/nf2lNl0.png',
         },
         fields: [
+          ...(name
+            ? [
+                {
+                  name: 'Game Name',
+                  value: `\\'\\'${name}\\'\\'`,
+                  inline: true,
+                },
+              ]
+            : []),
           {
-            name: !name ? 'game ID' : 'Name',
-            value: `\`\`\`${name ?? gameId}\`\`\``,
+            name: 'Game ID',
+            value: `\`\`\`${gameId}\`\`\``,
             inline: false,
           },
           {
