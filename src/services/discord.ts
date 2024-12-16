@@ -112,7 +112,7 @@ export async function sendNewTurnNotification(game: UncivJSON) {
             ? [
                 {
                   name: 'Game Name',
-                  value: `\\'\\'${name}\\'\\'`,
+                  value: `\`\`\`${name}\`\`\``,
                   inline: true,
                 },
               ]
