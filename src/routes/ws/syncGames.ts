@@ -12,8 +12,6 @@ export async function syncGames(
         body: typeof WS_BODY_SYNC_GAMES;
         response: typeof WS_RESPONSE_SCHEMA;
         headers: typeof WS_HEADERS_SCHEMA;
-        open: unknown;
-        message: unknown;
       },
       {}
     >,
