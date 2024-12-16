@@ -1,6 +1,7 @@
-import { parse, format } from 'bytes';
-import { LRUCache } from 'lru-cache';
 import { FILES_CACHE_MAX_ITEMS, FILES_CACHE_MAX_SIZE } from '@constants';
+import { format, parse } from 'bytes';
+import { LRUCache } from 'lru-cache';
+import type { CachedGame, CacheService } from '../../models/cache';
 
 let maxCacheSize = FILES_CACHE_MAX_SIZE;
 
@@ -13,12 +14,12 @@ if (process.env.MAX_CACHE_SIZE) {
   maxCacheSize = parsedMaxCacheSize;
 }
 
-const lruCache = new LRUCache<string, string>({
+const lruCache = new LRUCache<string, CachedGame>({
   max: FILES_CACHE_MAX_ITEMS,
   maxSize: maxCacheSize,
   // according to stackoverflow, any character is stored as utf-16
   // utf-16 is 2 bytes per character
-  sizeCalculation: (val, key) => 2 * (key.length + val.length),
+  sizeCalculation: (val, key) => 2 * (key.length + val.text.length),
 });
 
 setInterval(
@@ -37,11 +38,11 @@ class LRUCacheService implements CacheService {
     return Promise.resolve();
   }
 
-  get(key: string): Promise<string | undefined> {
+  get(key: string): Promise<CachedGame | undefined> {
     return Promise.resolve(lruCache.get(key));
   }
 
-  set(key: string, value: string): Promise<void> {
+  set(key: string, value: CachedGame): Promise<void> {
     lruCache.set(key, value);
     return Promise.resolve();
   }

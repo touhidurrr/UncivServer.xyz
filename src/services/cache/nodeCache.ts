@@ -1,6 +1,7 @@
+import { CACHE_TTL_CHECK_INTERVAL_SECONDS, CACHE_TTL_SECONDS } from '@constants';
 import { format } from 'bytes';
 import NodeCache from 'node-cache';
-import { CACHE_TTL_CHECK_INTERVAL_SECONDS, CACHE_TTL_SECONDS } from '@constants';
+import type { CachedGame, CacheService } from '../../models/cache';
 
 const nodeCache = new NodeCache({
   stdTTL: CACHE_TTL_SECONDS,
@@ -28,11 +29,11 @@ class NodeCacheService implements CacheService {
     return Promise.resolve();
   }
 
-  get(key: string): Promise<string | undefined> {
-    return Promise.resolve(nodeCache.get<string>(key));
+  get(key: string): Promise<CachedGame | undefined> {
+    return Promise.resolve(nodeCache.get<CachedGame>(key));
   }
 
-  set(key: string, value: string): Promise<boolean> {
+  set(key: string, value: CachedGame): Promise<boolean> {
     return Promise.resolve(nodeCache.set(key, value));
   }
 

@@ -1,13 +1,15 @@
 import { DEFAULT_PORT } from '@constants';
 import { app } from '@index';
-import { Elysia, t } from 'elysia';
+import { Elysia } from 'elysia';
 import {
   WS_BODY_SCHEMA,
   WS_GAME_NOT_FOUND,
+  WS_HEADERS_SCHEMA,
   WS_MAX_PAYLOAD_LENGTH,
   WS_RESPONSE_SCHEMA,
   WS_UNKNOWN_MESSAGE,
 } from './constants';
+import { syncGames } from './syncGames';
 
 const port = process.env.PORT || DEFAULT_PORT;
 const FILES_BASE_URL = `http://[::1]:${port}/files`;
@@ -20,7 +22,7 @@ export const websocketsRoute = new Elysia({
 }).ws('/ws', {
   body: WS_BODY_SCHEMA,
   response: WS_RESPONSE_SCHEMA,
-  headers: t.Object({ authorization: t.String() }),
+  headers: WS_HEADERS_SCHEMA,
   open: ws => {
     try {
       // Decode userId from authorization header
@@ -81,6 +83,10 @@ export const websocketsRoute = new Elysia({
           });
           break;
         }
+        break;
+      case 'SyncGames':
+        //@ts-ignore
+        await syncGames(ws, data.lastUpdatedList);
         break;
       default:
         ws.send(WS_UNKNOWN_MESSAGE);

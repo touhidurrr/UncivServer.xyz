@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
 
-interface UncivGame {
+export interface UncivGame {
   _id: string;
   text: string;
   timestamp: number;
