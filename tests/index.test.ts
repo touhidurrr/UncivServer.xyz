@@ -5,6 +5,7 @@ import { getRandomBase64String } from '@lib/getRandomBase64String';
 import cache from '@services/cache';
 import { describe, expect, test } from 'bun:test';
 import { randomUUID } from 'node:crypto';
+import type { CachedGame } from '../src/models/cache';
 
 const api = treaty(app, {
   onRequest: (_path, init) => {
@@ -44,13 +45,16 @@ describe('GET /files', () => {
 });
 
 describe('PATCH /files', () => {
-  const fileData = getRandomBase64String('100kb');
+  const cachedGame: CachedGame = {
+    text: getRandomBase64String('100kb'),
+    timestamp: Date.now(),
+  };
   const Authorization = `Bearer ${process.env.SYNC_TOKEN}`;
 
   test('Upload Success', async () => {
     await api
       .files({ gameId: TEST_GAME_ID })
-      .patch(fileData, { headers: { Authorization } })
+      .patch(cachedGame, { headers: { Authorization } })
       .then(({ status, data }) => {
         expect(status).toBe(200);
         expect(data).toBeString();
@@ -59,9 +63,9 @@ describe('PATCH /files', () => {
   });
 
   test('Cache Hit', async () => {
-    const cachedFile = await cache.get(TEST_GAME_ID);
-    expect(cachedFile).toBeString();
-    expect(cachedFile).toBe(fileData);
+    const game = await cache.get(TEST_GAME_ID);
+    expect(game).toBeObject();
+    expect(game).toEqual(cachedGame);
   });
 });
 
@@ -108,9 +112,11 @@ describe('PUT /files', () => {
     });
 
     test('Cache Hit', async () => {
-      const cachedFile = await cache.get(TEST_GAME_ID);
-      expect(cachedFile).toBeString();
-      expect(cachedFile).toBe(fileData);
+      const cachedGame = await cache.get(TEST_GAME_ID);
+      expect(cachedGame).toBeObject();
+      expect(cachedGame).toContainAllKeys(['text', 'timestamp']);
+      expect(cachedGame!.timestamp).toBeNumber();
+      expect(cachedGame!.text).toBe(fileData);
     });
 
     test('Can be found in GET /files', async () => {
