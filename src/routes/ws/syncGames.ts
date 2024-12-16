@@ -2,14 +2,14 @@ import cache from '@services/cache';
 import { db } from '@services/mongodb';
 import type { Static, UnwrapRoute } from 'elysia';
 import type { ElysiaWS } from 'elysia/ws';
-import type { WS_BODY_SYNC_GAMES, WS_HEADERS_SCHEMA, WS_RESPONSE_SCHEMA } from './constants';
+import type { WS_BODY_SYNC_GAMES_SCHEMA, WS_HEADERS_SCHEMA, WS_RESPONSE_SCHEMA } from './constants';
 
 export async function syncGames(
   ws: ElysiaWS<
     any,
     UnwrapRoute<
       {
-        body: typeof WS_BODY_SYNC_GAMES;
+        body: typeof WS_BODY_SYNC_GAMES_SCHEMA;
         response: typeof WS_RESPONSE_SCHEMA;
         headers: typeof WS_HEADERS_SCHEMA;
       },
@@ -17,7 +17,7 @@ export async function syncGames(
     >,
     any
   >,
-  lastUpdatedList: Static<typeof WS_BODY_SYNC_GAMES>['data']['lastUpdatedList']
+  lastUpdatedList: Static<typeof WS_BODY_SYNC_GAMES_SCHEMA>['data']['lastUpdatedList']
 ) {
   await Promise.allSettled(
     lastUpdatedList.map(({ gameId, lastUpdated }) =>
