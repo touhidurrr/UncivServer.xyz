@@ -11,6 +11,7 @@ import { staticPlugin } from '@elysiajs/static';
 import { swagger } from '@elysiajs/swagger';
 import { filesRoute } from '@routes/files';
 import { infoPlugin } from '@routes/info';
+import { jsonsRoute } from '@routes/jsons';
 import { Elysia } from 'elysia';
 import { version } from '../package.json';
 
@@ -36,6 +37,7 @@ export const app = new Elysia()
     }
   })
   .use(staticPlugin({ prefix: '/' }))
+  .use(jsonsRoute)
   .use(infoPlugin)
   .get('/isalive', true)
   .all('/support', ctx => ctx.redirect(SUPPORT_URL, 303))
