@@ -23,7 +23,7 @@ export const app = new Elysia()
     swagger({
       path: '/swagger',
       documentation: {
-        info: { title: 'Unciv API', version },
+        info: { title: 'UncivServer.xyz API', version },
       },
       exclude: /^\/(?!ws|files)/,
     })
