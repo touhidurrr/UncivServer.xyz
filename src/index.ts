@@ -8,10 +8,10 @@ import {
   SUPPORT_URL,
 } from '@constants';
 import { staticPlugin } from '@elysiajs/static';
+import { swagger } from '@elysiajs/swagger';
 import { filesRoute } from '@routes/files';
 import { infoPlugin } from '@routes/info';
 import { Elysia } from 'elysia';
-import { swagger } from '@elysiajs/swagger';
 import { version } from '../package.json';
 
 const port = process.env.PORT ?? DEFAULT_PORT;
@@ -22,7 +22,7 @@ export const app = new Elysia()
     swagger({
       path: '/swagger',
       documentation: {
-        info: { title: 'Unciv API', version },
+        info: { title: 'UncivServer.xyz API', version },
       },
       exclude: /^\/(?!ws|files)/,
     })
