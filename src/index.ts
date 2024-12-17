@@ -8,15 +8,26 @@ import {
   SUPPORT_URL,
 } from '@constants';
 import { staticPlugin } from '@elysiajs/static';
+import { swagger } from '@elysiajs/swagger';
 import { filesRoute } from '@routes/files';
 import { infoPlugin } from '@routes/info';
 import { websocketsRoute } from '@routes/ws';
 import { Elysia } from 'elysia';
+import { version } from '../package.json';
 
 const port = process.env.PORT ?? DEFAULT_PORT;
 const hostname = process.env.HOST ?? DEFAULT_HOST;
 
 export const app = new Elysia()
+  .use(
+    swagger({
+      path: '/swagger',
+      documentation: {
+        info: { title: 'Unciv API', version },
+      },
+      exclude: /^\/(?!ws|files)/,
+    })
+  )
   .use(websocketsRoute)
   .onRequest(({ request, error }) => {
     if (isDevelopment) console.info(`${request.method} ${request.url}`);
