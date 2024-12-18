@@ -11,7 +11,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -22,7 +23,6 @@ jobs:
         uses: supercharge/mongodb-github-action@1.11.0
         with:
           mongodb-db: unciv
-          mongodb-version: latest
 
       - name: Install dependencies
         run: bun install
@@ -30,14 +30,9 @@ jobs:
       - name: Lint TypeScript
         run: bun lint
 
-      - name: Make .env file
-        run: |
-          echo "SYNC_TOKEN=$(openssl rand -base64 32)" > .env
-          echo "DISCORD_TOKEN=$(openssl rand -base64 32)" >> .env
-          echo "MONGO_URL=mongodb://localhost:27017/unciv" >> .env
-
       - name: Run tests
-        run: bun test
-
-      - name: Shred data!
-        run: shred -uzn 10 .env
+        run: |
+          SYNC_TOKEN=$(openssl rand -base64 32) \
+          DISCORD_TOKEN=$(openssl rand -base64 32) \
+          MONGO_URL=mongodb://localhost:27017/unciv \
+          bun test
