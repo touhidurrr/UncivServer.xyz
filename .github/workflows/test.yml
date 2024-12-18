@@ -16,7 +16,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.11.0
+        with:
+          mongodb-db: unciv
+          mongodb-version: latest
 
       - name: Install dependencies
         run: bun install
@@ -28,7 +38,7 @@ jobs:
         run: |
           echo "SYNC_TOKEN=$(openssl rand -base64 32)" > .env
           echo "DISCORD_TOKEN=$(openssl rand -base64 32)" >> .env
-          echo "MONGO_URL=${{ secrets.MONGO_URL }}" >> .env
+          echo "MONGO_URL=mongodb://localhost:27017/unciv" >> .env
 
       - name: Run tests
         run: bun test
