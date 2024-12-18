@@ -16,9 +16,6 @@ export const isDiscordTokenValid = Boolean(DISCORD_TOKEN);
 
 const discord = new REST({ version: '10' }).setToken(DISCORD_TOKEN ?? '');
 
-// bun fix no brotli support
-discord.options.headers['Accept-Encoding'] = 'gzip, deflate';
-
 // handle some events for debug
 discord.on('invalidRequestWarning', data => {
   console.warn(`[Discord] Invalid Request Warning:`, data);
@@ -28,8 +25,8 @@ discord.on('rateLimited', data => {
   console.warn(`[Discord] Rate Limited:`, data);
 });
 
-discord.on('response', ({ path }, { status, statusText }) => {
-  console.log(`[Discord] Response on ${path}: ${status} ${statusText}`);
+discord.on('response', ({ path, method }, { status, statusText }) => {
+  console.log(`[Discord]`, method, path, status, statusText);
 });
 
 async function createMessage(
