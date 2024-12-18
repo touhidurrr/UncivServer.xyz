@@ -5,7 +5,7 @@ PROJECT_DIR="/path/to/project/dir"
 BUN_DIR="/path/to/bun"
 
 # Update
-alias bun="$BUN_DIR/.bin/bun"
+alias bun="$BUN_DIR/bin/bun"
 cd "$PROJECT_DIR"
 
 # Check for updates
