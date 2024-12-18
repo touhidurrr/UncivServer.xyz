@@ -5,6 +5,7 @@ import { getRandomBase64String } from '@lib/getRandomBase64String';
 import cache from '@services/cache';
 import { describe, expect, test } from 'bun:test';
 import { randomUUID } from 'node:crypto';
+import { sep } from 'node:path';
 
 const api = treaty(app, {
   onRequest: (_path, init) => {
@@ -124,4 +125,26 @@ describe('PUT /files', () => {
         });
     });
   });
+});
+
+test('All static assets can be accessed', async () => {
+  // make a list of paths
+  const paths: string[] = [];
+  const filenames = new Bun.Glob('public/**').scan({ onlyFiles: true });
+  for await (const file of filenames) {
+    const path = '/' + file.split(sep).slice(1).join('/');
+    paths.push(path);
+    if (path.endsWith('/index.html')) {
+      paths.push(path.slice(0, -10));
+    }
+  }
+
+  // test each path
+  const baseURL = 'http://[::1]:1557';
+  await Promise.all(
+    paths.map(async path => {
+      const res = await app.handle(new Request(`${baseURL}${path}`));
+      expect(res.status).toBe(200);
+    })
+  );
 });
