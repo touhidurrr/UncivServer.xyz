@@ -25,7 +25,7 @@ export const app = new Elysia()
       documentation: {
         info: { title: 'UncivServer.xyz API', version },
       },
-      exclude: /^\/(?!ws|files|jsons)/,
+      exclude: /^(?!\/(ws|files|jsons))/,
     })
   )
   .onRequest(({ request, error }) => {
