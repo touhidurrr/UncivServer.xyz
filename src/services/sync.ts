@@ -21,8 +21,7 @@ export async function syncGame(gameId: string, body: string) {
   Servers.forEach(api => {
     fetch(`${api}/files/${gameId}`, config)
       .then(
-        async res =>
-          !res.ok && console.error('[Sync] Error:', res.status, res.statusText, res.headers)
+        res => !res.ok && console.error('[Sync] Error:', res.status, res.statusText, res.headers)
       )
       .catch(err => console.error('[Sync] Fetch Error:', err));
   });
