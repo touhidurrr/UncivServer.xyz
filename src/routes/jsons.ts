@@ -1,10 +1,8 @@
 import { GAME_ID_REGEX } from '@constants';
 import cache from '@services/cache';
 import { db } from '@services/mongodb';
-import { unpack } from '@services/uncivGame';
+import { unpackJSON } from '@services/uncivGame';
 import { Elysia, t } from 'elysia';
-
-const unpackedJSON = (gameData: string) => JSON.stringify(unpack(gameData), null, 2);
 
 export const jsonsRoute = new Elysia().get(
   '/jsons/:gameId',
@@ -12,7 +10,7 @@ export const jsonsRoute = new Elysia().get(
     set.headers['content-type'] = 'application/json';
 
     const gameData = await cache.get(gameId);
-    if (gameData) return unpackedJSON(gameData);
+    if (gameData) return unpackJSON(gameData);
 
     const dbGame = await db.UncivServer.findOne(
       { _id: gameId },
@@ -21,7 +19,7 @@ export const jsonsRoute = new Elysia().get(
     if (!dbGame) return error(404);
 
     await cache.set(gameId, dbGame.text);
-    return unpackedJSON(dbGame.text);
+    return unpackJSON(dbGame.text);
   },
   {
     params: t.Object({ gameId: t.RegExp(GAME_ID_REGEX) }),
