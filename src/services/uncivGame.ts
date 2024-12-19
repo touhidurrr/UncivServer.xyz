@@ -13,7 +13,7 @@ export const unpackFromFile = async (path: string): Promise<UncivJSON> => {
 
 export const pack = (data: object): string => {
   const json = JSON.stringify(data);
-  const compressed = Bun.gzipSync(json);
+  const compressed = Bun.gzipSync(json, { level: 9 });
   // return base64 string
   return Buffer.from(compressed).toString('base64');
 };
