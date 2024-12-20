@@ -33,10 +33,10 @@
   "dependencies": {
     "@discordjs/rest": "^2.4.0",
     "@elysiajs/bearer": "^1.1.2",
-    "@elysiajs/static": "1.0.3",
+    "@elysiajs/static": "1.1.2",
     "bytes": "^3.1.2",
     "date-fns": "^4.1.0",
-    "discord-api-types": "^0.37.111",
+    "discord-api-types": "^0.37.112",
     "elysia": "^1.1.26",
     "ioredis": "^5.4.1",
     "lru-cache": "^11.0.2",
