@@ -17,6 +17,7 @@ const FILES_BASE_URL = `http://[::1]:${port}/files`;
 export const websocketsRoute = new Elysia({
   websocket: {
     idleTimeout: 30,
+    perMessageDeflate: true,
     maxPayloadLength: WS_MAX_PAYLOAD_LENGTH,
   },
 }).ws('/ws', {
