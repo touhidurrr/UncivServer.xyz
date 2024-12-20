@@ -12,13 +12,19 @@ import { swagger } from '@elysiajs/swagger';
 import { filesRoute } from '@routes/files';
 import { infoPlugin } from '@routes/info';
 import { websocketsRoute } from '@routes/ws';
+import { WS_MAX_PAYLOAD_LENGTH } from '@routes/ws/constants';
 import { Elysia } from 'elysia';
 import { version } from '../package.json';
 
 const port = process.env.PORT ?? DEFAULT_PORT;
 const hostname = process.env.HOST ?? DEFAULT_HOST;
 
-export const app = new Elysia()
+export const app = new Elysia({
+  websocket: {
+    perMessageDeflate: true,
+    maxPayloadLength: WS_MAX_PAYLOAD_LENGTH,
+  },
+})
   .use(
     swagger({
       path: '/swagger',

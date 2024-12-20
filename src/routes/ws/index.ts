@@ -5,7 +5,6 @@ import {
   WS_BODY_SCHEMA,
   WS_GAME_NOT_FOUND,
   WS_HEADERS_SCHEMA,
-  WS_MAX_PAYLOAD_LENGTH,
   WS_RESPONSE_SCHEMA,
   WS_UNKNOWN_MESSAGE,
 } from './constants';
@@ -14,13 +13,7 @@ import { syncGames } from './syncGames';
 const port = process.env.PORT || DEFAULT_PORT;
 const FILES_BASE_URL = `http://[::1]:${port}/files`;
 
-export const websocketsRoute = new Elysia({
-  websocket: {
-    idleTimeout: 30,
-    perMessageDeflate: true,
-    maxPayloadLength: WS_MAX_PAYLOAD_LENGTH,
-  },
-}).ws('/ws', {
+export const websocketsRoute = new Elysia().ws('/ws', {
   body: WS_BODY_SCHEMA,
   response: WS_RESPONSE_SCHEMA,
   headers: WS_HEADERS_SCHEMA,
