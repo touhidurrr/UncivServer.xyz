@@ -76,7 +76,7 @@ describe('PUT /files', () => {
       });
   });
 
-  test('Fail on Big File', async () => {
+  test('Fail on files larger than MAX_FILE_SIZE', async () => {
     await api
       .files({ gameId: TEST_GAME_ID })
       .put(getRandomBase64String(MAX_FILE_SIZE + 1))

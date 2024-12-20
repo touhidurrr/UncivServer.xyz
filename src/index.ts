@@ -18,7 +18,9 @@ import { version } from '../package.json';
 const port = process.env.PORT ?? DEFAULT_PORT;
 const hostname = process.env.HOST ?? DEFAULT_HOST;
 
-export const app = new Elysia()
+export const app = new Elysia({
+  serve: { maxRequestBodySize: 1.1 * MAX_CONTENT_LENGTH },
+})
   .use(
     swagger({
       path: '/swagger',

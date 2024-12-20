@@ -1,4 +1,9 @@
-import { START_TEST_FETCH_TIMEOUT, START_TEST_TIMEOUT } from '@constants';
+import {
+  MAX_CONTENT_LENGTH,
+  START_TEST_FETCH_TIMEOUT,
+  START_TEST_TIMEOUT,
+  TEST_GAME_ID,
+} from '@constants';
 import { getAppBaseURL } from '@lib/getAppBaseURL';
 import { describe, expect, test } from 'bun:test';
 
@@ -30,6 +35,17 @@ describe('App Start Test', () => {
     const res = await fetch(baseURL);
     expect(res.ok).toBeTrue();
     expect(res.status).not.toBe(404);
+  });
+
+  test('Fail on payloads larger than maxRequestBodySize', async () => {
+    let failed = false;
+    await fetch(`${baseURL}/files/${TEST_GAME_ID}`, {
+      method: 'PUT',
+      body: new Uint8Array(MAX_CONTENT_LENGTH * 1.11),
+    }).catch(() => {
+      failed = true;
+    });
+    expect(failed).toBeTrue();
   });
 
   test('App is still running', () => {
