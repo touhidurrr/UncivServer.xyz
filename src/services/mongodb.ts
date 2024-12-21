@@ -39,9 +39,11 @@ if (!process.env.MONGO_URL) {
 const _client = new MongoClient(process.env.MONGO_URL, {
   tls: true,
   compressors: ['zstd'],
+  socketTimeoutMS: 30_000,
+  retryWrites: true,
 });
 
-_client.on('connectionReady', () => {
+_client.on('open', () => {
   console.info('[MongoDB] Connected.');
 });
 
@@ -50,8 +52,11 @@ const reconnectMongo = async () => {
   await _client.connect();
 };
 
-_client.on('connectionClosed', reconnectMongo);
 _client.on('close', reconnectMongo);
+_client.on('timeout', reconnectMongo);
+_client.on('serverClosed', reconnectMongo);
+_client.on('topologyClosed', reconnectMongo);
+_client.on('connectionClosed', reconnectMongo);
 
 await _client.connect();
 const _db = await _client.db('unciv');
