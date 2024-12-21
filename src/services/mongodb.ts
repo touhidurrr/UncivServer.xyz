@@ -36,9 +36,24 @@ if (!process.env.MONGO_URL) {
   process.exit(1);
 }
 
-const _client = new MongoClient(process.env.MONGO_URL);
-await _client.connect();
+const _client = new MongoClient(process.env.MONGO_URL, {
+  tls: true,
+  compressors: ['zstd'],
+});
 
+_client.on('connectionReady', () => {
+  console.info('[MongoDB] Connected.');
+});
+
+const reconnectMongo = async () => {
+  console.error('[MongoDB] Disconnected!');
+  await _client.connect();
+};
+
+_client.on('connectionClosed', reconnectMongo);
+_client.on('close', reconnectMongo);
+
+await _client.connect();
 const _db = await _client.db('unciv');
 
 const [UncivServer, PlayerProfiles, ErrorLogs] = await Promise.all([
@@ -46,8 +61,6 @@ const [UncivServer, PlayerProfiles, ErrorLogs] = await Promise.all([
   _db.collection<PlayerProfile>('PlayerProfiles'),
   _db.collection<ErrorLog>('ErrorLogs'),
 ]);
-
-console.info('[MongoDB] Connected.');
 
 export const db = {
   _db,
