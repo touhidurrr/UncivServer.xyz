@@ -1,8 +1,10 @@
 import type { UncivJSON } from '@localTypes/unciv';
 
 export const unpackJSON = (data: string): string =>
-  //@ts-ignore
-  Buffer.from(Bun.gunzipSync(Buffer.from(data, 'base64')).buffer).toString('utf8');
+  Buffer.from(
+    //@ts-ignore
+    Bun.gunzipSync(Buffer.from(data, 'base64')).buffer
+  ).toString('utf8');
 
 export const unpack = (data: string): UncivJSON => JSON.parse(unpackJSON(data));
 

@@ -5,7 +5,7 @@ const Servers = (SYNC_SERVERS ?? '').split(/[\n\s]+/).filter(Boolean);
 
 console.info('[Sync] Servers:', Servers);
 
-export async function syncGame(gameId: string, body: string) {
+export const syncGame = (gameId: string, body: string) => {
   if (!SYNC_TOKEN || !Servers.length) return;
 
   const config = {
@@ -25,4 +25,4 @@ export async function syncGame(gameId: string, body: string) {
       )
       .catch(err => console.error('[Sync] Fetch Error:', err));
   });
-}
+};

@@ -12,6 +12,8 @@ export const infoPlugin = new Elysia().get('/info', () => {
       heapUsed: format(memory.heapUsed),
       external: format(memory.external),
     },
-    uptime: formatDistanceToNow(new Date(Date.now() - uptime * 1000), { includeSeconds: true }),
+    uptime: formatDistanceToNow(new Date(Date.now() - uptime * 1000), {
+      includeSeconds: true,
+    }),
   };
 });

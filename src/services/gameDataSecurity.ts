@@ -4,7 +4,7 @@ import { URL } from 'node:url';
 
 const allowedDomainsSet = new Set(allowedDomains);
 
-export function isAllowedURL(candidateURL: string): boolean {
+export const isAllowedURL = (candidateURL: string): boolean => {
   if (!candidateURL) return false;
 
   let url: URL | null = null;
@@ -24,11 +24,11 @@ export function isAllowedURL(candidateURL: string): boolean {
   }
 
   return true;
-}
+};
 
 // run security checks and returns true if game data is modified
 // game data should be modified in place
-export function gameDataSecurityModifier(game: UncivJSON): boolean {
+export const gameDataSecurityModifier = (game: UncivJSON): boolean => {
   let hasModifications = false;
 
   // LinkAction security
@@ -50,4 +50,4 @@ export function gameDataSecurityModifier(game: UncivJSON): boolean {
   });
 
   return hasModifications;
-}
+};

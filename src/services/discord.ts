@@ -29,23 +29,23 @@ discord.on('response', ({ path, method }, { status, statusText }) => {
   console.log(`[Discord]`, method, path, status, statusText);
 });
 
-async function createMessage(
+const createMessage = (
   channelId: string,
   message: RESTPostAPIChannelMessageJSONBody
-): Promise<RESTPostAPIChannelMessageResult> {
+): Promise<RESTPostAPIChannelMessageResult> => {
   return discord.post(Routes.channelMessages(channelId), {
     body: message,
   }) as Promise<RESTPostAPIChannelMessageResult>;
-}
+};
 
-async function getDMChannel(discordId: string) {
+const getDMChannel = async (discordId: string) => {
   const res = (await discord.post(Routes.userChannels(), {
     body: { recipient_id: discordId },
   })) as RESTPostAPICurrentUserCreateDMChannelResult;
   return res.id;
-}
+};
 
-export async function sendNewTurnNotification(game: UncivJSON) {
+export const sendNewTurnNotification = async (game: UncivJSON) => {
   const { turns, gameId, civilizations, currentPlayer, gameParameters } = game;
 
   // find currentPlayer's ID
@@ -150,4 +150,4 @@ export async function sendNewTurnNotification(game: UncivJSON) {
     });
     console.error(err);
   });
-}
+};

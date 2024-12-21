@@ -49,7 +49,9 @@ _client.on('open', () => {
 
 const reconnectMongo = async () => {
   console.error('[MongoDB] Disconnected!');
-  await _client.connect();
+  await _client.connect().catch(err => {
+    console.error('[MongoDB] Error calling connect():', err);
+  });
 };
 
 _client.on('close', reconnectMongo);
