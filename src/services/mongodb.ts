@@ -37,7 +37,6 @@ if (!process.env.MONGO_URL) {
 }
 
 const _client = new MongoClient(process.env.MONGO_URL, {
-  tls: true,
   compressors: ['zstd'],
   socketTimeoutMS: 30_000,
   retryWrites: true,
