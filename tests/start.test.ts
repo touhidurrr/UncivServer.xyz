@@ -41,7 +41,7 @@ describe('App Start Test', () => {
     let failed = false;
     await fetch(`${baseURL}/files/${TEST_GAME_ID}`, {
       method: 'PUT',
-      body: new Uint8Array(MAX_CONTENT_LENGTH * 1.2),
+      body: new Uint8Array(MAX_CONTENT_LENGTH * 1.2).buffer,
     }).catch(() => {
       failed = true;
     });

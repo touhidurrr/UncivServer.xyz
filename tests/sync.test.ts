@@ -11,18 +11,6 @@ if (!SYNC_TOKEN) {
   throw 'No Sync Token Found!';
 }
 
-// wait for the server to start properly
-let started = false;
-while (!started) {
-  try {
-    const isAlive = await fetch(`${getAppBaseURL()}/isalive`).then(res => res.text());
-    if (isAlive === 'true') {
-      started = true;
-      break;
-    }
-  } catch {}
-}
-
 const getSyncWSClient = (token: string) =>
   new WebSocket(`${getAppBaseURL()}/sync`, {
     headers: { Authorization: `Bearer ${token}` },
