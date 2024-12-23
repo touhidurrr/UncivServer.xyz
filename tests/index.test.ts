@@ -1,6 +1,7 @@
 import { MAX_FILE_SIZE, TEST_GAME_ID } from '@constants';
 import { treaty } from '@elysiajs/eden';
 import { app } from '@index';
+import { getAppBaseURL } from '@lib';
 import { getRandomBase64String } from '@lib/getRandomBase64String';
 import cache from '@services/cache';
 import { describe, expect, test } from 'bun:test';
@@ -41,28 +42,6 @@ describe('GET /files', () => {
       .then(({ status }) => {
         expect(status).toBe(404);
       });
-  });
-});
-
-describe('PATCH /files', () => {
-  const fileData = getRandomBase64String('100kb');
-  const Authorization = `Bearer ${process.env.SYNC_TOKEN}`;
-
-  test('Upload Success', async () => {
-    await api
-      .files({ gameId: TEST_GAME_ID })
-      .patch(fileData, { headers: { Authorization } })
-      .then(({ status, data }) => {
-        expect(status).toBe(200);
-        expect(data).toBeString();
-        expect(data).toBe('Done!');
-      });
-  });
-
-  test('Cache Hit', async () => {
-    const cachedFile = await cache.get(TEST_GAME_ID);
-    expect(cachedFile).toBeString();
-    expect(cachedFile).toBe(fileData);
   });
 });
 
@@ -140,10 +119,9 @@ test('All static assets can be accessed', async () => {
   }
 
   // test each path
-  const baseURL = 'http://[::1]:1557';
   await Promise.all(
     paths.map(async path => {
-      const res = await app.handle(new Request(`${baseURL}${path}`));
+      const res = await app.handle(new Request(`${getAppBaseURL()}${path}`));
       expect(res.status).toBe(200);
     })
   );

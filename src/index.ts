@@ -12,14 +12,21 @@ import { swagger } from '@elysiajs/swagger';
 import { filesRoute } from '@routes/files';
 import { infoPlugin } from '@routes/info';
 import { jsonsRoute } from '@routes/jsons';
+import { syncRoute } from '@routes/sync';
 import { Elysia } from 'elysia';
 import { version } from '../package.json';
+
+// start sync service
+import './services/sync';
 
 const port = process.env.PORT ?? DEFAULT_PORT;
 const hostname = process.env.HOST ?? DEFAULT_HOST;
 
 export const app = new Elysia({
   serve: { maxRequestBodySize: 1.1 * MAX_CONTENT_LENGTH },
+  websocket: {
+    perMessageDeflate: true,
+  },
 })
   .use(
     swagger({
@@ -38,13 +45,14 @@ export const app = new Elysia({
       if (+contentLen > MAX_CONTENT_LENGTH) return error(413);
     }
   })
-  .use(staticPlugin({ prefix: '/' }))
+  .use(filesRoute)
+  .use(syncRoute)
   .use(jsonsRoute)
   .use(infoPlugin)
   .get('/isalive', true)
   .all('/support', ctx => ctx.redirect(SUPPORT_URL, 303))
   .all('/discord', ctx => ctx.redirect(DISCORD_INVITE, 303))
-  .use(filesRoute)
+  .use(staticPlugin({ prefix: '/' }))
   .listen({ port, hostname });
 
 console.log(`Server started at ${app.server?.url}`);

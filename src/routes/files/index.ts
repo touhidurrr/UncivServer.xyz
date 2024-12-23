@@ -1,6 +1,5 @@
 import { Elysia, t } from 'elysia';
 import { getFile } from './get';
-import { patchFile } from './patch';
 import { putFile } from './put';
 
 import { GAME_ID_REGEX, MAX_FILE_SIZE, MIN_FILE_SIZE } from '@constants';
@@ -19,6 +18,6 @@ export const filesRoute = new Elysia({ prefix: '/files' }).guard(
           format: 'byte',
         }),
       },
-      app => app.use(putFile).use(patchFile)
+      app => app.use(putFile)
     )
 );

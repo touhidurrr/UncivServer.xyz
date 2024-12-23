@@ -43,22 +43,19 @@ const _client = new MongoClient(process.env.MONGO_URL, {
   retryWrites: true,
 });
 
-_client.on('open', () => {
+_client.once('open', () => {
   console.info('[MongoDB] Connected.');
 });
 
-const reconnectMongo = async () => {
-  console.error('[MongoDB] Disconnected!');
-  await _client.connect().catch(err => {
-    console.error('[MongoDB] Error calling connect():', err);
-  });
-};
+_client.on('close', () => {
+  console.error('[MongoDB] Connection closed!');
+  process.exit(1);
+});
 
-_client.on('close', reconnectMongo);
-_client.on('timeout', reconnectMongo);
-_client.on('serverClosed', reconnectMongo);
-_client.on('topologyClosed', reconnectMongo);
-_client.on('connectionClosed', reconnectMongo);
+_client.on('timeout', () => {
+  console.error('[MongoDB] Timeout!');
+  process.exit(1);
+});
 
 await _client.connect();
 const _db = await _client.db('unciv');
