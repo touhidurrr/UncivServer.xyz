@@ -1,4 +1,4 @@
-import type { SYNC_MESSAGE_SCHEMA } from '@routes/sync';
+import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import type { Static } from 'elysia';
 import random from 'random';
 import cache from './cache';
@@ -8,6 +8,8 @@ const SYNC_SERVERS = process.env.SYNC_SERVERS ?? '';
 
 const Servers: Record<string, WebSocket> = {};
 
+const MAX_RECONNECTION_ATTEMPTS = 100;
+
 // initialize a websocket connection with a sync server
 const initWs = (baseURL: string) => {
   const ws = new WebSocket(`${baseURL}/sync`, {
@@ -16,14 +18,15 @@ const initWs = (baseURL: string) => {
   });
 
   let authOk = true;
-  let maxReconnectionAttempts = 100;
+  let reconnectionAttemptsLeft = MAX_RECONNECTION_ATTEMPTS;
 
   ws.addEventListener('open', () => {
-    console.info(`[Sync] Connected established with ${baseURL}`);
+    console.info(`[Sync] Connection established with ${baseURL}.`);
+    reconnectionAttemptsLeft = MAX_RECONNECTION_ATTEMPTS;
   });
 
   ws.addEventListener('message', ({ data }) => {
-    const msg = JSON.parse(data.toString('utf8')) as Static<typeof SYNC_MESSAGE_SCHEMA>;
+    const msg = JSON.parse(data.toString('utf8')) as Static<typeof SYNC_RESPONSE_SCHEMA>;
     switch (msg.type) {
       case 'SyncData':
         cache.set(msg.data.gameId, msg.data.content);
@@ -41,10 +44,10 @@ const initWs = (baseURL: string) => {
   ws.addEventListener('close', ({ code, reason }) => {
     console.error(`[Sync] Connection closed:`, { code, reason, server: baseURL });
 
-    if (!authOk || maxReconnectionAttempts < 1) return;
+    if (!authOk || reconnectionAttemptsLeft < 1) return;
     setTimeout(
       () => {
-        maxReconnectionAttempts--;
+        reconnectionAttemptsLeft--;
         console.info(`[Sync] Reconnecting to:`, baseURL);
         Servers[baseURL] = initWs(baseURL);
       },

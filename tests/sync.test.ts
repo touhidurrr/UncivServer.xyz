@@ -2,7 +2,7 @@ import { TEST_GAME_ID } from '@constants';
 import '@index';
 import { getAppBaseURL } from '@lib';
 import { getRandomBase64String } from '@lib/getRandomBase64String';
-import type { SYNC_MESSAGE_SCHEMA } from '@routes/sync';
+import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import { describe, expect, test } from 'bun:test';
 import type { Static } from 'elysia';
 
@@ -24,7 +24,7 @@ describe('Token', () => {
         const ws = getSyncWSClient('');
         ws.addEventListener('open', () => Bun.sleep(1000).then(() => res('Done')));
         ws.addEventListener('message', ({ data }) => {
-          const msg = JSON.parse(data.toString('utf8')) as Static<typeof SYNC_MESSAGE_SCHEMA>;
+          const msg = JSON.parse(data.toString('utf8')) as Static<typeof SYNC_RESPONSE_SCHEMA>;
           if (msg.type === 'AuthError') {
             rej('AuthError');
             ws.close();
@@ -44,7 +44,7 @@ describe('Token', () => {
         const ws = getSyncWSClient('Bearer ');
         ws.addEventListener('open', () => Bun.sleep(1000).then(() => res('Done')));
         ws.addEventListener('message', ({ data }) => {
-          const msg = JSON.parse(data.toString('utf8')) as Static<typeof SYNC_MESSAGE_SCHEMA>;
+          const msg = JSON.parse(data.toString('utf8')) as Static<typeof SYNC_RESPONSE_SCHEMA>;
           if (msg.type === 'AuthError') {
             rej('AuthError');
             ws.close();
@@ -64,7 +64,7 @@ describe('Token', () => {
         const ws = getSyncWSClient('Bearer Mismatch');
         ws.addEventListener('open', () => Bun.sleep(1000).then(() => res('Done')));
         ws.addEventListener('message', ({ data }) => {
-          const msg = JSON.parse(data.toString('utf8')) as Static<typeof SYNC_MESSAGE_SCHEMA>;
+          const msg = JSON.parse(data.toString('utf8')) as Static<typeof SYNC_RESPONSE_SCHEMA>;
           if (msg.type === 'AuthError') {
             rej('AuthError');
             ws.close();
@@ -84,7 +84,7 @@ describe('Token', () => {
         const ws = getSyncWSClient(SYNC_TOKEN);
         ws.addEventListener('open', () => Bun.sleep(1000).then(() => res('Done')));
         ws.addEventListener('message', ({ data }) => {
-          const msg = JSON.parse(data.toString('utf8')) as Static<typeof SYNC_MESSAGE_SCHEMA>;
+          const msg = JSON.parse(data.toString('utf8')) as Static<typeof SYNC_RESPONSE_SCHEMA>;
           if (msg.type === 'AuthError') {
             rej('AuthError');
             ws.close();
@@ -103,15 +103,15 @@ test('Uploaded files are relayed properly', async () => {
   const url = `${getAppBaseURL()}/files/${TEST_GAME_ID}`;
   const fileData = getRandomBase64String('1kb');
 
-  const putFile = async (isPreview: boolean = false) => {
-    const res = await fetch(url + (isPreview ? '_Preview' : ''), {
+  const putFile = (isPreview: boolean = false) =>
+    fetch(url + (isPreview ? '_Preview' : ''), {
       method: 'PUT',
       body: fileData,
-      headers: { ['Content-Type']: fileData.length.toString() },
+      headers: {
+        'Content-Type': 'text/plain',
+        'Content-Length': fileData.length.toString(),
+      },
     }).catch(console.error);
-
-    if (res) console.log(res.status, res.statusText);
-  };
 
   let receivedData = false;
   let receivedPreview = false;
@@ -121,10 +121,11 @@ test('Uploaded files are relayed properly', async () => {
     Bun.sleep(5_000).then(() => reject('Timeout'));
 
     ws.addEventListener('message', ({ data }) => {
-      const msg = JSON.parse(data.toString('utf8')) as Static<typeof SYNC_MESSAGE_SCHEMA>;
+      const msg = JSON.parse(data.toString('utf8')) as Static<typeof SYNC_RESPONSE_SCHEMA>;
 
       if (msg.type === 'SyncData') {
         if (msg.data.content !== fileData) {
+          expect(msg.data.content).toBe(fileData);
           reject('Data Mismatch');
           return;
         }
@@ -144,6 +145,7 @@ test('Uploaded files are relayed properly', async () => {
   });
 
   await Promise.all([putFile(), putFile(true)]);
+  console.log(await promise);
   await expect(promise).resolves.toBeTruthy();
   expect(receivedData).toBeTrue();
   expect(receivedPreview).toBeTrue();

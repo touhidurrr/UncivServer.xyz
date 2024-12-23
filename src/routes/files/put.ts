@@ -1,12 +1,13 @@
+import { MAX_FILE_SIZE, MIN_FILE_SIZE } from '@constants';
 import { generateRandomNotification, getCurrentPlayerCivilization } from '@lib';
 import type { UncivJSON } from '@localTypes/unciv';
-import type { SYNC_MESSAGE_SCHEMA } from '@routes/sync';
+import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import cache from '@services/cache';
 import { isDiscordTokenValid, sendNewTurnNotification } from '@services/discord';
 import { gameDataSecurityModifier } from '@services/gameDataSecurity';
 import { db } from '@services/mongodb';
 import { pack, unpack } from '@services/uncivGame';
-import type { Elysia, Static } from 'elysia';
+import { type Elysia, type Static, t } from 'elysia';
 import random from 'random';
 
 export const putFile = (app: Elysia) =>
@@ -21,6 +22,12 @@ export const putFile = (app: Elysia) =>
       return 'Done!';
     },
     {
+      // body schema
+      body: t.String({
+        minLength: MIN_FILE_SIZE,
+        maxLength: MAX_FILE_SIZE,
+        format: 'byte',
+      }),
       // afterHandle is called after the route handler is executed but before the response is sent
       // do not use any synchronous code here as it will block the response
       // this notice is only valid for this file, not for the entire project
@@ -38,7 +45,7 @@ export const putFile = (app: Elysia) =>
           JSON.stringify({
             type: 'SyncData',
             data: { gameId, content: body },
-          } as Static<typeof SYNC_MESSAGE_SCHEMA>),
+          } as Static<typeof SYNC_RESPONSE_SCHEMA>),
           true
         );
 
