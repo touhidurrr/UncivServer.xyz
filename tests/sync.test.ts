@@ -11,6 +11,18 @@ if (!SYNC_TOKEN) {
   throw 'No Sync Token Found!';
 }
 
+// wait for the server to start properly
+let started = false;
+while (!started) {
+  try {
+    const isAlive = await fetch(`${getAppBaseURL()}/isalive`).then(res => res.text());
+    if (isAlive === 'true') {
+      started = true;
+      break;
+    }
+  } catch {}
+}
+
 const getSyncWSClient = (token: string) =>
   new WebSocket(`${getAppBaseURL()}/sync`, {
     headers: { Authorization: `Bearer ${token}` },
@@ -118,7 +130,12 @@ test('Uploaded files are relayed properly', async () => {
 
   const promise = new Promise((resolve, reject) => {
     const ws = getSyncWSClient(SYNC_TOKEN);
-    Bun.sleep(5_000).then(() => reject('Timeout'));
+
+    ws.addEventListener('open', () => {
+      putFile();
+      putFile(true);
+      Bun.sleep(5_000).then(() => reject('Timeout'));
+    });
 
     ws.addEventListener('message', ({ data }) => {
       const msg = JSON.parse(data.toString('utf8')) as Static<typeof SYNC_RESPONSE_SCHEMA>;
@@ -144,8 +161,6 @@ test('Uploaded files are relayed properly', async () => {
     ws.addEventListener('error', reject);
   });
 
-  await Promise.all([putFile(), putFile(true)]);
-  console.log(await promise);
   await expect(promise).resolves.toBeTruthy();
   expect(receivedData).toBeTrue();
   expect(receivedPreview).toBeTrue();
