@@ -4,6 +4,7 @@ import {
   START_TEST_TIMEOUT,
   TEST_GAME_ID,
 } from '@constants';
+import { getRandomBase64String } from '@lib';
 import { getAppBaseURL } from '@lib/getAppBaseURL';
 import { describe, expect, test } from 'bun:test';
 
@@ -38,14 +39,12 @@ describe('App Start Test', () => {
   });
 
   test('Fail on payloads larger than maxRequestBodySize', async () => {
-    let failed = false;
-    await fetch(`${baseURL}/files/${TEST_GAME_ID}`, {
+    const promise = fetch(`${baseURL}/files/${TEST_GAME_ID}`, {
       method: 'PUT',
-      body: new Uint8Array(MAX_CONTENT_LENGTH * 1.2).buffer,
-    }).catch(() => {
-      failed = true;
+      headers: { 'Content-Type': 'text/plain' },
+      body: getRandomBase64String(MAX_CONTENT_LENGTH * 1.2),
     });
-    expect(failed).toBeTrue();
+    await expect(promise).rejects.toThrow();
   });
 
   test('App is still running', () => {
