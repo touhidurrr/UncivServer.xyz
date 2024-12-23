@@ -32,7 +32,7 @@ jobs:
 
       - name: Run tests
         run: |
-          HOST=127.0.0.1 \
+          HOST=localhost \
           SYNC_TOKEN=$(openssl rand -base64 32) \
           DISCORD_TOKEN=$(openssl rand -base64 32) \
           MONGO_URL=mongodb://localhost:27017/unciv \
