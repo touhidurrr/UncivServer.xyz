@@ -1,9 +1,9 @@
-import { GAME_ID_REGEX } from '@constants';
+import { GAME_ID_WITH_PREVIEW_REGEX } from '@constants';
 import { Elysia, t } from 'elysia';
 
 const SYNC_GAME_DATA_SCHEMA = t.Object({
   type: t.Literal('SyncData'),
-  data: t.Object({ gameId: t.RegExp(GAME_ID_REGEX), content: t.String() }),
+  data: t.Object({ gameId: t.RegExp(GAME_ID_WITH_PREVIEW_REGEX), content: t.String() }),
 });
 
 const SYNC_ERROR_SCHEMA = t.Object({

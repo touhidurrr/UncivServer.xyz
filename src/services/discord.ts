@@ -57,9 +57,9 @@ export const sendNewTurnNotification = async (game: UncivJSON) => {
 
   // Check if the Player exists in DB
   const { playerId } = currentCiv;
-  const playerProfile = await db.PlayerProfiles.findOne(
+  const playerProfile = await db.PlayerProfile.findOne(
     { uncivUserIds: playerId },
-    { projection: { notifications: 1, dmChannel: 1 } }
+    { notifications: 1, dmChannel: 1 }
   );
 
   // if player has not registered or has disabled notifications, return
@@ -68,9 +68,8 @@ export const sendNewTurnNotification = async (game: UncivJSON) => {
   // If the player doesn't have a DM channel, create one
   if (!playerProfile.dmChannel) {
     try {
-      const dmChannel = await getDMChannel(playerProfile._id.toString());
-      await db.PlayerProfiles.updateOne({ _id: playerProfile._id }, { $set: { dmChannel } });
-      playerProfile.dmChannel = dmChannel;
+      playerProfile.dmChannel = await getDMChannel(playerProfile._id.toString());
+      await playerProfile.save();
     } catch (err) {
       console.error('[TurnNotifier] error creating DM channel for:', playerProfile);
       console.error(err);
@@ -89,9 +88,9 @@ export const sendNewTurnNotification = async (game: UncivJSON) => {
   ] as string[];
 
   // update game info on DB and return game name
-  const name = await db.UncivServer.findOneAndUpdate(
+  const name = await db.UncivGame.findByIdAndUpdate(
     //? always save metadata to preview file
-    { _id: `${gameId}_Preview` },
+    `${gameId}_Preview`,
     { $set: { currentPlayer, playerId, turns: turns || 0, players } },
     { projection: { _id: 0, name: 1 } }
   ).then(game => game?.name);

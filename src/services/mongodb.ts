@@ -1,74 +1,71 @@
-import { MongoClient } from 'mongodb';
+import { GAME_ID_REGEX, GAME_ID_WITH_PREVIEW_REGEX } from '@constants';
+import mongoose, { Schema } from 'mongoose';
 
-interface UncivGame {
-  _id: string;
-  text: string;
-  timestamp: number;
-  name?: string;
-  currentPlayer?: string;
-  playerId?: string;
-  players?: string[];
-  turns?: number;
-}
-
-interface PlayerProfile {
-  _id: string;
-  uncivUserIds: string[];
-  games: {
-    won: number;
-    lost: number;
-    played: number;
-    winPercentage: number | null;
-  };
-  rating: number | null;
-  notifications: 'enabled' | 'disabled';
-  dmChannel?: string;
-}
-
-interface ErrorLog {
-  type: string;
-  timestamp: number;
-  data: any;
-}
-
-if (!process.env.MONGO_URL) {
-  console.error('[MongoDB] MONGO_URL not set.');
-  process.exit(1);
-}
-
-const _client = new MongoClient(process.env.MONGO_URL, {
-  compressors: ['zstd'],
-  socketTimeoutMS: 30_000,
+await mongoose.connect(process.env.MONGO_URL!, {
+  dbName: 'unciv',
+  appName: 'UncivServer.xyz',
   retryWrites: true,
+  compressors: ['zstd'],
 });
 
-_client.once('open', () => {
-  console.info('[MongoDB] Connected.');
-});
+const UncivGameSchema = new Schema(
+  {
+    _id: { type: String, required: true, match: GAME_ID_WITH_PREVIEW_REGEX },
+    text: { type: String, required: true },
+    timestamp: { type: Number, default: Date.now },
+    name: String,
+    currentPlayer: String,
+    playerId: { type: String, match: GAME_ID_REGEX },
+    players: { type: [{ type: String, match: GAME_ID_REGEX }] },
+    turns: Number,
+  },
+  { collection: 'UncivServer' }
+);
 
-_client.on('close', () => {
-  console.error('[MongoDB] Connection closed!');
-  process.exit(1);
-});
+const PlayerProfileSchema = new Schema(
+  {
+    _id: { type: String, required: true },
+    games: {
+      won: { type: Number, default: 0 },
+      lost: { type: Number, default: 0 },
+      played: { type: Number, default: 0 },
+      winPercentage: { type: Number, default: null },
+    },
+    rating: { type: Number, default: null },
+    uncivUserIds: { type: [{ type: String, match: GAME_ID_REGEX }], default: [] },
+    notifications: { type: String, enum: ['enabled', 'disabled'], default: 'enabled' },
+    dmChannel: String,
+  },
+  { collection: 'PlayerProfiles', timestamps: true }
+);
 
-_client.on('timeout', () => {
-  console.error('[MongoDB] Timeout!');
-  process.exit(1);
-});
+const ErrorLogSchema = new Schema(
+  {
+    type: { type: String, required: true },
+    timestamp: { type: Number, default: Date.now },
+    data: { type: Schema.Types.Mixed, required: true },
+  },
+  { collection: 'ErrorLogs', timestamps: true }
+);
 
-await _client.connect();
-const _db = await _client.db('unciv');
+const VariableSchema = new Schema(
+  {
+    _id: { type: String, required: true },
+    value: { type: Schema.Types.Mixed, required: true },
+  },
+  { collection: 'Variables', timestamps: true }
+);
 
-const [UncivServer, PlayerProfiles, ErrorLogs] = await Promise.all([
-  _db.collection<UncivGame>('UncivServer'),
-  _db.collection<PlayerProfile>('PlayerProfiles'),
-  _db.collection<ErrorLog>('ErrorLogs'),
-]);
+export const UncivGame = mongoose.model('UncivGame', UncivGameSchema);
+export const PlayerProfile = mongoose.model('PlayerProfile', PlayerProfileSchema);
+export const ErrorLog = mongoose.model('ErrorLog', ErrorLogSchema);
+export const Variable = mongoose.model('Variable', VariableSchema);
 
 export const db = {
-  _db,
-  _client,
-  UncivServer,
-  PlayerProfiles,
-  ErrorLogs,
+  UncivGame,
+  PlayerProfile,
+  ErrorLog,
+  Variable,
 };
+
+export default db;

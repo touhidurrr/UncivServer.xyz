@@ -6,10 +6,7 @@ export const getFile = (app: Elysia) =>
   app.get(
     '/:gameId',
     async ({ error, params: { gameId } }) => {
-      const game = await db.UncivServer.findOne(
-        { _id: gameId },
-        { projection: { _id: 0, text: 1 } }
-      );
+      const game = await db.UncivGame.findById(gameId, { _id: 0, text: 1 });
 
       if (!game) return error(404);
 

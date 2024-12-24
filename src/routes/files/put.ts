@@ -33,9 +33,9 @@ export const putFile = (app: Elysia) =>
       // this notice is only valid for this file, not for the entire project
       afterHandle: async ({ body, server, params: { gameId }, store: { game } }) => {
         // save on mongodb
-        db.UncivServer.updateOne(
+        db.UncivGame.updateOne(
           { _id: gameId },
-          { $set: { timestamp: Date.now(), text: body as string } },
+          { $set: { text: body as string } },
           { upsert: true }
         ).catch(err => console.error(`[MongoDB] Error saving game ${gameId}:`, err));
 
