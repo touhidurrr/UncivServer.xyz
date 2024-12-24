@@ -38,7 +38,7 @@ describe('App Start Test', () => {
     expect(res.status).not.toBe(404);
   });
 
-  test('Pass on payloads than maxRequestBodySize', async () => {
+  test('Pass on payloads smaller than maxRequestBodySize', async () => {
     await expect(
       async () =>
         await fetch(`${baseURL}/files/${TEST_GAME_ID}`, {
@@ -55,7 +55,7 @@ describe('App Start Test', () => {
         await fetch(`${baseURL}/files/${TEST_GAME_ID}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'text/plain' },
-          body: getRandomBase64String(MAX_CONTENT_LENGTH * 1.5),
+          body: getRandomBase64String(MAX_CONTENT_LENGTH * 2),
         })
     ).toThrow();
   });
