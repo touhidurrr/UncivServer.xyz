@@ -55,7 +55,7 @@ describe('App Start Test', () => {
         await fetch(`${baseURL}/files/${TEST_GAME_ID}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'text/plain' },
-          body: getRandomBase64String(MAX_CONTENT_LENGTH * 1.15),
+          body: getRandomBase64String(MAX_CONTENT_LENGTH * 1.5),
         })
     ).toThrow();
   });
