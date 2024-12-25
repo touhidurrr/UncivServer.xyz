@@ -38,26 +38,24 @@ describe('App Start Test', () => {
     expect(res.status).not.toBe(404);
   });
 
-  test('Pass on payloads smaller than maxRequestBodySize', async () => {
-    await expect(
-      async () =>
-        await fetch(`${baseURL}/files/${TEST_GAME_ID}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'text/plain' },
-          body: getRandomBase64String(MAX_CONTENT_LENGTH * 1.05),
-        }).then(console.log)
-    ).not.toThrow();
-  });
+  describe('maxRequestBodySize', () => {
+    const putRandomBody = async (size: number) => {
+      const body = getRandomBase64String(size);
+      const res = await fetch(`${baseURL}/files/${TEST_GAME_ID}`, {
+        body,
+        method: 'PUT',
+        headers: { 'Content-Type': 'text/plain' },
+      });
+      console.log(Buffer.byteLength(body), res);
+    };
 
-  test('Fail on payloads larger than maxRequestBodySize', async () => {
-    await expect(
-      async () =>
-        await fetch(`${baseURL}/files/${TEST_GAME_ID}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'text/plain' },
-          body: getRandomBase64String(MAX_CONTENT_LENGTH * 2),
-        }).then(console.log)
-    ).toThrow();
+    test('pass on smaller payloads', async () => {
+      await expect(putRandomBody(MAX_CONTENT_LENGTH * 1.05)).not.toThrow();
+    });
+
+    test('fail on larger payloads', async () => {
+      await expect(putRandomBody(MAX_CONTENT_LENGTH * 2)).toThrow();
+    });
   });
 
   test('App is still running', () => {
