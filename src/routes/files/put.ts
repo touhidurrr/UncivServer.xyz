@@ -1,13 +1,14 @@
+import { MAX_FILE_SIZE, MIN_FILE_SIZE } from '@constants';
 import { generateRandomNotification, getCurrentPlayerCivilization } from '@lib';
 import { getWSMessageString } from '@lib/getWSMessageString';
 import type { UncivJSON } from '@localTypes/unciv';
+import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import cache from '@services/cache';
 import { isDiscordTokenValid, sendNewTurnNotification } from '@services/discord';
 import { gameDataSecurityModifier } from '@services/gameDataSecurity';
 import { db } from '@services/mongodb';
-import { syncGame } from '@services/sync';
 import { pack, unpack } from '@services/uncivGame';
-import { type Elysia } from 'elysia';
+import { type Elysia, type Static, t } from 'elysia';
 import random from 'random';
 import type { CachedGame } from '../../models/cache';
 
@@ -22,34 +23,45 @@ export const putFile = (app: Elysia) =>
       async ({ body, store, params: { gameId } }) => {
         // for performance reasons, just store the file in cache and return ok
         // try to do everything else asynchronously in afterHandle
-
         store.cachedGame = {
-          text: body as string,
+          text: body,
           timestamp: Date.now(),
         };
         await cache.set(gameId, store.cachedGame);
         return 'Done!';
       },
       {
+        // body schema
+        body: t.String({
+          minLength: MIN_FILE_SIZE,
+          maxLength: MAX_FILE_SIZE,
+          format: 'byte',
+        }),
         // afterHandle is called after the route handler is executed but before the response is sent
         // do not use any synchronous code here as it will block the response
         // this notice is only valid for this file, not for the entire project
         afterHandle: async ({ server, params: { gameId }, store: { game, cachedGame } }) => {
-          const { text, timestamp } = cachedGame!;
-
           // save on mongodb
-          db.UncivServer.updateOne(
+          const { text, timestamp } = cachedGame!;
+          db.UncivGame.updateOne(
             { _id: gameId },
             { $set: { text, timestamp } },
             { upsert: true }
           ).catch(err => console.error(`[MongoDB] Error saving game ${gameId}:`, err));
 
           // sync with other servers
-          syncGame(gameId, cachedGame!);
+          server?.publish(
+            'sync',
+            JSON.stringify({
+              type: 'SyncData',
+              data: { gameId, content: text },
+            } as Static<typeof SYNC_RESPONSE_SCHEMA>),
+            true
+          );
 
+          // send new turn notification
           if (game !== null) {
             const isPreview = gameId.endsWith('_Preview');
-            // send turn notification
             if (isDiscordTokenValid && isPreview) {
               sendNewTurnNotification(game!);
             }

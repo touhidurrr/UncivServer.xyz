@@ -10,10 +10,10 @@ RestartSec=1
 StartLimitBurst=3600
 User=nobody
 Group=nogroup
-# Replace `/bun/directory` with `which bun` output
-ExecSearchPath=`/bun/directory`
-# replace `/path/to/home/UncivServer.xyz` with server repo path
-WorkingDirectory=/path/to/home/UncivServer.xyz
+# Replace `/path/to/bun/directory/bin` with `dirname $(which bun)` output
+ExecSearchPath=/path/to/bun/directory/bin
+# replace `/path/to/UncivServer.xyz` with server repo path
+WorkingDirectory=/path/to/UncivServer.xyz
 
 [Install]
 WantedBy=multi-user.target

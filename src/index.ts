@@ -11,10 +11,15 @@ import { staticPlugin } from '@elysiajs/static';
 import { swagger } from '@elysiajs/swagger';
 import { filesRoute } from '@routes/files';
 import { infoPlugin } from '@routes/info';
+import { jsonsRoute } from '@routes/jsons';
+import { syncRoute } from '@routes/sync';
 import { websocketsRoute } from '@routes/ws';
 import { WS_MAX_PAYLOAD_LENGTH } from '@routes/ws/constants';
 import { Elysia } from 'elysia';
 import { version } from '../package.json';
+
+// start sync service
+import './services/sync';
 
 const port = process.env.PORT ?? DEFAULT_PORT;
 const hostname = process.env.HOST ?? DEFAULT_HOST;
@@ -31,10 +36,9 @@ export const app = new Elysia({
       documentation: {
         info: { title: 'UncivServer.xyz API', version },
       },
-      exclude: /^\/(?!ws|files)/,
+      exclude: /^\/(?!ws|files|jsons)/,
     })
   )
-  .use(websocketsRoute)
   .onRequest(({ request, error }) => {
     if (isDevelopment) console.info(`${request.method} ${request.url}`);
     if (request.body !== null) {
@@ -43,12 +47,15 @@ export const app = new Elysia({
       if (+contentLen > MAX_CONTENT_LENGTH) return error(413);
     }
   })
-  .use(staticPlugin({ prefix: '/' }))
+  .use(websocketsRoute)
+  .use(filesRoute)
+  .use(syncRoute)
+  .use(jsonsRoute)
   .use(infoPlugin)
   .get('/isalive', true)
   .all('/support', ctx => ctx.redirect(SUPPORT_URL, 303))
   .all('/discord', ctx => ctx.redirect(DISCORD_INVITE, 303))
-  .use(filesRoute)
+  .use(staticPlugin({ prefix: '/' }))
   .listen({ port, hostname });
 
 console.log(`Server started at ${app.server?.url}`);

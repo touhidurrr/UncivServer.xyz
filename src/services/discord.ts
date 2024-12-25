@@ -16,9 +16,6 @@ export const isDiscordTokenValid = Boolean(DISCORD_TOKEN);
 
 const discord = new REST({ version: '10' }).setToken(DISCORD_TOKEN ?? '');
 
-// bun fix no brotli support
-discord.options.headers['Accept-Encoding'] = 'gzip, deflate';
-
 // handle some events for debug
 discord.on('invalidRequestWarning', data => {
   console.warn(`[Discord] Invalid Request Warning:`, data);
@@ -28,27 +25,27 @@ discord.on('rateLimited', data => {
   console.warn(`[Discord] Rate Limited:`, data);
 });
 
-discord.on('response', ({ path }, { status, statusText }) => {
-  console.log(`[Discord] Response on ${path}: ${status} ${statusText}`);
+discord.on('response', ({ path, method }, { status, statusText }) => {
+  console.log(`[Discord]`, method, path, status, statusText);
 });
 
-async function createMessage(
+const createMessage = (
   channelId: string,
   message: RESTPostAPIChannelMessageJSONBody
-): Promise<RESTPostAPIChannelMessageResult> {
+): Promise<RESTPostAPIChannelMessageResult> => {
   return discord.post(Routes.channelMessages(channelId), {
     body: message,
   }) as Promise<RESTPostAPIChannelMessageResult>;
-}
+};
 
-async function getDMChannel(discordId: string) {
+const getDMChannel = async (discordId: string) => {
   const res = (await discord.post(Routes.userChannels(), {
     body: { recipient_id: discordId },
   })) as RESTPostAPICurrentUserCreateDMChannelResult;
   return res.id;
-}
+};
 
-export async function sendNewTurnNotification(game: UncivJSON) {
+export const sendNewTurnNotification = async (game: UncivJSON) => {
   const { turns, gameId, civilizations, currentPlayer, gameParameters } = game;
 
   // find currentPlayer's ID
@@ -60,9 +57,9 @@ export async function sendNewTurnNotification(game: UncivJSON) {
 
   // Check if the Player exists in DB
   const { playerId } = currentCiv;
-  const playerProfile = await db.PlayerProfiles.findOne(
+  const playerProfile = await db.PlayerProfile.findOne(
     { uncivUserIds: playerId },
-    { projection: { notifications: 1, dmChannel: 1 } }
+    { notifications: 1, dmChannel: 1 }
   );
 
   // if player has not registered or has disabled notifications, return
@@ -71,9 +68,8 @@ export async function sendNewTurnNotification(game: UncivJSON) {
   // If the player doesn't have a DM channel, create one
   if (!playerProfile.dmChannel) {
     try {
-      const dmChannel = await getDMChannel(playerProfile._id.toString());
-      await db.PlayerProfiles.updateOne({ _id: playerProfile._id }, { $set: { dmChannel } });
-      playerProfile.dmChannel = dmChannel;
+      playerProfile.dmChannel = await getDMChannel(playerProfile._id.toString());
+      await playerProfile.save();
     } catch (err) {
       console.error('[TurnNotifier] error creating DM channel for:', playerProfile);
       console.error(err);
@@ -92,9 +88,9 @@ export async function sendNewTurnNotification(game: UncivJSON) {
   ] as string[];
 
   // update game info on DB and return game name
-  const name = await db.UncivServer.findOneAndUpdate(
+  const name = await db.UncivGame.findByIdAndUpdate(
     //? always save metadata to preview file
-    { _id: `${gameId}_Preview` },
+    `${gameId}_Preview`,
     { $set: { currentPlayer, playerId, turns: turns || 0, players } },
     { projection: { _id: 0, name: 1 } }
   ).then(game => game?.name);
@@ -112,7 +108,7 @@ export async function sendNewTurnNotification(game: UncivJSON) {
             ? [
                 {
                   name: 'Game Name',
-                  value: `\\'\\'${name}\\'\\'`,
+                  value: `\`\`\`${name}\`\`\``,
                   inline: true,
                 },
               ]
@@ -153,4 +149,4 @@ export async function sendNewTurnNotification(game: UncivJSON) {
     });
     console.error(err);
   });
-}
+};

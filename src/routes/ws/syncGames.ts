@@ -1,22 +1,13 @@
 import cache from '@services/cache';
 import { db } from '@services/mongodb';
-import type { Static, UnwrapRoute } from 'elysia';
+import type { Static } from 'elysia';
 import type { ElysiaWS } from 'elysia/ws';
-import type { WS_BODY_SYNC_GAMES_SCHEMA, WS_HEADERS_SCHEMA, WS_RESPONSE_SCHEMA } from './constants';
+import type { WS_BODY_SYNC_GAMES_SCHEMA, WS_RESPONSE_SCHEMA } from './constants';
 
 export async function syncGames(
-  ws: ElysiaWS<
-    any,
-    UnwrapRoute<
-      {
-        body: typeof WS_BODY_SYNC_GAMES_SCHEMA;
-        response: typeof WS_RESPONSE_SCHEMA;
-        headers: typeof WS_HEADERS_SCHEMA;
-      },
-      {}
-    >,
-    any
-  >,
+  ws: ElysiaWS<{
+    response: typeof WS_RESPONSE_SCHEMA;
+  }>,
   lastUpdatedList: Static<typeof WS_BODY_SYNC_GAMES_SCHEMA>['data']['lastUpdatedList']
 ) {
   await Promise.allSettled(
@@ -25,9 +16,9 @@ export async function syncGames(
         // if cache not found
         if (!cachedGame) {
           // search gameId in db if lastUpdated > timestamp
-          const game = await db.UncivServer.findOne(
+          const game = await db.UncivGame.findOne(
             { _id: gameId, timestamp: { $gt: lastUpdated } },
-            { projection: { _id: 0, text: 1, timestamp: 1 } }
+            { _id: 0, text: 1, timestamp: 1 }
           );
 
           // if such a game is not found then we return

@@ -1,6 +1,8 @@
-import type { UncivGame } from '@services/mongodb';
-
-export type CachedGame = Omit<UncivGame, '_id'>;
+import type { UncivGameSchema } from '@services/mongodb';
+import type { InferSchemaType } from 'mongoose';
+export type CachedGame = Omit<Omit<InferSchemaType<typeof UncivGameSchema>, '_id'>, 'players'> & {
+  players?: string[];
+};
 
 export abstract class CacheService {
   abstract ready(): Promise<void>;

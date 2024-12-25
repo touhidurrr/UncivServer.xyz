@@ -9,7 +9,7 @@ const DEFAULT_SPN_ICON = notificationsData.icons.promotion[0]!;
 // Self promotion notification probability
 const SPN_PROBABILITY = 0.2;
 
-export function generateRandomNotification(gameData: UncivJSON): Notification {
+export const generateRandomNotification = (gameData: UncivJSON): Notification => {
   let text = DEFAULT_NOTIFICATION;
   const icons = [DEFAULT_NOTIFICATION_ICON];
   const actions: Notification['actions'] = [];
@@ -35,4 +35,4 @@ export function generateRandomNotification(gameData: UncivJSON): Notification {
     actions,
     category: 'General',
   };
-}
+};

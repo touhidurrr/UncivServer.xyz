@@ -33,7 +33,8 @@ export const websocketsRoute = new Elysia().ws('/ws', {
         data: {
           message: 'Invalid connection attempt',
         },
-      }).close();
+      });
+      ws.close();
     }
   },
   // @ts-ignore

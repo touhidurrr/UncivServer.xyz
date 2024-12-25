@@ -1,24 +1,23 @@
 import type { UncivJSON } from '@localTypes/unciv';
 
-export function unpack(data: string): UncivJSON {
-  //@ts-ignore
-  const jsonArray = Bun.gunzipSync(Buffer.from(data, 'base64'));
-  const jsonText = Buffer.from(jsonArray.buffer).toString('utf8');
-  return JSON.parse(jsonText);
-}
+export const unpackJSON = (data: string): string =>
+  Buffer.from(
+    //@ts-ignore
+    Bun.gunzipSync(Buffer.from(data, 'base64')).buffer
+  ).toString('utf8');
 
-export async function unpackFromFile(path: string): Promise<UncivJSON> {
+export const unpack = (data: string): UncivJSON => JSON.parse(unpackJSON(data));
+
+export const unpackFromFile = async (path: string): Promise<UncivJSON> => {
   const data = await Bun.file(path).text();
   return unpack(data);
-}
+};
 
-export function pack(data: object): string {
+export const pack = (data: object): string => {
   const json = JSON.stringify(data);
-  const compressed = Bun.gzipSync(json);
+  const compressed = Bun.gzipSync(json, { library: 'libdeflate', level: 7 });
   // return base64 string
   return Buffer.from(compressed).toString('base64');
-}
+};
 
-export async function packToFile(data: object, path: string): Promise<void> {
-  await Bun.write(path, pack(data));
-}
+export const packToFile = (data: object, path: string) => Bun.write(path, pack(data));

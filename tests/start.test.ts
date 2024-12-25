@@ -1,4 +1,10 @@
-import { START_TEST_FETCH_TIMEOUT, START_TEST_TIMEOUT } from '@constants';
+import {
+  MAX_CONTENT_LENGTH,
+  START_TEST_FETCH_TIMEOUT,
+  START_TEST_TIMEOUT,
+  TEST_GAME_ID,
+} from '@constants';
+import { getRandomBase64String } from '@lib';
 import { getAppBaseURL } from '@lib/getAppBaseURL';
 import { describe, expect, test } from 'bun:test';
 
@@ -30,6 +36,28 @@ describe('App Start Test', () => {
     const res = await fetch(baseURL);
     expect(res.ok).toBeTrue();
     expect(res.status).not.toBe(404);
+  });
+
+  test('Pass on payloads than maxRequestBodySize', async () => {
+    await expect(
+      async () =>
+        await fetch(`${baseURL}/files/${TEST_GAME_ID}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'text/plain' },
+          body: getRandomBase64String(MAX_CONTENT_LENGTH * 1.05),
+        })
+    ).not.toThrow();
+  });
+
+  test('Fail on payloads larger than maxRequestBodySize', async () => {
+    await expect(
+      async () =>
+        await fetch(`${baseURL}/files/${TEST_GAME_ID}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'text/plain' },
+          body: getRandomBase64String(MAX_CONTENT_LENGTH * 1.15),
+        })
+    ).toThrow();
   });
 
   test('App is still running', () => {

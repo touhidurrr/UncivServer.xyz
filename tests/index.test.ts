@@ -1,11 +1,12 @@
 import { MAX_FILE_SIZE, TEST_GAME_ID } from '@constants';
 import { treaty } from '@elysiajs/eden';
 import { app } from '@index';
+import { getAppBaseURL } from '@lib';
 import { getRandomBase64String } from '@lib/getRandomBase64String';
 import cache from '@services/cache';
 import { describe, expect, test } from 'bun:test';
 import { randomUUID } from 'node:crypto';
-import type { CachedGame } from '../src/models/cache';
+import { sep } from 'node:path';
 
 const api = treaty(app, {
   onRequest: (_path, init) => {
@@ -44,31 +45,6 @@ describe('GET /files', () => {
   });
 });
 
-describe('PATCH /files', () => {
-  const cachedGame: CachedGame = {
-    text: getRandomBase64String('100kb'),
-    timestamp: Date.now(),
-  };
-  const Authorization = `Bearer ${process.env.SYNC_TOKEN}`;
-
-  test('Upload Success', async () => {
-    await api
-      .files({ gameId: TEST_GAME_ID })
-      .patch(cachedGame, { headers: { Authorization } })
-      .then(({ status, data }) => {
-        expect(status).toBe(200);
-        expect(data).toBeString();
-        expect(data).toBe('Done!');
-      });
-  });
-
-  test('Cache Hit', async () => {
-    const game = await cache.get(TEST_GAME_ID);
-    expect(game).toBeObject();
-    expect(game).toEqual(cachedGame);
-  });
-});
-
 describe('PUT /files', () => {
   test('Fail on Small File', async () => {
     await api
@@ -79,7 +55,7 @@ describe('PUT /files', () => {
       });
   });
 
-  test('Fail on Big File', async () => {
+  test('Fail on files larger than MAX_FILE_SIZE', async () => {
     await api
       .files({ gameId: TEST_GAME_ID })
       .put(getRandomBase64String(MAX_FILE_SIZE + 1))
@@ -115,8 +91,8 @@ describe('PUT /files', () => {
       const cachedGame = await cache.get(TEST_GAME_ID);
       expect(cachedGame).toBeObject();
       expect(cachedGame).toContainAllKeys(['text', 'timestamp']);
-      expect(cachedGame!.timestamp).toBeNumber();
-      expect(cachedGame!.text).toBe(fileData);
+      expect(cachedGame!['timestamp']).toBeNumber();
+      expect(cachedGame!['text']).toBe(fileData);
     });
 
     test('Can be found in GET /files', async () => {
@@ -130,4 +106,25 @@ describe('PUT /files', () => {
         });
     });
   });
+});
+
+test('All static assets can be accessed', async () => {
+  // make a list of paths
+  const paths: string[] = [];
+  const filenames = new Bun.Glob('public/**').scan({ onlyFiles: true });
+  for await (const file of filenames) {
+    const path = '/' + file.split(sep).slice(1).join('/');
+    paths.push(path);
+    if (path.endsWith('/index.html')) {
+      paths.push(path.slice(0, -10));
+    }
+  }
+
+  // test each path
+  await Promise.all(
+    paths.map(async path => {
+      const res = await app.handle(new Request(`${getAppBaseURL()}${path}`));
+      expect(res.status).toBe(200);
+    })
+  );
 });
