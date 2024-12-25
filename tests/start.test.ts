@@ -38,7 +38,7 @@ describe('App Start Test', () => {
     expect(res.status).not.toBe(404);
   });
 
-  describe('maxRequestBodySize', async () => {
+  describe('maxRequestBodySize', () => {
     const putRandomBody = (size: number) => {
       const body = getRandomBase64String(size);
       return fetch(`${baseURL}/files/${TEST_GAME_ID}`, {
