@@ -29,7 +29,10 @@ const initWs = (baseURL: string) => {
     const msg = JSON.parse(data.toString('utf8')) as Static<typeof SYNC_RESPONSE_SCHEMA>;
     switch (msg.type) {
       case 'SyncData':
-        cache.set(msg.data.gameId, msg.data.content);
+        cache.set(msg.data.gameId, {
+          text: msg.data.content,
+          timestamp: Date.now(),
+        });
         break;
       case 'AuthError':
         authOk = false;

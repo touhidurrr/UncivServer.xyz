@@ -88,9 +88,11 @@ describe('PUT /files', () => {
     });
 
     test('Cache Hit', async () => {
-      const cachedFile = await cache.get(TEST_GAME_ID);
-      expect(cachedFile).toBeString();
-      expect(cachedFile).toBe(fileData);
+      const cachedGame = await cache.get(TEST_GAME_ID);
+      expect(cachedGame).toBeObject();
+      expect(cachedGame).toContainAllKeys(['text', 'timestamp']);
+      expect(cachedGame!['timestamp']).toBeNumber();
+      expect(cachedGame!['text']).toBe(fileData);
     });
 
     test('Can be found in GET /files', async () => {

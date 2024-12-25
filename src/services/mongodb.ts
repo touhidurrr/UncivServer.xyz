@@ -8,7 +8,7 @@ await mongoose.connect(process.env.MONGO_URL!, {
   compressors: ['zstd'],
 });
 
-const UncivGameSchema = new Schema(
+export const UncivGameSchema = new Schema(
   {
     _id: { type: String, required: true, match: GAME_ID_WITH_PREVIEW_REGEX },
     text: { type: String, required: true },
@@ -22,7 +22,7 @@ const UncivGameSchema = new Schema(
   { collection: 'UncivServer' }
 );
 
-const PlayerProfileSchema = new Schema(
+export const PlayerProfileSchema = new Schema(
   {
     _id: { type: String, required: true },
     games: {
@@ -39,7 +39,7 @@ const PlayerProfileSchema = new Schema(
   { collection: 'PlayerProfiles', timestamps: true }
 );
 
-const ErrorLogSchema = new Schema(
+export const ErrorLogSchema = new Schema(
   {
     type: { type: String, required: true },
     timestamp: { type: Number, default: Date.now },
@@ -48,7 +48,7 @@ const ErrorLogSchema = new Schema(
   { collection: 'ErrorLogs', timestamps: true }
 );
 
-const VariableSchema = new Schema(
+export const VariableSchema = new Schema(
   {
     _id: { type: String, required: true },
     value: { type: Schema.Types.Mixed, required: true },
