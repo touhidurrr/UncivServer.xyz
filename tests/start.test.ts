@@ -39,7 +39,7 @@ describe('App Start Test', () => {
   });
 
   describe('maxRequestBodySize', () => {
-    const putRandomBody = async (size: number) => {
+    const putRandomBody = (size: number) => async () => {
       const body = getRandomBase64String(size);
       const res = await fetch(`${baseURL}/files/${TEST_GAME_ID}`, {
         body,
