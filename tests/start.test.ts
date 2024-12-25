@@ -38,23 +38,34 @@ describe('App Start Test', () => {
     expect(res.status).not.toBe(404);
   });
 
-  describe('maxRequestBodySize', () => {
-    const putRandomBody = (size: number) => async () => {
+  describe('maxRequestBodySize', async () => {
+    const putRandomBody = (size: number) => {
       const body = getRandomBase64String(size);
-      const res = await fetch(`${baseURL}/files/${TEST_GAME_ID}`, {
+      return fetch(`${baseURL}/files/${TEST_GAME_ID}`, {
         body,
         method: 'PUT',
         headers: { 'Content-Type': 'text/plain' },
       });
-      console.log(Buffer.byteLength(body), res);
     };
 
     test('pass on smaller payloads', async () => {
-      await expect(putRandomBody(MAX_CONTENT_LENGTH * 1.05)).not.toThrow();
+      let res: Response | null = null;
+      try {
+        res = await putRandomBody(MAX_CONTENT_LENGTH * 1.05);
+        expect(res.headers.get('connection')).not.toBe('close'); 
+      } catch {
+        expect(res).not.toBeNull();
+      }
     });
 
     test('fail on larger payloads', async () => {
-      await expect(putRandomBody(MAX_CONTENT_LENGTH * 2)).toThrow();
+      let res: Response | null = null;
+      try {
+        res = await putRandomBody(MAX_CONTENT_LENGTH * 1.15);
+        expect(res.headers.get('connection')).toBe('close'); 
+      } catch {
+        expect(res).toBeNull();
+      }
     });
   });
 
