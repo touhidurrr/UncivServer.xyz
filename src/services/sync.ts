@@ -33,7 +33,7 @@ const initWs = (baseURL: string) => {
         break;
       case 'AuthError':
         authOk = false;
-        console.error(`[Sync] Invalid auth attempt to ${baseURL}`);
+        console.error(`[Sync] Invalid auth attempt to ${baseURL}!`);
         break;
       default:
         console.warn(`[Sync] Unknown sync message:`, msg);
@@ -53,10 +53,6 @@ const initWs = (baseURL: string) => {
       },
       random.int(5_000, 10_000)
     );
-  });
-
-  ws.addEventListener('error', err => {
-    console.error(`[Sync] Error conversing with ${baseURL}:`, err);
   });
 
   return ws;
