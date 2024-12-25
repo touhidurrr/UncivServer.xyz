@@ -56,7 +56,7 @@ describe('App Start Test', () => {
           method: 'PUT',
           headers: { 'Content-Type': 'text/plain' },
           body: getRandomBase64String(MAX_CONTENT_LENGTH * 2),
-        }).then(res => res.text()).then(console.log);
+        }).then(res => res.text()).then(console.log)
     ).toThrow();
   });
 
