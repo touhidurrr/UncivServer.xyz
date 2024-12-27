@@ -2,8 +2,8 @@
 create table "Variable" (
   "id" text not null primary key,
   "value" text,
-  "createdAt" integer not null default (1000 * unixepoch ('subsec')),
-  "updatedAt" integer not null default (1000 * unixepoch ('subsec'))
+  "createdAt" integer not null default (cast(1000 * unixepoch ('subsec') as integer)),
+  "updatedAt" integer not null default (cast(1000 * unixepoch ('subsec') as integer))
 );
 
 -- CreateTable
@@ -15,14 +15,14 @@ create table "Game" (
   "turns" integer not null default 0,
   "currentPlayer" text,
   "playerId" text,
-  "createdAt" integer not null default (1000 * unixepoch ('subsec')),
-  "updatedAt" integer not null default (1000 * unixepoch ('subsec'))
+  "createdAt" integer not null default (cast(1000 * unixepoch ('subsec') as integer)),
+  "updatedAt" integer not null default (cast(1000 * unixepoch ('subsec') as integer))
 );
 
 -- CreateTable
 create table "User" (
   "id" text not null primary key,
-  "createdAt" integer not null default (1000 * unixepoch ('subsec'))
+  "createdAt" integer not null default (cast(1000 * unixepoch ('subsec') as integer))
 );
 
 -- CreateTable
@@ -30,7 +30,7 @@ create table "UsersInGame" (
   "id" integer not null primary key autoincrement,
   "gameId" text not null,
   "userId" text not null,
-  "createdAt" integer not null default (1000 * unixepoch ('subsec')),
+  "createdAt" integer not null default (cast(1000 * unixepoch ('subsec') as integer)),
   constraint "UsersInGame_gameId_fkey" foreign key ("gameId") references "Game" ("id") on delete restrict on update cascade,
   constraint "UsersInGame_userId_fkey" foreign key ("userId") references "User" ("id") on delete restrict on update cascade
 );
@@ -42,8 +42,8 @@ create table "Profile" (
   "rating" real not null default 1000,
   "dmChannel" integer,
   "notifications" text not null default 'enabled',
-  "createdAt" integer not null default (1000 * unixepoch ('subsec')),
-  "updatedAt" integer not null default (1000 * unixepoch ('subsec'))
+  "createdAt" integer not null default (cast(1000 * unixepoch ('subsec') as integer)),
+  "updatedAt" integer not null default (cast(1000 * unixepoch ('subsec') as integer))
 );
 
 -- CreateTable
@@ -51,7 +51,7 @@ create table "UsersInProfile" (
   "id" integer not null primary key autoincrement,
   "userId" text not null,
   "profileId" integer not null,
-  "createdAt" integer not null default (1000 * unixepoch ('subsec')),
+  "createdAt" integer not null default (cast(1000 * unixepoch ('subsec') as integer)),
   constraint "UsersInProfile_userId_fkey" foreign key ("userId") references "User" ("id") on delete restrict on update cascade,
   constraint "UsersInProfile_profileId_fkey" foreign key ("profileId") references "Profile" ("id") on delete restrict on update cascade
 );
@@ -61,7 +61,7 @@ create table "ErrorLog" (
   "id" integer not null primary key autoincrement,
   "type" text not null,
   "message" text,
-  "createdAt" integer not null default (1000 * unixepoch ('subsec'))
+  "createdAt" integer not null default (cast(1000 * unixepoch ('subsec') as integer))
 );
 
 -- CreateIndex

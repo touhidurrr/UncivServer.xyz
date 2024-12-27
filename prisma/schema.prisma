@@ -5,14 +5,14 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:test.db"
+  url      = "file:temp.db"
 }
 
 model Variable {
   id        String  @id @unique
   value     String?
-  createdAt Int     @default(dbgenerated("(1000 * unixepoch('subsec'))"))
-  updatedAt Int     @default(dbgenerated("(1000 * unixepoch('subsec'))"))
+  createdAt Int     @default(dbgenerated("(cast(1000 * unixepoch('subsec') as integer))"))
+  updatedAt Int     @default(dbgenerated("(cast(1000 * unixepoch('subsec') as integer))"))
 
   @@index([createdAt])
   @@index([updatedAt])
@@ -26,8 +26,8 @@ model Game {
   turns         Int     @default(0)
   currentPlayer String?
   playerId      String?
-  createdAt     Int     @default(dbgenerated("(1000 * unixepoch('subsec'))"))
-  updatedAt     Int     @default(dbgenerated("(1000 * unixepoch('subsec'))"))
+  createdAt     Int     @default(dbgenerated("(cast(1000 * unixepoch('subsec') as integer))"))
+  updatedAt     Int     @default(dbgenerated("(cast(1000 * unixepoch('subsec') as integer))"))
 
   players UsersInGame[]
 
@@ -38,7 +38,7 @@ model Game {
 
 model User {
   id        String @id
-  createdAt Int    @default(dbgenerated("(1000 * unixepoch('subsec'))"))
+  createdAt Int    @default(dbgenerated("(cast(1000 * unixepoch('subsec') as integer))"))
 
   games    UsersInGame[]
   profiles UsersInProfile[]
@@ -50,7 +50,7 @@ model UsersInGame {
   id        Int    @id @default(autoincrement())
   gameId    String
   userId    String
-  createdAt Int    @default(dbgenerated("(1000 * unixepoch('subsec'))"))
+  createdAt Int    @default(dbgenerated("(cast(1000 * unixepoch('subsec') as integer))"))
 
   game Game @relation(fields: [gameId], references: [id])
   user User @relation(fields: [userId], references: [id])
@@ -65,8 +65,8 @@ model Profile {
   rating        Float  @default(1000)
   dmChannel     Int?
   notifications String @default("enabled")
-  createdAt     Int    @default(dbgenerated("(1000 * unixepoch('subsec'))"))
-  updatedAt     Int    @default(dbgenerated("(1000 * unixepoch('subsec'))"))
+  createdAt     Int    @default(dbgenerated("(cast(1000 * unixepoch('subsec') as integer))"))
+  updatedAt     Int    @default(dbgenerated("(cast(1000 * unixepoch('subsec') as integer))"))
 
   users UsersInProfile[]
 
@@ -80,7 +80,7 @@ model UsersInProfile {
   id        Int    @id @default(autoincrement())
   userId    String @unique
   profileId Int
-  createdAt Int    @default(dbgenerated("(1000 * unixepoch('subsec'))"))
+  createdAt Int    @default(dbgenerated("(cast(1000 * unixepoch('subsec') as integer))"))
 
   user    User    @relation(fields: [userId], references: [id])
   profile Profile @relation(fields: [profileId], references: [id])
@@ -94,7 +94,7 @@ model ErrorLog {
   id        Int     @id @default(autoincrement())
   type      String
   message   String?
-  createdAt Int     @default(dbgenerated("(1000 * unixepoch('subsec'))"))
+  createdAt Int     @default(dbgenerated("(cast(1000 * unixepoch('subsec') as integer))"))
 
   @@index([createdAt])
 }

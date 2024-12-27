@@ -29,7 +29,7 @@
     "lint": "tsc --noEmit",
     "format": "prettier --write '**/?*.*'",
     "wc": "find src tests -type f -exec wc {} +",
-    "sqlgen": "bun scripts/sqlgen.bun.sh",
+    "sqlgen": "bun scripts/sqlgen.ts",
     "prismagen": "prisma generate"
   },
   "dependencies": {
