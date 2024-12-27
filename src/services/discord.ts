@@ -46,7 +46,7 @@ const getDMChannel = async (discordId: string) => {
 };
 
 export const sendNewTurnNotification = async (game: UncivJSON) => {
-  const { turns, gameId, civilizations, currentPlayer, gameParameters } = game;
+  const { turns, gameId, civilizations, currentPlayer } = game;
 
   // find currentPlayer's ID
   const currentCiv = civilizations.find(c => c.civName === currentPlayer);
@@ -63,23 +63,22 @@ export const sendNewTurnNotification = async (game: UncivJSON) => {
   });
 
   // if player has not registered or has disabled notifications, return
-  if (!playerProfile || playerProfile.notifications !== 'enabled') return;
-
-  const { id, discordId } = playerProfile;
+  if (!playerProfile) return;
+  const { id, discordId, notifications } = playerProfile;
+  if (!discordId || notifications !== 'enabled') return;
 
   // If the player doesn't have a DM channel, create one
   let { dmChannel } = playerProfile;
   if (!dmChannel) {
     try {
-      dmChannel = await getDMChannel(discordId!.toString()).then(id => parseInt(id));
+      dmChannel = await getDMChannel(discordId.toString()).then(id => parseInt(id));
 
       await prisma.profile.update({
         where: { id },
         data: { dmChannel, updatedAt: Date.now() },
       });
     } catch (err) {
-      console.error('[TurnNotifier] error creating DM channel for:', playerProfile);
-      console.error(err);
+      console.error(`[TurnNotifier] error creating DM channel for ${discordId}:`, err);
       return;
     }
   }
@@ -143,12 +142,11 @@ export const sendNewTurnNotification = async (game: UncivJSON) => {
       SUPPORT_EMBED,
     ],
   }).catch(err => {
-    console.error('[TurnNotifier] error sending notification:', {
+    console.error(`[TurnNotifier] ${err} while sending notification:`, {
       gameId,
       playerId,
       currentPlayer,
-      dmChannel: playerProfile.dmChannel,
+      dmChannel,
     });
-    console.error(err);
   });
 };
