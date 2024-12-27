@@ -48,9 +48,13 @@ export const putFile = (app: Elysia) =>
             create: {
               id: gameId,
               save: isPreview ? '' : body,
-              ...(isPreview && { preview: body }),
+              preview: isPreview ? body : undefined,
             },
-            update: { updatedAt: Date.now(), ...(isPreview ? { preview: body } : { save: body }) },
+            update: {
+              updatedAt: Date.now(),
+              save: isPreview ? undefined : body,
+              preview: isPreview ? body : undefined,
+            },
           })
           .then(() => {
             // Unique list of Players
@@ -71,12 +75,16 @@ export const putFile = (app: Elysia) =>
                   create: {
                     id: playerId,
                     games: {
-                      connect: { userId_gameId: { userId: playerId, gameId: game.gameId } },
+                      connect: {
+                        userId_gameId: { userId: playerId, gameId: game.gameId },
+                      },
                     },
                   },
                   update: {
                     games: {
-                      connect: { userId_gameId: { userId: playerId, gameId: game.gameId } },
+                      connect: {
+                        userId_gameId: { userId: playerId, gameId: game.gameId },
+                      },
                     },
                   },
                 })

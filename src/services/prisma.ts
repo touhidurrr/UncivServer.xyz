@@ -11,19 +11,15 @@ const adapter = new PrismaLibSQL(libsql);
 export const prisma = new PrismaClient({ adapter });
 
 export const getGameWithPrima = async (gameId: string) => {
-  if (gameId.endsWith('_Preview')) {
-    const game = await prisma.game.findUnique({
-      where: { id: gameId.replace('_Preview', '') },
-      select: { preview: true },
-    });
-    return game ? game.preview : null;
-  }
-
+  const isPreview = gameId.endsWith('_Preview');
   const game = await prisma.game.findUnique({
-    where: { id: gameId },
-    select: { save: true },
+    where: { id: isPreview ? gameId.slice(0, -8) : gameId },
+    select: {
+      preview: isPreview,
+      save: !isPreview,
+    },
   });
-  return game ? game.save : null;
+  return game && (isPreview ? game.preview : game.save);
 };
 
 await prisma.$connect();
