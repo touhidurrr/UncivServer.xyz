@@ -1,0 +1,100 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:test.db"
+}
+
+model Variable {
+  id        String  @id @unique
+  value     String?
+  createdAt Int     @default(dbgenerated("(1000 * unixepoch('subsec'))"))
+  updatedAt Int     @default(dbgenerated("(1000 * unixepoch('subsec'))"))
+
+  @@index([createdAt])
+  @@index([updatedAt])
+}
+
+model Game {
+  id            String  @id
+  save          String
+  preview       String?
+  name          String?
+  turns         Int     @default(0)
+  currentPlayer String?
+  playerId      String?
+  createdAt     Int     @default(dbgenerated("(1000 * unixepoch('subsec'))"))
+  updatedAt     Int     @default(dbgenerated("(1000 * unixepoch('subsec'))"))
+
+  players UsersInGame[]
+
+  @@index([playerId])
+  @@index([createdAt])
+  @@index([updatedAt])
+}
+
+model User {
+  id        String @id
+  createdAt Int    @default(dbgenerated("(1000 * unixepoch('subsec'))"))
+
+  games    UsersInGame[]
+  profiles UsersInProfile[]
+
+  @@index([createdAt])
+}
+
+model UsersInGame {
+  id        Int    @id @default(autoincrement())
+  gameId    String
+  userId    String
+  createdAt Int    @default(dbgenerated("(1000 * unixepoch('subsec'))"))
+
+  game Game @relation(fields: [gameId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, gameId])
+  @@index([createdAt])
+}
+
+model Profile {
+  id            Int    @id @default(autoincrement())
+  discordId     Int?
+  rating        Float  @default(1000)
+  dmChannel     Int?
+  notifications String @default("enabled")
+  createdAt     Int    @default(dbgenerated("(1000 * unixepoch('subsec'))"))
+  updatedAt     Int    @default(dbgenerated("(1000 * unixepoch('subsec'))"))
+
+  users UsersInProfile[]
+
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([discordId])
+  @@index([dmChannel])
+}
+
+model UsersInProfile {
+  id        Int    @id @default(autoincrement())
+  userId    String @unique
+  profileId Int
+  createdAt Int    @default(dbgenerated("(1000 * unixepoch('subsec'))"))
+
+  user    User    @relation(fields: [userId], references: [id])
+  profile Profile @relation(fields: [profileId], references: [id])
+
+  @@unique([userId, profileId])
+  @@index([profileId])
+  @@index([createdAt])
+}
+
+model ErrorLog {
+  id        Int     @id @default(autoincrement())
+  type      String
+  message   String?
+  createdAt Int     @default(dbgenerated("(1000 * unixepoch('subsec'))"))
+
+  @@index([createdAt])
+}

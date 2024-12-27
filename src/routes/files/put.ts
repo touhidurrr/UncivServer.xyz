@@ -6,6 +6,7 @@ import cache from '@services/cache';
 import { isDiscordTokenValid, sendNewTurnNotification } from '@services/discord';
 import { gameDataSecurityModifier } from '@services/gameDataSecurity';
 import { db } from '@services/mongodb';
+import prisma from '@services/prisma';
 import { pack, unpack } from '@services/uncivGame';
 import { type Elysia, type Static, t } from 'elysia';
 import random from 'random';
@@ -39,6 +40,51 @@ export const putFile = (app: Elysia) =>
           { upsert: true }
         ).catch(err => console.error(`[MongoDB] Error saving game ${gameId}:`, err));
 
+        const isPreview = gameId.endsWith('_Preview');
+
+        prisma.game
+          .upsert({
+            where: { id: gameId.replace('_Preview', '') },
+            create: {
+              id: gameId,
+              save: isPreview ? '' : body,
+              ...(isPreview && { preview: body }),
+            },
+            update: { updatedAt: Date.now(), ...(isPreview ? { preview: body } : { save: body }) },
+          })
+          .then(() => {
+            // Unique list of Players
+            if (!game || (game.turns && game.turns > 0)) return;
+            const players = [
+              ...new Set(
+                [
+                  ...game.civilizations?.map(c => c.playerId),
+                  ...game.gameParameters?.players.map(p => p.playerId),
+                ].filter(Boolean)
+              ),
+            ] as string[];
+
+            return Promise.all(
+              players.map(playerId =>
+                prisma.user.upsert({
+                  where: { id: playerId },
+                  create: {
+                    id: playerId,
+                    games: {
+                      connect: { userId_gameId: { userId: playerId, gameId: game.gameId } },
+                    },
+                  },
+                  update: {
+                    games: {
+                      connect: { userId_gameId: { userId: playerId, gameId: game.gameId } },
+                    },
+                  },
+                })
+              )
+            );
+          })
+          .catch(err => console.error(`[Prisma] Error saving game ${gameId}:`, err));
+
         // sync with other servers
         server?.publish(
           'sync',
@@ -50,7 +96,7 @@ export const putFile = (app: Elysia) =>
         );
 
         // send turn notification
-        if (game !== null && isDiscordTokenValid && gameId.endsWith('_Preview')) {
+        if (game !== null && isDiscordTokenValid && isPreview) {
           sendNewTurnNotification(game!);
         }
       },

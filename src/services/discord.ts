@@ -8,7 +8,7 @@ import {
   type RESTPostAPIChannelMessageResult,
   type RESTPostAPICurrentUserCreateDMChannelResult,
 } from 'discord-api-types/rest/v10';
-import { db } from './mongodb';
+import prisma from './prisma';
 
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 
@@ -26,7 +26,7 @@ discord.on('rateLimited', data => {
 });
 
 discord.on('response', ({ path, method }, { status, statusText }) => {
-  console.log(`[Discord]`, method, path, status, statusText);
+  console.info(`[Discord]`, method, path, status, statusText);
 });
 
 const createMessage = (
@@ -57,19 +57,26 @@ export const sendNewTurnNotification = async (game: UncivJSON) => {
 
   // Check if the Player exists in DB
   const { playerId } = currentCiv;
-  const playerProfile = await db.PlayerProfile.findOne(
-    { uncivUserIds: playerId },
-    { notifications: 1, dmChannel: 1 }
-  );
+  const playerProfile = await prisma.profile.findFirst({
+    where: { users: { some: { userId: playerId } } },
+    select: { id: true, notifications: true, discordId: true, dmChannel: true },
+  });
 
   // if player has not registered or has disabled notifications, return
   if (!playerProfile || playerProfile.notifications !== 'enabled') return;
 
+  const { id, discordId } = playerProfile;
+
   // If the player doesn't have a DM channel, create one
-  if (!playerProfile.dmChannel) {
+  let { dmChannel } = playerProfile;
+  if (!dmChannel) {
     try {
-      playerProfile.dmChannel = await getDMChannel(playerProfile._id.toString());
-      await playerProfile.save();
+      dmChannel = await getDMChannel(discordId!.toString()).then(id => parseInt(id));
+
+      await prisma.profile.update({
+        where: { id },
+        data: { dmChannel, updatedAt: Date.now() },
+      });
     } catch (err) {
       console.error('[TurnNotifier] error creating DM channel for:', playerProfile);
       console.error(err);
@@ -77,25 +84,20 @@ export const sendNewTurnNotification = async (game: UncivJSON) => {
     }
   }
 
-  // Unique list of Players
-  const players = [
-    ...new Set(
-      [
-        ...civilizations.map(c => c.playerId),
-        ...gameParameters.players.map(p => p.playerId),
-      ].filter(Boolean)
-    ),
-  ] as string[];
-
   // update game info on DB and return game name
-  const name = await db.UncivGame.findByIdAndUpdate(
-    //? always save metadata to preview file
-    `${gameId}_Preview`,
-    { $set: { currentPlayer, playerId, turns: turns || 0, players } },
-    { projection: { _id: 0, name: 1 } }
-  ).then(game => game?.name);
+  const name = await prisma.game
+    .update({
+      where: { id: gameId },
+      data: {
+        currentPlayer,
+        playerId,
+        turns: turns || 0,
+      },
+      select: { name: true },
+    })
+    .then(game => game?.name);
 
-  await createMessage(playerProfile.dmChannel, {
+  await createMessage(dmChannel!.toString(), {
     embeds: [
       {
         color: getRandomColor(),

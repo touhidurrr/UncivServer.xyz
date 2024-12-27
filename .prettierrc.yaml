@@ -1,11 +1,20 @@
 semi: true
 tabWidth: 2
 useTabs: false
-endOfLine: 'lf'
+endOfLine: lf
 printWidth: 100
 singleQuote: true
-proseWrap: 'always'
-arrowParens: 'avoid'
-trailingComma: 'es5'
+proseWrap: always
+arrowParens: avoid
+trailingComma: es5
 bracketSpacing: true
-quoteProps: 'as-needed'
+quoteProps: as-needed
+
+plugins:
+  - prettier-plugin-sql
+
+# for SQL
+keywordCase: lower
+dataTypeCase: lower
+functionCase: lower
+identifierCase: lower

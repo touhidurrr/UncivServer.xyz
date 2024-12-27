@@ -28,17 +28,22 @@
     "start": "bun src/index.ts",
     "lint": "tsc --noEmit",
     "format": "prettier --write '**/?*.*'",
-    "wc": "find src tests -type f -exec wc {} +"
+    "wc": "find src tests -type f -exec wc {} +",
+    "sqlgen": "bun scripts/sqlgen.bun.sh",
+    "prismagen": "prisma generate"
   },
   "dependencies": {
     "@discordjs/rest": "^2.4.0",
     "@elysiajs/bearer": "^1.2.0",
     "@elysiajs/static": "^1.2.0",
+    "@libsql/client": "^0.14.0",
     "@mongodb-js/zstd": "^2.0.0",
+    "@prisma/adapter-libsql": "^6.1.0",
+    "@prisma/client": "^6.1.0",
     "bytes": "^3.1.2",
     "date-fns": "^4.1.0",
     "discord-api-types": "^0.37.114",
-    "elysia": "^1.2.5",
+    "elysia": "^1.2.6",
     "ioredis": "^5.4.2",
     "lru-cache": "^11.0.2",
     "mongoose": "^8.9.2",
@@ -51,6 +56,8 @@
     "@types/bun": "^1.1.14",
     "@types/bytes": "^3.1.5",
     "prettier": "^3.4.2",
+    "prettier-plugin-sql": "^0.18.1",
+    "prisma": "^6.1.0",
     "typescript": "^5.7.2"
   },
   "trustedDependencies": [
