@@ -1,6 +1,6 @@
 {
   // include paths
-  "include": ["src", "tests", "scripts"],
+  "include": ["src", "tests", "scripts", "test.ts"],
 
   "compilerOptions": {
     "lib": ["ESNext"],
