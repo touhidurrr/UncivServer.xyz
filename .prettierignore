@@ -2,6 +2,8 @@
 *.png
 *.txt
 *.service
+*.toml
+*.prisma
 node_modules/
 bun.lockb
 yarn.lock

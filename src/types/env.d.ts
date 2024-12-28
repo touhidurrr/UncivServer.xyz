@@ -10,5 +10,7 @@ declare namespace NodeJS {
     SYNC_SERVERS?: string;
     DISCORD_TOKEN?: string;
     MAX_CACHE_SIZE?: string;
+    TURSO_DATABASE_URL?: string;
+    TURSO_AUTH_TOKEN?: string;
   }
 }
