@@ -30,7 +30,7 @@
     "format": "prettier --write '**/?*.*'",
     "wc": "find src tests -type f -exec wc {} +",
     "sqlgen": "bun scripts/sqlgen.ts",
-    "prismagen": "prisma generate"
+    "typegen": "prisma generate"
   },
   "dependencies": {
     "@discordjs/rest": "^2.4.0",
