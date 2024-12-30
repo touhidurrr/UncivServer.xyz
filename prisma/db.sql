@@ -61,6 +61,30 @@ create table "ErrorLog" (
   "createdAt" bigint not null default (cast(1000 * unixepoch ('subsec') as integer))
 );
 
+create table "DiscordPoll" (
+  "id" bigint not null primary key,
+  "authorId" bigint not null,
+  "createdAt" bigint not null default (cast(1000 * unixepoch ('subsec') as integer))
+);
+
+create table "DiscordPollEntry" (
+  "id" integer not null primary key autoincrement,
+  "pollId" bigint not null,
+  "order" integer not null,
+  "label" text not null,
+  "createdAt" bigint not null default (cast(1000 * unixepoch ('subsec') as integer)),
+  "updatedAt" bigint not null default (cast(1000 * unixepoch ('subsec') as integer)),
+  constraint "DiscordPollEntry_pollId_fkey" foreign key ("pollId") references "DiscordPoll" ("id") on delete restrict on update cascade
+);
+
+create table "DiscordPollVote" (
+  "id" integer not null primary key autoincrement,
+  "entryId" integer not null,
+  "discordId" bigint not null,
+  "createdAt" bigint not null default (cast(1000 * unixepoch ('subsec') as integer)),
+  constraint "DiscordPollVote_entryId_fkey" foreign key ("entryId") references "DiscordPollEntry" ("id") on delete restrict on update cascade
+);
+
 create unique index "Variable_id_key" on "Variable" ("id");
 
 create index "Variable_createdAt_idx" on "Variable" ("createdAt");
@@ -96,3 +120,15 @@ create index "UsersInProfile_createdAt_idx" on "UsersInProfile" ("createdAt");
 create unique index "UsersInProfile_userId_profileId_key" on "UsersInProfile" ("userId", "profileId");
 
 create index "ErrorLog_createdAt_idx" on "ErrorLog" ("createdAt");
+
+create index "DiscordPoll_createdAt_idx" on "DiscordPoll" ("createdAt");
+
+create index "DiscordPollEntry_createdAt_idx" on "DiscordPollEntry" ("createdAt");
+
+create index "DiscordPollEntry_updatedAt_idx" on "DiscordPollEntry" ("updatedAt");
+
+create unique index "DiscordPollEntry_pollId_order_key" on "DiscordPollEntry" ("pollId", "order");
+
+create index "DiscordPollVote_createdAt_idx" on "DiscordPollVote" ("createdAt");
+
+create unique index "DiscordPollVote_entryId_discordId_key" on "DiscordPollVote" ("entryId", "discordId");

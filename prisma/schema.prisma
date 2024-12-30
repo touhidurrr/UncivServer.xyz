@@ -99,3 +99,42 @@ model ErrorLog {
 
   @@index([createdAt])
 }
+
+model DiscordPoll {
+  id        BigInt @id
+  authorId  BigInt
+  createdAt BigInt @default(dbgenerated("(cast(1000 * unixepoch('subsec') as integer))"))
+
+  entries DiscordPollEntry[]
+
+  @@index([createdAt])
+}
+
+model DiscordPollEntry {
+  id     Int    @id @default(autoincrement())
+  pollId BigInt
+  order  Int
+  label  String
+
+  createdAt BigInt @default(dbgenerated("(cast(1000 * unixepoch('subsec') as integer))"))
+  updatedAt BigInt @default(dbgenerated("(cast(1000 * unixepoch('subsec') as integer))"))
+
+  poll  DiscordPoll       @relation(fields: [pollId], references: [id])
+  votes DiscordPollVote[]
+
+  @@unique([pollId, order])
+  @@index([createdAt])
+  @@index([updatedAt])
+}
+
+model DiscordPollVote {
+  id        Int    @id @default(autoincrement())
+  entryId   Int
+  discordId BigInt
+  createdAt BigInt @default(dbgenerated("(cast(1000 * unixepoch('subsec') as integer))"))
+
+  entry DiscordPollEntry @relation(fields: [entryId], references: [id])
+
+  @@unique([entryId, discordId])
+  @@index([createdAt])
+}

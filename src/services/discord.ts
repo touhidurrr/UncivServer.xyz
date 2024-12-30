@@ -71,7 +71,7 @@ export const sendNewTurnNotification = async (game: UncivJSON) => {
   let { dmChannel } = playerProfile;
   if (!dmChannel) {
     try {
-      dmChannel = await getDMChannel(discordId.toString()).then(id => parseInt(id));
+      dmChannel = await getDMChannel(discordId.toString()).then(BigInt);
 
       await prisma.profile.update({
         where: { id },
