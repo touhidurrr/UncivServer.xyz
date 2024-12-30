@@ -74,9 +74,9 @@ create table "DiscordPoll" (
 -- CreateTable
 create table "DiscordPollEntry" (
   "id" integer not null primary key autoincrement,
-  "pollId" bigint not null,
-  "order" integer not null,
   "label" text not null,
+  "pollId" bigint not null,
+  "count" integer not null default 0,
   "createdAt" bigint not null default (cast(1000 * unixepoch ('subsec') as integer)),
   "updatedAt" bigint not null default (cast(1000 * unixepoch ('subsec') as integer)),
   constraint "DiscordPollEntry_pollId_fkey" foreign key ("pollId") references "DiscordPoll" ("id") on delete restrict on update cascade
@@ -153,9 +153,6 @@ create index "DiscordPollEntry_createdAt_idx" on "DiscordPollEntry" ("createdAt"
 
 -- CreateIndex
 create index "DiscordPollEntry_updatedAt_idx" on "DiscordPollEntry" ("updatedAt");
-
--- CreateIndex
-create unique index "DiscordPollEntry_pollId_order_key" on "DiscordPollEntry" ("pollId", "order");
 
 -- CreateIndex
 create index "DiscordPollVote_createdAt_idx" on "DiscordPollVote" ("createdAt");
