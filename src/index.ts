@@ -12,6 +12,7 @@ import { swagger } from '@elysiajs/swagger';
 import { filesRoute } from '@routes/files';
 import { infoPlugin } from '@routes/info';
 import { jsonsRoute } from '@routes/jsons';
+import { statsPlugin } from '@routes/stats';
 import { syncRoute } from '@routes/sync';
 import { Elysia } from 'elysia';
 import { version } from '../package.json';
@@ -37,6 +38,7 @@ export const app = new Elysia({
       exclude: /^(?!\/(ws|files|jsons))/,
     })
   )
+  .use(statsPlugin)
   .onRequest(({ request, error }) => {
     if (isDevelopment) console.info(`${request.method} ${request.url}`);
     if (request.body !== null) {
