@@ -3,10 +3,13 @@ WORKDIR /usr/touhidurrr/app
 
 COPY package.json package.json
 COPY bun.lockb bun.lockb
-RUN bun install --frozen-lockfile
 COPY tsconfig.json tsconfig.json
 COPY public public
 COPY src src
+
+# build app
+COPY scripts scripts
+RUN bun run build
 
 # run the app
 EXPOSE 1557/tcp
