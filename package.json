@@ -41,7 +41,7 @@
     "elysia": "^1.2.9",
     "ioredis": "^5.4.2",
     "lru-cache": "^11.0.2",
-    "mongoose": "^8.9.2",
+    "mongoose": "^8.9.3",
     "node-cache": "^5.1.2",
     "random": "^5.1.1"
   },
