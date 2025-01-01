@@ -27,10 +27,10 @@ create table "User" (
 );
 
 create table "UsersInGame" (
-  "id" integer not null primary key autoincrement,
   "gameId" text not null,
   "userId" text not null,
   "createdAt" bigint not null default (cast(1000 * unixepoch ('subsec') as integer)),
+  primary key ("userId", "gameId"),
   constraint "UsersInGame_gameId_fkey" foreign key ("gameId") references "Game" ("id") on delete restrict on update cascade,
   constraint "UsersInGame_userId_fkey" foreign key ("userId") references "User" ("id") on delete restrict on update cascade
 );
@@ -46,10 +46,10 @@ create table "Profile" (
 );
 
 create table "UsersInProfile" (
-  "id" integer not null primary key autoincrement,
   "userId" text not null,
   "profileId" integer not null,
   "createdAt" bigint not null default (cast(1000 * unixepoch ('subsec') as integer)),
+  primary key ("userId", "profileId"),
   constraint "UsersInProfile_userId_fkey" foreign key ("userId") references "User" ("id") on delete restrict on update cascade,
   constraint "UsersInProfile_profileId_fkey" foreign key ("profileId") references "Profile" ("id") on delete restrict on update cascade
 );
@@ -99,9 +99,11 @@ create index "Game_updatedAt_idx" on "Game" ("updatedAt");
 
 create index "User_createdAt_idx" on "User" ("createdAt");
 
-create index "UsersInGame_createdAt_idx" on "UsersInGame" ("createdAt");
+create index "UsersInGame_userId_idx" on "UsersInGame" ("userId");
 
-create unique index "UsersInGame_userId_gameId_key" on "UsersInGame" ("userId", "gameId");
+create index "UsersInGame_gameId_idx" on "UsersInGame" ("gameId");
+
+create index "UsersInGame_createdAt_idx" on "UsersInGame" ("createdAt");
 
 create index "Profile_createdAt_idx" on "Profile" ("createdAt");
 
@@ -113,11 +115,11 @@ create index "Profile_dmChannel_idx" on "Profile" ("dmChannel");
 
 create unique index "UsersInProfile_userId_key" on "UsersInProfile" ("userId");
 
+create index "UsersInProfile_userId_idx" on "UsersInProfile" ("userId");
+
 create index "UsersInProfile_profileId_idx" on "UsersInProfile" ("profileId");
 
 create index "UsersInProfile_createdAt_idx" on "UsersInProfile" ("createdAt");
-
-create unique index "UsersInProfile_userId_profileId_key" on "UsersInProfile" ("userId", "profileId");
 
 create index "ErrorLog_createdAt_idx" on "ErrorLog" ("createdAt");
 

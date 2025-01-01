@@ -5,6 +5,7 @@ import { PrismaClient } from '@prisma/client';
 export const libsql = createClient({
   url: process.env.TURSO_DATABASE_URL!,
   authToken: process.env.TURSO_AUTH_TOKEN!,
+  intMode: 'bigint',
 });
 
 const adapter = new PrismaLibSQL(libsql);
@@ -22,5 +23,4 @@ export const getGameWithPrima = async (gameId: string) => {
   return game && (isPreview ? game.preview : game.save);
 };
 
-await prisma.$connect();
 export default prisma;

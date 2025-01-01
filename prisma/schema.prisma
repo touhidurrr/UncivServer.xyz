@@ -47,7 +47,6 @@ model User {
 }
 
 model UsersInGame {
-  id        Int    @id @default(autoincrement())
   gameId    String
   userId    String
   createdAt BigInt @default(dbgenerated("(cast(1000 * unixepoch('subsec') as integer))"))
@@ -55,7 +54,9 @@ model UsersInGame {
   game Game @relation(fields: [gameId], references: [id])
   user User @relation(fields: [userId], references: [id])
 
-  @@unique([userId, gameId])
+  @@id([userId, gameId])
+  @@index([userId])
+  @@index([gameId])
   @@index([createdAt])
 }
 
@@ -77,7 +78,6 @@ model Profile {
 }
 
 model UsersInProfile {
-  id        Int    @id @default(autoincrement())
   userId    String @unique
   profileId Int
   createdAt BigInt @default(dbgenerated("(cast(1000 * unixepoch('subsec') as integer))"))
@@ -85,7 +85,8 @@ model UsersInProfile {
   user    User    @relation(fields: [userId], references: [id])
   profile Profile @relation(fields: [profileId], references: [id])
 
-  @@unique([userId, profileId])
+  @@id([userId, profileId])
+  @@index([userId])
   @@index([profileId])
   @@index([createdAt])
 }
