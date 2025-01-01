@@ -1,6 +1,14 @@
 import cache from '@services/cache';
 import { db } from '@services/mongodb';
+import { stringify } from 'cache-control-parser';
 import type { Elysia } from 'elysia';
+
+const CACHE_CONTROL = stringify({
+  public: true,
+  immutable: true,
+  'max-age': 2,
+  'stale-while-revalidate': 10,
+});
 
 export const getFile = (app: Elysia) =>
   app.get(
@@ -14,7 +22,8 @@ export const getFile = (app: Elysia) =>
       return game.text;
     },
     {
-      beforeHandle: async ({ params: { gameId } }) => {
+      beforeHandle: async ({ params: { gameId }, set }) => {
+        set.headers['cache-control'] = CACHE_CONTROL;
         const cachedResponse = await cache.get(gameId);
         if (cachedResponse) return cachedResponse;
       },

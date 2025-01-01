@@ -2,13 +2,22 @@ import { GAME_ID_WITH_PREVIEW_REGEX } from '@constants';
 import cache from '@services/cache';
 import { db } from '@services/mongodb';
 import { unpackJSON } from '@services/uncivGame';
+import { stringify } from 'cache-control-parser';
 import { type Elysia, t } from 'elysia';
+
+const CACHE_CONTROL = stringify({
+  public: true,
+  immutable: true,
+  'max-age': 10,
+  'stale-while-revalidate': 60,
+});
 
 export const jsonsRoute = (app: Elysia) =>
   app.get(
     '/jsons/:gameId',
     async ({ error, set, params: { gameId } }) => {
       set.headers['content-type'] = 'application/json';
+      set.headers['cache-control'] = CACHE_CONTROL;
 
       const gameData = await cache.get(gameId);
       if (gameData) return unpackJSON(gameData);

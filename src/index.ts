@@ -54,7 +54,7 @@ export const app = new Elysia({
   .get('/isalive', true)
   .all('/support', ctx => ctx.redirect(SUPPORT_URL, 303))
   .all('/discord', ctx => ctx.redirect(DISCORD_INVITE, 303))
-  .use(staticPlugin({ prefix: '/' }))
+  .use(staticPlugin({ prefix: '/', alwaysStatic: true }))
   .listen({ port, hostname });
 
 console.log(`Server started at ${app.server?.url}`);
