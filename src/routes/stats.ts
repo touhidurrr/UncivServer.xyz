@@ -13,5 +13,6 @@ export const statsPlugin = (app: Elysia) =>
       Object.entries(stats)
         .sort((a, b) => b[1] - a[1])
         .map((o, i) => `${i + 1}. ${o[0]} (hits ${o[1]})`)
+        .slice(0, 100)
         .join('\n')
     );
