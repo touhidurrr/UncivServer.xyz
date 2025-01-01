@@ -3,7 +3,7 @@ import { rm } from 'node:fs/promises';
 
 const converter = new Converter({
   completeHTMLDocument: true,
-  encodeEmails: true,
+  encodeEmails: false,
   ghCodeBlocks: true,
   openLinksInNewWindow: true,
   smartIndentationFix: true,
@@ -18,3 +18,6 @@ for await (const path of paths) {
   const outPath = path.replace(/src[/\\]data/, 'public').replace(/\.md$/, '/index.html');
   await Bun.write(outPath, html);
 }
+
+// format outputs
+await Bun.$`prettier --write public`;
