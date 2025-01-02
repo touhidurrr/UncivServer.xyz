@@ -7,7 +7,11 @@ const pathStart = /(?<=\/\/[^/]+)\/[^/]*/;
 export const statsPlugin = (app: Elysia) =>
   app
     .onRequest(({ request: { method, url } }) => {
-      const key = `${method} ${pathStart.exec(url)![0]}`;
+      let key = `${method} ${pathStart.exec(url)![0]}`;
+      if (key.endsWith('/files')) {
+        if (url.endsWith('_Preview')) key += ' (preview)';
+        else key += ' (full)';
+      }
       stats[key] = (stats[key] ?? 0) + 1;
     })
     .get('/stats/', ({ set }) => {
