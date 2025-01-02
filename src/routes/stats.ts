@@ -1,15 +1,8 @@
-import { stringify } from 'cache-control-parser';
+import { MINIMAL_CACHE_CONTROL } from '@constants';
 import { type Elysia } from 'elysia';
 
 const stats: { [route: string]: number } = {};
 const pathStart = /(?<=\/\/[^/]+)\/[^/]*/;
-
-const CACHE_CONTROL = stringify({
-  public: true,
-  immutable: true,
-  'max-age': 1,
-  'stale-while-revalidate': 10,
-});
 
 export const statsPlugin = (app: Elysia) =>
   app
@@ -18,7 +11,7 @@ export const statsPlugin = (app: Elysia) =>
       stats[key] = (stats[key] ?? 0) + 1;
     })
     .get('/stats/', ({ set }) => {
-      set.headers['cache-control'] = CACHE_CONTROL;
+      set.headers['cache-control'] = MINIMAL_CACHE_CONTROL;
       return Object.entries(stats)
         .sort((a, b) => b[1] - a[1])
         .map((o, i) => `${i + 1}. ${o[0]} (hits ${o[1]})`)

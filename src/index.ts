@@ -5,6 +5,7 @@ import {
   isDevelopment,
   MAX_CONTENT_LENGTH,
   MIN_CONTENT_LENGTH,
+  NO_CACHE_CONTROL,
   SUPPORT_URL,
 } from '@constants';
 import { staticPlugin } from '@elysiajs/static';
@@ -51,7 +52,10 @@ export const app = new Elysia({
   .use(syncRoute)
   .use(jsonsRoute)
   .use(infoPlugin)
-  .get('/isalive', true)
+  .get('/isalive', ({ set }) => {
+    set.headers['cache-control'] = NO_CACHE_CONTROL;
+    return true;
+  })
   .all('/support', ctx => ctx.redirect(SUPPORT_URL, 303))
   .all('/discord', ctx => ctx.redirect(DISCORD_INVITE, 303))
   .use(staticPlugin({ prefix: '/', alwaysStatic: true }))

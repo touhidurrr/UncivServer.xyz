@@ -1,4 +1,5 @@
 import bytes from 'bytes';
+import { stringify as stringifyCacheControl } from 'cache-control-parser';
 import type { APIEmbed } from 'discord-api-types/v10';
 
 // utils
@@ -51,3 +52,16 @@ export const SUPPORT_EMBED: Readonly<APIEmbed> = Object.freeze({
 
 // misc
 export const DISCORD_INVITE = 'https://discord.gg/cdDhexB6qh';
+
+// cache control
+export const MINIMAL_CACHE_CONTROL = stringifyCacheControl({
+  public: true,
+  immutable: true,
+  'max-age': 1,
+  'stale-while-revalidate': 10,
+});
+
+export const NO_CACHE_CONTROL = stringifyCacheControl({
+  'no-store': true,
+  'no-cache': true,
+});
