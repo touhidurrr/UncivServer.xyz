@@ -16,6 +16,9 @@ export const syncRoute = (app: Elysia) =>
   app.ws('/sync', {
     headers: t.Object({ authorization: t.RegExp('^Bearer .+$') }),
     response: SYNC_RESPONSE_SCHEMA,
+    beforeHandle: ({ set }) => {
+      set.headers['cache-control'] = 'no-store, no-cache';
+    },
     open: ws => {
       const token = ws.data.headers.authorization.replace('Bearer ', '');
       if (token !== process.env.SYNC_TOKEN) {

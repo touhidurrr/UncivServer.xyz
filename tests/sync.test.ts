@@ -4,6 +4,7 @@ import { getAppBaseURL } from '@lib';
 import { getRandomBase64String } from '@lib/getRandomBase64String';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import { describe, expect, test } from 'bun:test';
+import { parse as parseCacheControl } from 'cache-control-parser';
 import type { Static } from 'elysia';
 
 const { SYNC_TOKEN } = process.env;
@@ -16,6 +17,22 @@ const getSyncWSClient = (token: string) =>
     headers: { Authorization: `Bearer ${token}` },
     perMessageDeflate: true,
   });
+
+test('Cache Control', async () =>
+  await fetch(`${getAppBaseURL()}/sync`, {
+    headers: {
+      connection: 'upgrade',
+      upgrade: 'websocket',
+      authorization: `Bearer Test`,
+    },
+  }).then(res => {
+    const ccHeaders = res.headers.get('cache-control');
+    expect(ccHeaders).not.toBeNull();
+    const cacheControl = parseCacheControl(ccHeaders!);
+    expect(cacheControl).toBeObject();
+    expect(cacheControl['no-store']).toBeTrue();
+    expect(cacheControl['no-cache']).toBeTrue();
+  }));
 
 describe('Token', () => {
   test('Rejects No Token', async () => {
