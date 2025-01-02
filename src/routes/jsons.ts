@@ -9,7 +9,7 @@ const CACHE_CONTROL = stringify({
   public: true,
   immutable: true,
   'max-age': 10,
-  'stale-while-revalidate': 60,
+  'stale-while-revalidate': 100,
 });
 
 export const jsonsRoute = (app: Elysia) =>

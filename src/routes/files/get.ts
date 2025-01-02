@@ -6,7 +6,7 @@ import type { Elysia } from 'elysia';
 const CACHE_CONTROL = stringify({
   public: true,
   immutable: true,
-  'max-age': 2,
+  'max-age': 1,
   'stale-while-revalidate': 10,
 });
 
