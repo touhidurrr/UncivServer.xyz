@@ -1,4 +1,4 @@
-# UncivServer.xyz
+# UncivServer.xyz ![UncivServerxyz](https://cronitor.io/badges/Kaypra/production/lEZjMiCpMzbYrsBnSfGjVGmdw9I.svg)
 
 An open source, free-to-play, Unciv multiplayer server written in TypeScript.
 
