@@ -56,8 +56,9 @@ export const DISCORD_INVITE = 'https://discord.gg/cdDhexB6qh';
 // cache control
 export const MINIMAL_CACHE_CONTROL = stringifyCacheControl({
   public: true,
-//  immutable: true,
-//  'max-age': 7,
+  // immutable: true,
+  // 'max-age': 7,
+  'must-revalidate': true,
   'stale-while-revalidate': 10,
 });
 
