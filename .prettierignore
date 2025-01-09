@@ -2,6 +2,7 @@
 *.png
 *.txt
 *.service
+/*.md
 node_modules/
 bun.lockb
 yarn.lock
