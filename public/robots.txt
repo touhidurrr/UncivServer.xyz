@@ -1,4 +1,2 @@
-User-agent: *
-Disallow: /files/
-
+Allow: *
 Sitemap: https://uncivserver.xyz/sitemap.txt
