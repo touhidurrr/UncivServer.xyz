@@ -8,7 +8,7 @@ export const isDevelopment = !isProduction;
 
 // server
 export const DEFAULT_PORT = '1557';
-export const DEFAULT_HOST = '0.0.0.0';
+export const DEFAULT_HOST = '::';
 export const MIN_CONTENT_LENGTH = bytes.parse('10b')!;
 export const MAX_CONTENT_LENGTH = bytes.parse('1mb')!;
 
