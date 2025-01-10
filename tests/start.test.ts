@@ -28,6 +28,7 @@ describe('App Start Test', () => {
 
   test('GET / is found', async () => {
     const res = await fetch(baseURL);
+    console.log(res);
     expect(res.ok).toBeTrue();
     expect(res.status).not.toBe(404);
   });

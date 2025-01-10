@@ -1,6 +1,6 @@
 import { DEFAULT_PORT } from '@constants';
-import { hostname } from 'node:os';
 import { isIPv6 } from 'node:net';
+import { hostname } from 'node:os';
 
 const host = process.env.HOST ?? hostname();
 const port = process.env.PORT ?? DEFAULT_PORT;
