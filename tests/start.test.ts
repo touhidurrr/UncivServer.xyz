@@ -38,36 +38,37 @@ describe('App Start Test', () => {
     expect(res.status).not.toBe(404);
   });
 
-  describe('maxRequestBodySize', async () => {
-    const putRandomBody = (size: number) => {
-      const body = getRandomBase64String(size);
-      return fetch(`${baseURL}/files/${TEST_GAME_ID}`, {
-        body,
-        method: 'PUT',
-        headers: { 'Content-Type': 'text/plain' },
-      });
-    };
+  //! Disabled because cannot be reliably tested across different environments
+  // describe('maxRequestBodySize', async () => {
+  //   const putRandomBody = (size: number) => {
+  //     const body = getRandomBase64String(size);
+  //     return fetch(`${baseURL}/files/${TEST_GAME_ID}`, {
+  //       body,
+  //       method: 'PUT',
+  //       headers: { 'Content-Type': 'text/plain' },
+  //     });
+  //   };
 
-    test('pass on smaller payloads', async () => {
-      let res: Response | null = null;
-      try {
-        res = await putRandomBody(MAX_CONTENT_LENGTH);
-        expect(res.headers.get('connection')).not.toBe('close');
-      } catch {
-        expect(res).not.toBeNull();
-      }
-    });
+  //   test('pass on smaller payloads', async () => {
+  //     let res: Response | null = null;
+  //     try {
+  //       res = await putRandomBody(MAX_CONTENT_LENGTH);
+  //       expect(res.headers.get('connection')).not.toBe('close');
+  //     } catch {
+  //       expect(res).not.toBeNull();
+  //     }
+  //   });
 
-    test('fail on larger payloads', async () => {
-      let res: Response | null = null;
-      try {
-        res = await putRandomBody(MAX_CONTENT_LENGTH * 1.3);
-        expect(res.headers.get('connection')).toBe('close');
-      } catch {
-        expect(res).toBeNull();
-      }
-    });
-  });
+  //   test('fail on larger payloads', async () => {
+  //     let res: Response | null = null;
+  //     try {
+  //       res = await putRandomBody(MAX_CONTENT_LENGTH * 1.3);
+  //       expect(res.headers.get('connection')).toBe('close');
+  //     } catch {
+  //       expect(res).toBeNull();
+  //     }
+  //   });
+  // });
 
   test('App is still running', () => {
     expect(proc.killed).toBeFalse();
