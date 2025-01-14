@@ -34,7 +34,7 @@ you can change this behavior setting `PORT` and `HOST` environment variables in 
 just made. Note that both of these variables are optional.
 
 ```bash
-bun install --frozen-lockfile
+bun run build
 bun start
 ```
 
