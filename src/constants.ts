@@ -58,7 +58,7 @@ export const MINIMAL_CACHE_CONTROL = stringifyCacheControl({
   public: true,
   immutable: true,
   'max-age': 7,
-  'stale-while-revalidate': 7,
+  'stale-while-revalidate': 60,
 });
 
 export const NO_CACHE_CONTROL = stringifyCacheControl({
