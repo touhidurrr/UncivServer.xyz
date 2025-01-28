@@ -15,6 +15,7 @@ if (!SYNC_TOKEN) {
 const getSyncWSClient = (token: string) =>
   new WebSocket(`${getAppBaseURL()}/sync`, {
     headers: { Authorization: `Bearer ${token}` },
+    //@ts-ignore
     perMessageDeflate: true,
   });
 
