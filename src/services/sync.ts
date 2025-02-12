@@ -57,6 +57,8 @@ const initWs = (baseURL: string) => {
     );
   });
 
+  ws.addEventListener('error', console.error);
+
   return ws;
 };
 
