@@ -17,7 +17,7 @@ export const putFile = (app: Elysia) =>
     '/:gameId',
     async ({ body, params: { gameId } }) => {
       // for performance reasons, just store the file in cache and return ok
-      // try to do everything else asynchronously in afterHandle
+      // try to do everything else asynchronously in afterResponse
       await cache.set(gameId, body as string);
       return 'Done!';
     },
@@ -28,9 +28,7 @@ export const putFile = (app: Elysia) =>
         maxLength: MAX_FILE_SIZE,
         format: 'byte',
       }),
-      // afterHandle is called after the route handler is executed but before the response is sent
-      // do not use any synchronous code here as it will block the response
-      // this notice is only valid for this file, not for the entire project
+
       afterResponse: async ({ body, server, params: { gameId }, store: { game } }) => {
         // save on mongodb
         await db.UncivGame.updateOne(
