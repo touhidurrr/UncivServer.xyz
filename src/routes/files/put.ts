@@ -31,9 +31,9 @@ export const putFile = (app: Elysia) =>
       // afterHandle is called after the route handler is executed but before the response is sent
       // do not use any synchronous code here as it will block the response
       // this notice is only valid for this file, not for the entire project
-      afterHandle: async ({ body, server, params: { gameId }, store: { game } }) => {
+      afterResponse: async ({ body, server, params: { gameId }, store: { game } }) => {
         // save on mongodb
-        db.UncivGame.updateOne(
+        await db.UncivGame.updateOne(
           { _id: gameId },
           { $set: { text: body as string } },
           { upsert: true }
@@ -51,7 +51,7 @@ export const putFile = (app: Elysia) =>
 
         // send turn notification
         if (game !== null && isDiscordTokenValid && gameId.endsWith('_Preview')) {
-          sendNewTurnNotification(game!);
+          await sendNewTurnNotification(game!);
         }
       },
 
