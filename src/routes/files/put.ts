@@ -33,7 +33,7 @@ export const putFile = (app: Elysia) =>
         // save on mongodb
         await db.UncivGame.updateOne(
           { _id: gameId },
-          { $set: { text: body as string } },
+          { $set: { text: body as string, timestamp: Date.now() } },
           { upsert: true }
         ).catch(err => console.error(`[MongoDB] Error saving game ${gameId}:`, err));
 
