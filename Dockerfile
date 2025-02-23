@@ -1,4 +1,4 @@
-FROM oven/bun:distroless
+FROM oven/bun:slim
 WORKDIR /usr/touhidurrr/app
 
 COPY package.json package.json
