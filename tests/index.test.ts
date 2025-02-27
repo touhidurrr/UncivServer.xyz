@@ -1,8 +1,7 @@
 import { MAX_FILE_SIZE, TEST_GAME_ID } from '@constants';
 import { treaty } from '@elysiajs/eden';
 import { app } from '@index';
-import { getAppBaseURL } from '@lib';
-import { getRandomBase64String } from '@lib/getRandomBase64String';
+import { getAppBaseURL, getRandomSave } from '@lib';
 import cache from '@services/cache';
 import { describe, expect, test } from 'bun:test';
 import { randomUUID } from 'node:crypto';
@@ -58,14 +57,14 @@ describe('PUT /files', () => {
   test('Fail on files larger than MAX_FILE_SIZE', async () => {
     await api
       .files({ gameId: TEST_GAME_ID })
-      .put(getRandomBase64String(MAX_FILE_SIZE + 1))
+      .put(getRandomSave(MAX_FILE_SIZE + 1))
       .then(({ status }) => {
         expect(status).toBe(413);
       });
   });
 
   describe('Good File', () => {
-    const fileData = getRandomBase64String('100kb');
+    const fileData = getRandomSave('100kb');
 
     test('Fail on Bad ID', async () => {
       await api
