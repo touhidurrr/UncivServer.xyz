@@ -20,6 +20,8 @@
       "@index": ["./src/index"],
       "@constants": ["./src/constants"],
 
+      "@package.json": ["./package.json"],
+
       "@lib/*": ["./src/lib/*"],
       "@data/*": ["./src/data/*"],
       "@routes/*": ["./src/routes/*"],
