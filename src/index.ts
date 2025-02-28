@@ -15,6 +15,8 @@ import { infoPlugin } from '@routes/info';
 import { jsonsRoute } from '@routes/jsons';
 import { statsPlugin } from '@routes/stats';
 import { syncRoute } from '@routes/sync';
+import { websocketsRoute } from '@routes/ws';
+import { WS_MAX_PAYLOAD_LENGTH } from '@routes/ws/constants';
 import { Elysia } from 'elysia';
 import { version } from '../package.json';
 
@@ -25,9 +27,9 @@ const port = process.env.PORT ?? DEFAULT_PORT;
 const hostname = process.env.HOST ?? DEFAULT_HOST;
 
 export const app = new Elysia({
-  serve: { maxRequestBodySize: 1.1 * MAX_CONTENT_LENGTH },
   websocket: {
     perMessageDeflate: true,
+    maxPayloadLength: WS_MAX_PAYLOAD_LENGTH,
   },
 })
   .use(
@@ -36,7 +38,7 @@ export const app = new Elysia({
       documentation: {
         info: { title: 'UncivServer.xyz API', version },
       },
-      exclude: /^(?!\/(ws|files|jsons))/,
+      exclude: /^\/(?!ws|files|jsons)/,
     })
   )
   .use(statsPlugin)
@@ -48,6 +50,7 @@ export const app = new Elysia({
       if (+contentLen > MAX_CONTENT_LENGTH) return error(413);
     }
   })
+  .use(websocketsRoute)
   .use(filesRoute)
   .use(syncRoute)
   .use(jsonsRoute)

@@ -19,13 +19,13 @@ export const jsonsRoute = (app: Elysia) =>
       set.headers['content-type'] = 'application/json';
       set.headers['cache-control'] = CACHE_CONTROL;
 
-      const gameData = await cache.get(gameId);
-      if (gameData) return unpackJSON(gameData);
+      const cachedGame = await cache.get(gameId);
+      if (cachedGame) return unpackJSON(cachedGame.text);
 
-      const dbGame = await db.UncivGame.findById(gameId, { _id: 0, text: 1 });
+      const dbGame = await db.UncivGame.findById(gameId, { _id: 0, text: 1, timestamp: 1 });
       if (!dbGame) return error(404);
 
-      await cache.set(gameId, dbGame.text);
+      await cache.set(gameId, { text: dbGame.text, timestamp: dbGame.timestamp });
       return unpackJSON(dbGame.text);
     },
     {
