@@ -37,13 +37,13 @@ export const putFile = (app: Elysia) =>
           maxLength: MAX_FILE_SIZE,
           format: 'byte',
         }),
-        // afterHandle is called after the route handler is executed but before the response is sent
+        // afterResponse is called after the route handler is executed but before the response is sent
         // do not use any synchronous code here as it will block the response
         // this notice is only valid for this file, not for the entire project
-        afterHandle: async ({ server, params: { gameId }, store: { game, cachedGame } }) => {
+        afterResponse: async ({ server, params: { gameId }, store: { game, cachedGame } }) => {
           // save on mongodb
           const { text, timestamp } = cachedGame!;
-          db.UncivGame.updateOne(
+          await db.UncivGame.updateOne(
             { _id: gameId },
             { $set: { text, timestamp } },
             { upsert: true }
@@ -61,13 +61,12 @@ export const putFile = (app: Elysia) =>
 
           // send new turn notification
           if (game !== null) {
-            const isPreview = gameId.endsWith('_Preview');
-            if (isDiscordTokenValid && isPreview) {
-              sendNewTurnNotification(game!);
-            }
-
-            // publish game data to connected clients
-            if (!isPreview) {
+            if (gameId.endsWith('_Preview')) {
+              if (isDiscordTokenValid) {
+                await sendNewTurnNotification(game);
+              }
+            } else {
+              // publish game data to connected clients
               const wsMsg = getWSMessageString({
                 type: 'GameData',
                 data: { gameId, content: text },
@@ -84,43 +83,34 @@ export const putFile = (app: Elysia) =>
         // used for notifications, security provider and discord notifications
         // in case an injection is possible, we need to repack the body to update it
         transform: ctx => {
-          // need to think of a better way of doing this
-          // ideally there should be no try-catch here
-          // if parsing fails then we should just let it happen
-          // this way bad game data will not be saved
-          // but current tests are not good enough to ensure this
-          try {
-            ctx.store.game = unpack(ctx.body as string);
+          ctx.store.game = unpack(ctx.body as string);
 
-            // run security modifier on game data
-            const hasModifications = gameDataSecurityModifier(ctx.store.game);
+          // run security modifier on game data
+          const hasModifications = gameDataSecurityModifier(ctx.store.game);
 
-            // notifications provider
-            let hasNotifications = false;
-            if (
-              !ctx.params.gameId.endsWith('_Preview') &&
-              ctx.store.game.version.number >= 4 &&
-              ctx.store.game.version.createdWith.number > 1074 &&
-              // 52.5% chance of a notification being shown per turn
-              // weighted average of a poll in Unciv the discord server
-              // decreased to 10% at least for this year because yair thinks it's too much
-              random.float() < 0.1
-            ) {
-              hasNotifications = true;
-              const targetCiv = getCurrentPlayerCivilization(ctx.store.game);
-              if (targetCiv) {
-                const newNotification = generateRandomNotification(ctx.store.game);
-                if (targetCiv.notifications) targetCiv.notifications.push(newNotification);
-                else targetCiv.notifications = [newNotification];
-              }
+          // notifications provider
+          let hasNotifications = false;
+          if (
+            !ctx.params.gameId.endsWith('_Preview') &&
+            ctx.store.game.version.number >= 4 &&
+            ctx.store.game.version.createdWith.number > 1074 &&
+            // 52.5% chance of a notification being shown per turn
+            // weighted average of a poll in Unciv the discord server
+            // decreased to 10% at least for this year because yair thinks it's too much
+            random.float() < 0.1
+          ) {
+            hasNotifications = true;
+            const targetCiv = getCurrentPlayerCivilization(ctx.store.game);
+            if (targetCiv) {
+              const newNotification = generateRandomNotification(ctx.store.game);
+              if (targetCiv.notifications) targetCiv.notifications.push(newNotification);
+              else targetCiv.notifications = [newNotification];
             }
+          }
 
-            // repack game data if there are modifications or notifications
-            if (hasModifications || hasNotifications) {
-              ctx.body = pack(ctx.store.game);
-            }
-          } catch (err) {
-            console.error(`[PutBodyTransformError]:\n`, err);
+          // repack game data if there are modifications or notifications
+          if (hasModifications || hasNotifications) {
+            ctx.body = pack(ctx.store.game);
           }
         },
       }

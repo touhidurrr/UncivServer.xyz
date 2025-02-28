@@ -1,9 +1,9 @@
 import { TEST_GAME_ID } from '@constants';
 import '@index';
-import { getAppBaseURL } from '@lib';
-import { getRandomBase64String } from '@lib/getRandomBase64String';
+import { getAppBaseURL, getRandomSave } from '@lib';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import { describe, expect, test } from 'bun:test';
+import { parse as parseCacheControl } from 'cache-control-parser';
 import type { Static } from 'elysia';
 
 const { SYNC_TOKEN } = process.env;
@@ -14,8 +14,25 @@ if (!SYNC_TOKEN) {
 const getSyncWSClient = (token: string) =>
   new WebSocket(`${getAppBaseURL()}/sync`, {
     headers: { Authorization: `Bearer ${token}` },
+    //@ts-ignore
     perMessageDeflate: true,
   });
+
+test('Cache Control', async () =>
+  await fetch(`${getAppBaseURL()}/sync`, {
+    headers: {
+      connection: 'upgrade',
+      upgrade: 'websocket',
+      authorization: `Bearer Test`,
+    },
+  }).then(res => {
+    const ccHeaders = res.headers.get('cache-control');
+    expect(ccHeaders).not.toBeNull();
+    const cacheControl = parseCacheControl(ccHeaders!);
+    expect(cacheControl).toBeObject();
+    expect(cacheControl['no-store']).toBeTrue();
+    expect(cacheControl['no-cache']).toBeTrue();
+  }));
 
 describe('Token', () => {
   test('Rejects No Token', async () => {
@@ -101,7 +118,7 @@ describe('Token', () => {
 
 test('Uploaded files are relayed properly', async () => {
   const url = `${getAppBaseURL()}/files/${TEST_GAME_ID}`;
-  const fileData = getRandomBase64String('1kb');
+  const fileData = getRandomSave('1kb');
 
   const putFile = (isPreview: boolean = false) =>
     fetch(url + (isPreview ? '_Preview' : ''), {

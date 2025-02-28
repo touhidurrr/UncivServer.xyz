@@ -1,6 +1,6 @@
 {
   "name": "uncivserver.xyz",
-  "version": "4.19.0",
+  "version": "4.25.0",
   "description": "An Open Source, Free to Play, Unciv Multiplayer Server written in Javascript",
   "author": "Md. Touhidur Rahman",
   "license": "BSD-3-Clause",
@@ -16,8 +16,8 @@
     "Discord",
     "Turn",
     "Notifications",
-    "fastify",
-    "Redis"
+    "Bun",
+    "Elysia"
   ],
   "type": "module",
   "main": "src/index.ts",
@@ -28,30 +28,34 @@
     "start": "bun src/index.ts",
     "lint": "tsc --noEmit",
     "format": "prettier --write '**/?*.*'",
-    "wc": "find src tests -type f -exec wc {} +"
+    "wc": "find src tests -type f -exec wc {} +",
+    "build": "bun scripts/build.bun.sh"
   },
   "dependencies": {
-    "@discordjs/rest": "^2.4.0",
+    "@discordjs/rest": "^2.4.3",
     "@elysiajs/bearer": "^1.2.0",
     "@elysiajs/static": "^1.2.0",
     "@mongodb-js/zstd": "^2.0.0",
     "bytes": "^3.1.2",
+    "cache-control-parser": "^2.0.6",
     "date-fns": "^4.1.0",
-    "discord-api-types": "^0.37.114",
-    "elysia": "^1.2.5",
-    "ioredis": "^5.4.2",
+    "discord-api-types": "^0.37.119",
+    "elysia": "^1.2.23",
+    "ioredis": "^5.5.0",
     "lru-cache": "^11.0.2",
-    "mongoose": "^8.9.2",
+    "mongoose": "^8.11.0",
     "node-cache": "^5.1.2",
-    "random": "^5.1.1"
+    "random": "^5.3.0"
   },
   "devDependencies": {
     "@elysiajs/eden": "^1.2.0",
-    "@elysiajs/swagger": "^1.2.0",
-    "@types/bun": "^1.1.14",
+    "@elysiajs/swagger": "^1.2.2",
+    "@types/bun": "^1.2.4",
     "@types/bytes": "^3.1.5",
-    "prettier": "^3.4.2",
-    "typescript": "^5.7.2"
+    "@types/showdown": "^2.0.6",
+    "prettier": "^3.5.2",
+    "showdown": "^2.1.0",
+    "typescript": "^5.8.2"
   },
   "trustedDependencies": [
     "@mongodb-js/zstd"

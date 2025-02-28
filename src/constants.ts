@@ -1,4 +1,5 @@
 import bytes from 'bytes';
+import { stringify as stringifyCacheControl } from 'cache-control-parser';
 import type { APIEmbed } from 'discord-api-types/v10';
 
 // utils
@@ -7,9 +8,9 @@ export const isDevelopment = !isProduction;
 
 // server
 export const DEFAULT_PORT = '1557';
-export const DEFAULT_HOST = '0.0.0.0';
+export const DEFAULT_HOST = '::';
 export const MIN_CONTENT_LENGTH = bytes.parse('10b')!;
-export const MAX_CONTENT_LENGTH = bytes.parse('1mb')!;
+export const MAX_CONTENT_LENGTH = bytes.parse('2mb')!;
 
 // redis
 export const REDIS_DEFAULT_URL = '0.0.0.0:6379';
@@ -26,7 +27,7 @@ export const FILES_CACHE_MAX_SIZE = bytes.parse('150mb')!;
 
 // files
 export const MIN_FILE_SIZE = Math.max(MIN_CONTENT_LENGTH, bytes.parse('10b')!);
-export const MAX_FILE_SIZE = Math.min(MAX_CONTENT_LENGTH, bytes.parse('1mb')!);
+export const MAX_FILE_SIZE = Math.min(MAX_CONTENT_LENGTH, bytes.parse('2mb')!);
 
 // auth
 export const GAME_ID_WITH_PREVIEW_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}(_Preview)?$/;
@@ -51,3 +52,16 @@ export const SUPPORT_EMBED: Readonly<APIEmbed> = Object.freeze({
 
 // misc
 export const DISCORD_INVITE = 'https://discord.gg/cdDhexB6qh';
+
+// cache control
+export const MINIMAL_CACHE_CONTROL = stringifyCacheControl({
+  public: true,
+  immutable: true,
+  'max-age': 7,
+  'stale-while-revalidate': 70,
+});
+
+export const NO_CACHE_CONTROL = stringifyCacheControl({
+  'no-store': true,
+  'no-cache': true,
+});

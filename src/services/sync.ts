@@ -14,6 +14,7 @@ const MAX_RECONNECTION_ATTEMPTS = 100;
 const initWs = (baseURL: string) => {
   const ws = new WebSocket(`${baseURL}/sync`, {
     headers: { Authorization: `Bearer ${SYNC_TOKEN}` },
+    //@ts-ignore
     perMessageDeflate: true,
   });
 
@@ -36,7 +37,7 @@ const initWs = (baseURL: string) => {
         break;
       case 'AuthError':
         authOk = false;
-        console.error(`[Sync] Invalid auth attempt to ${baseURL}`);
+        console.error(`[Sync] Invalid auth attempt to ${baseURL}!`);
         break;
       default:
         console.warn(`[Sync] Unknown sync message:`, msg);
@@ -52,15 +53,14 @@ const initWs = (baseURL: string) => {
       () => {
         reconnectionAttemptsLeft--;
         console.info(`[Sync] Reconnecting to:`, baseURL);
+        //@ts-ignore
         Servers[baseURL] = initWs(baseURL);
       },
       random.int(5_000, 10_000)
     );
   });
 
-  ws.addEventListener('error', err => {
-    console.error(`[Sync] Error conversing with ${baseURL}:`, err);
-  });
+  ws.addEventListener('error', console.error);
 
   return ws;
 };
@@ -69,6 +69,7 @@ const initWs = (baseURL: string) => {
 SYNC_SERVERS.split(/[\n\s]+/)
   .filter(Boolean)
   .forEach(baseURL => {
+    //@ts-ignore
     Servers[baseURL] = initWs(baseURL);
   });
 

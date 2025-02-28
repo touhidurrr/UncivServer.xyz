@@ -1,3 +1,4 @@
+import { MINIMAL_CACHE_CONTROL, NO_CACHE_CONTROL } from '@constants';
 import cache from '@services/cache';
 import { db } from '@services/mongodb';
 import type { Elysia } from 'elysia';
@@ -16,7 +17,10 @@ export const getFile = (app: Elysia) =>
       return text;
     },
     {
-      beforeHandle: async ({ params: { gameId } }) => {
+      beforeHandle: async ({ params: { gameId }, set }) => {
+        set.headers['cache-control'] = gameId.endsWith('_Preview')
+          ? MINIMAL_CACHE_CONTROL
+          : NO_CACHE_CONTROL;
         const cachedResponse = await cache.get(gameId);
         if (cachedResponse) return cachedResponse.text;
       },

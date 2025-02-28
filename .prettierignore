@@ -2,7 +2,8 @@
 *.png
 *.txt
 *.service
+/*.md
 node_modules/
-bun.lockb
+bun.lock
 yarn.lock
 package-lock.json

@@ -5,6 +5,7 @@ import {
   isDevelopment,
   MAX_CONTENT_LENGTH,
   MIN_CONTENT_LENGTH,
+  NO_CACHE_CONTROL,
   SUPPORT_URL,
 } from '@constants';
 import { staticPlugin } from '@elysiajs/static';
@@ -12,6 +13,7 @@ import { swagger } from '@elysiajs/swagger';
 import { filesRoute } from '@routes/files';
 import { infoPlugin } from '@routes/info';
 import { jsonsRoute } from '@routes/jsons';
+import { statsPlugin } from '@routes/stats';
 import { syncRoute } from '@routes/sync';
 import { websocketsRoute } from '@routes/ws';
 import { WS_MAX_PAYLOAD_LENGTH } from '@routes/ws/constants';
@@ -39,6 +41,7 @@ export const app = new Elysia({
       exclude: /^\/(?!ws|files|jsons)/,
     })
   )
+  .use(statsPlugin)
   .onRequest(({ request, error }) => {
     if (isDevelopment) console.info(`${request.method} ${request.url}`);
     if (request.body !== null) {
@@ -52,10 +55,13 @@ export const app = new Elysia({
   .use(syncRoute)
   .use(jsonsRoute)
   .use(infoPlugin)
-  .get('/isalive', true)
+  .get('/isalive', ({ set }) => {
+    set.headers['cache-control'] = NO_CACHE_CONTROL;
+    return true;
+  })
   .all('/support', ctx => ctx.redirect(SUPPORT_URL, 303))
   .all('/discord', ctx => ctx.redirect(DISCORD_INVITE, 303))
-  .use(staticPlugin({ prefix: '/' }))
+  .use(staticPlugin({ prefix: '/', alwaysStatic: true }))
   .listen({ port, hostname });
 
 console.log(`Server started at ${app.server?.url}`);

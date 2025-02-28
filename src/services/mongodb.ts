@@ -12,7 +12,7 @@ export const UncivGameSchema = new Schema(
   {
     _id: { type: String, required: true, match: GAME_ID_WITH_PREVIEW_REGEX },
     text: { type: String, required: true },
-    timestamp: { type: Number, default: Date.now },
+    timestamp: { type: Number, default: Date.now, required: true },
     name: String,
     currentPlayer: String,
     playerId: { type: String, match: GAME_ID_REGEX },
