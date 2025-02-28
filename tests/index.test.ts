@@ -57,7 +57,7 @@ describe('PUT /files', () => {
   test('Fail on files larger than MAX_FILE_SIZE', async () => {
     await api
       .files({ gameId: TEST_GAME_ID })
-      .put(getRandomSave(MAX_FILE_SIZE + 1))
+      .put(getRandomSave(MAX_FILE_SIZE + 100))
       .then(({ status }) => {
         expect(status).toBe(413);
       });

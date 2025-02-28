@@ -123,7 +123,7 @@
 
     "discord-api-types": ["discord-api-types@0.37.119", "", {}, "sha512-WasbGFXEB+VQWXlo6IpW3oUv73Yuau1Ig4AZF/m13tXcTKnMpc/mHjpztIlz4+BM9FG9BHQkEXiPto3bKduQUg=="],
 
-    "elysia": ["elysia@1.2.22", "", { "dependencies": { "@sinclair/typebox": "^0.34.27", "cookie": "^1.0.2", "memoirist": "^0.3.0", "openapi-types": "^12.1.3" }, "peerDependencies": { "typescript": ">= 5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-Cj6PTpdLqzq2xbzdWffMyH6eEBe6NY06SS0Qdq48jU5Qtw/TG2rhiw0UHqxbTkYVAyNbR4EmVeQvNcNgNdE9xg=="],
+    "elysia": ["elysia@1.2.23", "", { "dependencies": { "@sinclair/typebox": "^0.34.27", "cookie": "^1.0.2", "memoirist": "^0.3.0", "openapi-types": "^12.1.3" }, "peerDependencies": { "typescript": ">= 5.0.0" }, "optionalPeers": ["typescript"] }, "sha512-hMezhUkbpzZQduu01tmODsNJXk5CJ8oAQvc5gN1+GLv8cjiOFOnMQdEpTtaMplTKU0lr7MBtwL2duVFXEBPKOg=="],
 
     "end-of-stream": ["end-of-stream@1.4.4", "", { "dependencies": { "once": "^1.4.0" } }, "sha512-+uw1inIHVPQoaVuHzRyXd21icM+cnt4CzD5rW+NC1wjOUSTOs+Te7FOv7AhN7vS9x/oIyhLP5PR1H+phQAHu5Q=="],
 

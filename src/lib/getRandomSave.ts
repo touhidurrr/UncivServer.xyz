@@ -1,3 +1,4 @@
+import { TEST_GAME_ID } from '@constants';
 import { pack } from '@services/uncivGame';
 import bytes from 'bytes';
 import { getRandomBase64String } from './getRandomBase64String';
@@ -21,7 +22,7 @@ export const getRandomSave = (size: number | string): string => {
     i += 1;
     mid = low + Math.floor((high - low) / 2);
     save = pack({
-      gameId: Bun.randomUUIDv7(),
+      gameId: TEST_GAME_ID,
       civilizations: [],
       version: { number: 0 },
       data: getRandomBase64String(mid),
