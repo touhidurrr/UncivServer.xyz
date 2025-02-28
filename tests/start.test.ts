@@ -36,7 +36,7 @@ describe('App Start Test', () => {
   //! Disabled because cannot be reliably tested across different environments
   // describe('maxRequestBodySize', async () => {
   //   const putRandomBody = (size: number) => {
-  //     const body = getRandomBase64String(size);
+  //     const body = getRandomSave(size);
   //     return fetch(`${baseURL}/files/${TEST_GAME_ID}`, {
   //       body,
   //       method: 'PUT',

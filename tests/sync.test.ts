@@ -1,7 +1,6 @@
 import { TEST_GAME_ID } from '@constants';
 import '@index';
-import { getAppBaseURL } from '@lib';
-import { getRandomBase64String } from '@lib/getRandomBase64String';
+import { getAppBaseURL, getRandomSave } from '@lib';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import { describe, expect, test } from 'bun:test';
 import { parse as parseCacheControl } from 'cache-control-parser';
@@ -119,7 +118,7 @@ describe('Token', () => {
 
 test('Uploaded files are relayed properly', async () => {
   const url = `${getAppBaseURL()}/files/${TEST_GAME_ID}`;
-  const fileData = getRandomBase64String('1kb');
+  const fileData = getRandomSave('1kb');
 
   const putFile = (isPreview: boolean = false) =>
     fetch(url + (isPreview ? '_Preview' : ''), {
