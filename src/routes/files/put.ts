@@ -26,7 +26,6 @@ export const putFile = (app: Elysia) =>
       body: t.String({
         minLength: MIN_FILE_SIZE,
         maxLength: MAX_FILE_SIZE,
-        format: 'byte',
       }),
 
       afterResponse: async ({ body, server, params: { gameId }, store: { game } }) => {
