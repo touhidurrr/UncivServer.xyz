@@ -17,10 +17,16 @@ export const putFile = (app: Elysia) =>
     '/:gameId',
     async ({ body, params: { gameId }, error, store, headers }) => {
       const [userId, password] = parseBasicHeader(headers.authorization);
-      const userInGame = store.game!.gameParameters.players.some(p => p.playerId === userId);
+      const previewId = gameId.endsWith('_Preview') ? gameId : `${gameId}_Preview`;
+
+      const [dbAuth, dbGame] = await Promise.all([
+        db.Auth.findById(userId, { hash: 1 }),
+        db.UncivGame.findById(previewId, { players: 1 }),
+      ]);
+
+      const userInGame = dbGame === null || dbGame.players.includes(userId);
       if (!userInGame) return error('Unauthorized');
 
-      const dbAuth = await db.Auth.findOne({ _id: userId }, { hash: 1 });
       if (dbAuth) {
         const verified = await Bun.password.verify(password, dbAuth.hash);
         if (!verified) return error('Unauthorized');

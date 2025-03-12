@@ -16,7 +16,7 @@ export const authRoute = new Elysia({ prefix: '/auth' }).guard(
         set.headers['cache-control'] = NO_CACHE_CONTROL;
         const [userId, password] = parseBasicHeader(headers.authorization);
 
-        const dbAuth = await db.Auth.findOne({ _id: userId }, { hash: 1 });
+        const dbAuth = await db.Auth.findById(userId, { hash: 1 });
         if (dbAuth === null) return 'Unregistered!';
 
         const verified = await Bun.password.verify(password, dbAuth.hash);
@@ -31,7 +31,7 @@ export const authRoute = new Elysia({ prefix: '/auth' }).guard(
           set.headers['cache-control'] = NO_CACHE_CONTROL;
           const [userId, password] = parseBasicHeader(headers.authorization);
 
-          const dbAuth = await db.Auth.findOne({ _id: userId }, { hash: 1 });
+          const dbAuth = await db.Auth.findById(userId, { hash: 1 });
           if (dbAuth === null) {
             const hash = await Bun.password.hash(newPassword);
             await db.Auth.create({ _id: userId, hash });
