@@ -1,5 +1,4 @@
 import { Converter } from 'showdown';
-import { rm } from 'node:fs/promises';
 
 const converter = new Converter({
   completeHTMLDocument: true,
@@ -9,8 +8,7 @@ const converter = new Converter({
   smartIndentationFix: true,
 });
 
-await rm('public/bot', { recursive: true, force: true });
-const paths = new Bun.Glob('src/data/bot/**.md').scan({ onlyFiles: true });
+const paths = new Bun.Glob('src/data/**.md').scan({ onlyFiles: true });
 
 for await (const path of paths) {
   const md = await Bun.file(path).text();
@@ -20,4 +18,4 @@ for await (const path of paths) {
 }
 
 // format outputs
-await Bun.$`prettier --write public`;
+await Bun.$`prettier --write public --config .prettierrc.yaml`;
