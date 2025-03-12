@@ -24,7 +24,11 @@ export const putFile = (app: Elysia) =>
         db.UncivGame.findById(previewId, { players: 1 }),
       ]);
 
-      const userInGame = dbGame === null || dbGame.players.includes(userId);
+      const userInGame =
+        store.game!.gameParameters.players.some(p => p.playerId === userId) &&
+        store.game!.civilizations.some(civ => civ.playerId === userId) &&
+        (dbGame === null || dbGame.players.includes(userId));
+
       if (!userInGame) return error('Unauthorized');
 
       if (dbAuth) {
