@@ -1,4 +1,4 @@
-import { MAX_FILE_SIZE, MIN_FILE_SIZE } from '@constants';
+import { GAME_ID_REGEX, MAX_FILE_SIZE, MIN_FILE_SIZE } from '@constants';
 import { generateRandomNotification, getCurrentPlayerCivilization, parseBasicHeader } from '@lib';
 import type { UncivJSON } from '@localTypes/unciv';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
@@ -16,8 +16,9 @@ export const putFile = (app: Elysia) =>
   app.state('game', null as UncivJSON | null).put(
     '/:gameId',
     async ({ body, params: { gameId }, error, store, headers }) => {
-      const [userId, password] = parseBasicHeader(headers.authorization);
       const previewId = gameId.endsWith('_Preview') ? gameId : `${gameId}_Preview`;
+      const [userId, password] = parseBasicHeader(headers.authorization);
+      if (!GAME_ID_REGEX.test(userId)) error('Bad Request');
 
       const [dbAuth, dbGame] = await Promise.all([
         db.Auth.findById(userId, { hash: 1 }),
