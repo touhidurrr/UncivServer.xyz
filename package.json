@@ -1,6 +1,6 @@
 {
   "name": "uncivserver.xyz",
-  "version": "4.24.4",
+  "version": "4.25.0",
   "description": "An Open Source, Free to Play, Unciv Multiplayer Server written in Javascript",
   "author": "Md. Touhidur Rahman",
   "license": "BSD-3-Clause",
@@ -40,20 +40,20 @@
     "cache-control-parser": "^2.0.6",
     "date-fns": "^4.1.0",
     "discord-api-types": "^0.37.119",
-    "elysia": "^1.2.24",
-    "ioredis": "^5.5.0",
+    "elysia": "^1.2.25",
+    "ioredis": "^5.6.0",
     "lru-cache": "^11.0.2",
-    "mongoose": "^8.11.0",
+    "mongoose": "^8.12.1",
     "node-cache": "^5.1.2",
     "random": "^5.3.0"
   },
   "devDependencies": {
     "@elysiajs/eden": "^1.2.0",
     "@elysiajs/swagger": "^1.2.2",
-    "@types/bun": "^1.2.4",
+    "@types/bun": "^1.2.5",
     "@types/bytes": "^3.1.5",
     "@types/showdown": "^2.0.6",
-    "prettier": "^3.5.2",
+    "prettier": "^3.5.3",
     "showdown": "^2.1.0",
     "typescript": "^5.8.2"
   },
