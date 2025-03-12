@@ -17,10 +17,14 @@ const api = treaty(app, {
   },
 });
 
+const options = {
+  headers: { authorization: `Basic ${Buffer.from(`${TEST_GAME_ID}:demo`).toString('base64')}` },
+};
+
 test('GET /isalive', async () => {
   await api.isalive.get().then(({ status, data }) => {
     expect(status).toBe(200);
-    expect(data).toBe(true);
+    expect(data).toBe({ authVersion: 1 });
   });
 });
 
@@ -48,7 +52,7 @@ describe('PUT /files', () => {
   test('Fail on Small File', async () => {
     await api
       .files({ gameId: TEST_GAME_ID })
-      .put('test')
+      .put('test', options)
       .then(({ status }) => {
         expect(status).toBe(400);
       });
@@ -57,7 +61,7 @@ describe('PUT /files', () => {
   test('Fail on files larger than MAX_FILE_SIZE', async () => {
     await api
       .files({ gameId: TEST_GAME_ID })
-      .put(getRandomSave(MAX_FILE_SIZE + 100))
+      .put(getRandomSave(MAX_FILE_SIZE + 100), options)
       .then(({ status }) => {
         expect(status).toBe(413);
       });
@@ -69,7 +73,7 @@ describe('PUT /files', () => {
     test('Fail on Bad ID', async () => {
       await api
         .files({ gameId: 'bad-id' })
-        .put(fileData)
+        .put(fileData, options)
         .then(({ status }) => {
           expect(status).toBe(422);
         });
@@ -78,7 +82,7 @@ describe('PUT /files', () => {
     test('Upload Success', async () => {
       await api
         .files({ gameId: TEST_GAME_ID })
-        .put(fileData)
+        .put(fileData, options)
         .then(({ status, data }) => {
           expect(status).toBe(200);
           expect(data).toBeString();
