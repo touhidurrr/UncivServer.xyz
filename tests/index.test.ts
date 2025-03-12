@@ -18,7 +18,9 @@ const api = treaty(app, {
 });
 
 const options = {
-  headers: { authorization: `Basic ${Buffer.from(`${TEST_GAME_ID}:demo`).toString('base64')}` },
+  headers: {
+    authorization: `Basic ${Buffer.from(`${TEST_GAME_ID}:${Bun.env.SYNC_TOKEN}`).toString('base64')}`,
+  },
 };
 
 test('GET /isalive', async () => {
