@@ -8,7 +8,7 @@ const converter = new Converter({
   smartIndentationFix: true,
 });
 
-const paths = new Bun.Glob('src/data/**.md').scan({ onlyFiles: true });
+const paths = new Bun.Glob('src/data/**/*.md').scan({ onlyFiles: true });
 
 for await (const path of paths) {
   const md = await Bun.file(path).text();
