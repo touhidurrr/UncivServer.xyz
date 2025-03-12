@@ -17,7 +17,7 @@ export const putFile = (app: Elysia) =>
     '/:gameId',
     async ({ body, params: { gameId }, error, store, headers }) => {
       const [userId, password] = parseBasicHeader(headers.authorization);
-      const userInGame = store.game!.gameParameters.players.find(p => p.playerId === userId);
+      const userInGame = store.game!.gameParameters.players.some(p => p.playerId === userId);
       if (!userInGame) return error('Unauthorized');
 
       const dbAuth = await db.Auth.findOne({ _id: userId }, { hash: 1 });
