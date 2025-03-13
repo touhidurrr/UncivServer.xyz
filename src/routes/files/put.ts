@@ -26,9 +26,8 @@ export const putFile = (app: Elysia) =>
       ]);
 
       const userInGame =
-        store.game!.gameParameters.players.some(p => p.playerId === userId) &&
-        store.game!.civilizations.some(civ => civ.playerId === userId) &&
-        (dbGame === null || dbGame.players.includes(userId));
+        (dbGame === null || dbGame.players.includes(userId)) &&
+        store.game!.gameParameters.players.some(p => p.playerId === userId);
 
       if (!userInGame) return error('Unauthorized');
 
