@@ -35,27 +35,27 @@
     "@discordjs/rest": "^2.4.3",
     "@elysiajs/bearer": "^1.2.0",
     "@elysiajs/static": "^1.2.0",
-    "@mongodb-js/zstd": "^2.0.0",
+    "@mongodb-js/zstd": "^2.0.1",
     "bytes": "^3.1.2",
     "cache-control-parser": "^2.0.6",
     "date-fns": "^4.1.0",
     "discord-api-types": "^0.37.119",
     "elysia": "^1.2.25",
     "ioredis": "^5.6.0",
-    "lru-cache": "^11.0.2",
-    "mongoose": "^8.12.1",
+    "lru-cache": "^11.1.0",
+    "mongoose": "^8.13.2",
     "node-cache": "^5.1.2",
     "random": "^5.3.0"
   },
   "devDependencies": {
     "@elysiajs/eden": "^1.2.0",
     "@elysiajs/swagger": "^1.2.2",
-    "@types/bun": "^1.2.5",
+    "@types/bun": "^1.2.8",
     "@types/bytes": "^3.1.5",
     "@types/showdown": "^2.0.6",
     "prettier": "^3.5.3",
     "showdown": "^2.1.0",
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.3"
   },
   "trustedDependencies": [
     "@mongodb-js/zstd"
