@@ -1,22 +1,16 @@
 import { REDIS_DEFAULT_URL } from '@constants';
-import Redis from 'ioredis';
+import { RedisClient } from 'bun';
 
 const REDIS_URL = process.env.REDISCLOUD_URL || process.env.REDIS_URL || REDIS_DEFAULT_URL;
 
-const redis = new Redis(REDIS_URL);
+const redis = new RedisClient(REDIS_URL);
 
-redis.on('error', error => {
-  console.error(`[Redis] Error:`, error);
-});
-
-redis.on('close', () => {
-  console.error(`[Redis] Connection closed.`);
-});
+redis.onconnect = () => console.log(`[Redis] Connected to ${REDIS_URL}`);
+redis.onclose = error => console.error(`[Redis] Connection closed. Reason:`, error);
 
 class RedisCacheService implements CacheService {
   async ready() {
     await redis.connect();
-    await redis.ping();
   }
 
   async get(key: string): Promise<string | null> {
