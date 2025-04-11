@@ -33,7 +33,6 @@
   },
   "dependencies": {
     "@discordjs/rest": "^2.4.3",
-    "@elysiajs/bearer": "^1.2.0",
     "@elysiajs/static": "^1.2.0",
     "@mongodb-js/zstd": "^2.0.1",
     "bytes": "^3.1.2",
