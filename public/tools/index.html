@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toolbox</title>
+    <link rel="stylesheet" href="/tools/index.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Toolbox</h1>
+
+      <div class="card">
+        <h2>User ID / Password Validator</h2>
+        <form id="validate-form">
+          <label for="userId">User ID:</label>
+          <input type="text" id="userId" required placeholder="Enter your User ID" />
+          <label for="password">Password:</label>
+          <input type="password" id="password" required placeholder="Enter your password" />
+          <button type="submit">Validate</button>
+        </form>
+        <p id="validate-status" class="status"></p>
+        <p id="validate-result" class="result"></p>
+      </div>
+
+      <div class="card">
+        <h2>Password Changer</h2>
+        <form id="change-password-form">
+          <label for="changeUserId">User ID:</label>
+          <input type="text" id="changeUserId" required placeholder="Enter your User ID" />
+          <label for="oldPassword">Old Password:</label>
+          <input type="password" id="oldPassword" required placeholder="Enter your old password" />
+          <label for="newPassword">New Password:</label>
+          <input type="password" id="newPassword" required placeholder="Enter your new password" />
+          <label for="confirmPassword">Confirm Password:</label>
+          <input
+            type="password"
+            id="confirmPassword"
+            required
+            placeholder="Confirm your new password"
+          />
+          <button type="submit">Change Password</button>
+        </form>
+        <p id="change-status" class="status"></p>
+        <p id="change-result" class="result"></p>
+      </div>
+    </div>
+
+    <script>
+      document.getElementById('validate-form').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        const userId = document.getElementById('userId').value;
+        const password = document.getElementById('password').value;
+
+        const response = await fetch('/auth', {
+          method: 'GET',
+          headers: {
+            Authorization: 'Basic ' + btoa(userId + ':' + password),
+          },
+        });
+
+        const responseBody = await response.text();
+        const statusElement = document.getElementById('validate-status');
+        statusElement.textContent = `${response.status} ${response.statusText}`;
+        statusElement.className = response.ok ? 'status success' : 'status error';
+        document.getElementById('validate-result').textContent = responseBody;
+      });
+
+      document
+        .getElementById('change-password-form')
+        .addEventListener('submit', async function (event) {
+          event.preventDefault();
+          const userId = document.getElementById('changeUserId').value;
+          const oldPassword = document.getElementById('oldPassword').value;
+          const newPassword = document.getElementById('newPassword').value;
+          const confirmPassword = document.getElementById('confirmPassword').value;
+
+          if (newPassword !== confirmPassword) {
+            document.getElementById('change-status').textContent = 'Passwords do not match';
+            document.getElementById('change-status').className = 'status error';
+            return;
+          }
+
+          const response = await fetch('/auth', {
+            method: 'PUT',
+            headers: {
+              Authorization: 'Basic ' + btoa(userId + ':' + oldPassword),
+              'Content-Type': 'text/plain',
+            },
+            body: newPassword,
+          });
+
+          const responseBody = await response.text();
+          const statusElement = document.getElementById('change-status');
+          statusElement.textContent = `${response.status} ${response.statusText}`;
+          statusElement.className = response.ok ? 'status success' : 'status error';
+          document.getElementById('change-result').textContent = responseBody;
+        });
+    </script>
+  </body>
+</html>

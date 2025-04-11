@@ -56,16 +56,26 @@ const VariableSchema = new Schema(
   { collection: 'Variables', timestamps: true }
 );
 
+const AuthSchema = new Schema(
+  {
+    _id: { type: String, required: true },
+    hash: { type: String, required: true },
+  },
+  { collection: 'Auth', timestamps: true }
+);
+
 export const UncivGame = mongoose.model('UncivGame', UncivGameSchema);
 export const PlayerProfile = mongoose.model('PlayerProfile', PlayerProfileSchema);
 export const ErrorLog = mongoose.model('ErrorLog', ErrorLogSchema);
 export const Variable = mongoose.model('Variable', VariableSchema);
+export const Auth = mongoose.model('Auth', AuthSchema);
 
 export const db = {
   UncivGame,
   PlayerProfile,
   ErrorLog,
   Variable,
+  Auth,
 };
 
 export default db;

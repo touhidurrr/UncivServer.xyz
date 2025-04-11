@@ -9,7 +9,7 @@ export const isDevelopment = !isProduction;
 // server
 export const DEFAULT_PORT = '1557';
 export const DEFAULT_HOST = '::';
-export const MIN_CONTENT_LENGTH = bytes.parse('10b')!;
+export const MIN_CONTENT_LENGTH = bytes.parse('6b')!;
 export const MAX_CONTENT_LENGTH = bytes.parse('2mb')!;
 
 // redis
