@@ -1,6 +1,6 @@
 import * as notificationsData from '@data/notifications';
 import type { Notification, UncivJSON } from '@localTypes/unciv';
-import random from 'random';
+import { choice, probability } from 'randomcryp';
 
 const DEFAULT_NOTIFICATION = 'Welcome to UncivServer.xyz!';
 const DEFAULT_NOTIFICATION_ICON = 'NotificationIcons/RobotArm';
@@ -16,16 +16,16 @@ export const generateRandomNotification = (gameData: UncivJSON): Notification =>
 
   if (gameData.turns) {
     // Self promotion notifications
-    if (random.float() < SPN_PROBABILITY) {
-      const { message, url, icon } = random.choice(notificationsData.promotion)!;
+    if (probability(SPN_PROBABILITY)) {
+      const { message, url, icon } = choice(notificationsData.promotion)!;
       text = message;
       icons[0] = icon || DEFAULT_SPN_ICON;
       if (gameData.version.createdWith.number > 1076) {
         actions[0] = { LinkAction: { url } };
       }
     } else {
-      text = random.choice(notificationsData.classic)!;
-      icons[0] = random.choice(notificationsData.icons.classic)!;
+      text = choice(notificationsData.classic)!;
+      icons[0] = choice(notificationsData.icons.classic)!;
     }
   }
 

@@ -1,6 +1,6 @@
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import type { Static } from 'elysia';
-import random from 'random';
+import { randInt } from 'randomcryp';
 import cache from './cache';
 
 const SYNC_TOKEN = process.env.SYNC_TOKEN;
@@ -53,7 +53,7 @@ const initWs = (baseURL: string) => {
         //@ts-ignore
         Servers[baseURL] = initWs(baseURL);
       },
-      random.int(5_000, 10_000)
+      randInt(5_000, 10_000)
     );
   });
 

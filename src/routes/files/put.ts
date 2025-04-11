@@ -8,7 +8,7 @@ import { gameDataSecurityModifier } from '@services/gameDataSecurity';
 import { db } from '@services/mongodb';
 import { pack, unpack } from '@services/uncivGame';
 import { type Elysia, type Static, t } from 'elysia';
-import random from 'random';
+import { percentage } from 'randomcryp';
 
 export const putFile = (app: Elysia) =>
   // ctx.game should contain parsed game data
@@ -70,7 +70,7 @@ export const putFile = (app: Elysia) =>
           // 52.5% chance of a notification being shown per turn
           // weighted average of a poll in Unciv the discord server
           // decreased to 10% at least for this year because yair thinks it's too much
-          random.float() < 0.1
+          percentage(10)
         ) {
           hasNotifications = true;
           const targetCiv = getCurrentPlayerCivilization(ctx.store.game);
