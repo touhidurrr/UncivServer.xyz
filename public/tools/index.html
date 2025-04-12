@@ -31,18 +31,18 @@
         <h2>Password Changer</h2>
         <form id="change-password-form">
           <label for="changeUserId">User ID:</label>
-          <input type="text" id="changeUserId" required placeholder="Enter your User ID" />
+          <input type="text" id="changeUserId" required placeholder="Enter User ID" />
           <label for="oldPassword">Old Password:</label>
-          <input type="password" id="oldPassword" required placeholder="Enter your old password" />
-          <label for="newPassword">New Password:</label>
-          <input type="password" id="newPassword" required placeholder="Enter your new password" />
-          <label for="confirmPassword">Confirm Password:</label>
           <input
             type="password"
-            id="confirmPassword"
+            id="oldPassword"
             required
-            placeholder="Confirm your new password"
+            placeholder="Enter old password (leave empty for no previous passoword)"
           />
+          <label for="newPassword">New Password:</label>
+          <input type="password" id="newPassword" required placeholder="Enter a new password" />
+          <label for="confirmPassword">Confirm Password:</label>
+          <input type="password" id="confirmPassword" required placeholder="Confirm new password" />
           <button type="submit">Change Password</button>
         </form>
         <p id="change-status" class="status"></p>
