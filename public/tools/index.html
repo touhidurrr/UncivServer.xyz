@@ -67,7 +67,23 @@
         const statusElement = document.getElementById('validate-status');
         statusElement.textContent = `${response.status} ${response.statusText}`;
         statusElement.className = response.ok ? 'status success' : 'status error';
-        document.getElementById('validate-result').textContent = responseBody;
+
+        let AuthStatus = 'Unknown';
+        switch (response.status) {
+          case 200:
+            AuthStatus = 'Authenticated';
+            break;
+          case 201:
+            AuthStatus = 'Unregistered';
+            break;
+          case 401:
+            AuthStatus = 'Unauthorized';
+            break;
+          default:
+            AuthStatus = 'Unknown';
+        }
+
+        document.getElementById('validate-result').textContent = AuthStatus;
       });
 
       document
