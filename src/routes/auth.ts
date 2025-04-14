@@ -22,12 +22,15 @@ export const authRoute = new Elysia({ prefix: '/auth' }).guard(
         }
 
         const dbAuth = await db.Auth.findById(userId, { hash: 1 });
-        if (dbAuth === null) return 'Unregistered!';
+        if (dbAuth === null) {
+          set.status = 204;
+          return;
+        }
 
         const verified = await Bun.password.verify(password, dbAuth.hash);
         if (!verified) return error('Unauthorized');
 
-        return 'Verified!';
+        return 'Authenticated';
       })
 
       .put(

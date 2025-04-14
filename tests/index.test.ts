@@ -149,8 +149,7 @@ describe('Auth', () => {
     const res = await api.auth.get({
       headers: getAuthHeaders(uuid, ''),
     });
-    expect(res.status).toBe(200);
-    expect(res.data).toBe('Unregistered!');
+    expect(res.status).toBe(204);
   });
 
   test('Initial PUT /auth', async () => {
