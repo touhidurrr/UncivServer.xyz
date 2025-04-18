@@ -27,7 +27,7 @@ const options = {
 test('GET /isalive', async () => {
   await api.isalive.get().then(({ status, data }) => {
     expect(status).toBe(200);
-    expect(data).toBe({ authVersion: 1 });
+    expect(data).toStrictEqual({ authVersion: 1 });
   });
 });
 
@@ -157,7 +157,7 @@ describe('Auth', () => {
       headers: getAuthHeaders(uuid, ''),
     });
     expect(res.status).toBe(200);
-    expect(res.data).toBe('Successfully assinged a new password');
+    expect(res.data).toBe('Successfully assigned a new password');
   });
 
   test('PUT /auth with no password', async () => {

@@ -48,7 +48,7 @@ export const authRoute = new Elysia({ prefix: '/auth' }).guard(
           if (dbAuth === null) {
             const hash = await Bun.password.hash(newPassword);
             await db.Auth.create({ _id: userId, hash });
-            return 'Successfully assinged a new password';
+            return 'Successfully assigned a new password';
           }
 
           const verified = await Bun.password.verify(password, dbAuth.hash);
