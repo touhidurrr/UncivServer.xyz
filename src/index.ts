@@ -10,6 +10,7 @@ import {
 } from '@constants';
 import { staticPlugin } from '@elysiajs/static';
 import { swagger } from '@elysiajs/swagger';
+import { authRoute } from '@routes/auth';
 import { filesRoute } from '@routes/files';
 import { infoPlugin } from '@routes/info';
 import { jsonsRoute } from '@routes/jsons';
@@ -50,11 +51,12 @@ export const app = new Elysia({
   })
   .use(filesRoute)
   .use(syncRoute)
+  .use(authRoute)
   .use(jsonsRoute)
   .use(infoPlugin)
   .get('/isalive', ({ set }) => {
     set.headers['cache-control'] = NO_CACHE_CONTROL;
-    return true;
+    return { authVersion: 1 };
   })
   .all('/support', ctx => ctx.redirect(SUPPORT_URL, 303))
   .all('/discord', ctx => ctx.redirect(DISCORD_INVITE, 303))

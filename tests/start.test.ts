@@ -3,21 +3,20 @@ import { getAppBaseURL } from '@lib/getAppBaseURL';
 import { describe, expect, test } from 'bun:test';
 
 describe('App Start Test', () => {
-  const proc = Bun.spawn(['bun', 'start']);
+  const proc = Bun.spawn(['bun', 'start'], { stdout: Bun.stdout });
   const baseURL = getAppBaseURL();
-  const url = `${baseURL}/isalive` as const;
 
   test(
-    'wait till GET /isalive is true',
+    'wait till GET /isalive is { authVersion: 1 }',
     async () => {
+      const isAliveURL = `${baseURL}/isalive` as const;
       while (!proc.killed) {
         try {
-          const isAlive = await fetch(url, {
+          const isAlive = await fetch(isAliveURL, {
             signal: AbortSignal.timeout(START_TEST_FETCH_TIMEOUT),
-          }).then(res => res.text());
+          }).then(res => res.json());
           if (isAlive) {
-            expect(isAlive).toBeString();
-            expect(isAlive).toBe('true');
+            expect(isAlive).toStrictEqual({ authVersion: 1 });
             break;
           }
         } catch {}
@@ -26,12 +25,13 @@ describe('App Start Test', () => {
     START_TEST_TIMEOUT
   );
 
-  //! Also unreliable, but not sure why
-  // test('GET / is found', async () => {
-  //   const res = await fetch(baseURL);
-  //   expect(res.ok).toBeTrue();
-  //   expect(res.status).not.toBe(404);
-  // });
+  test('GET / is found', async () => {
+    const res = await fetch(baseURL, {
+      signal: AbortSignal.timeout(START_TEST_FETCH_TIMEOUT),
+    });
+    expect(res.ok).toBeTrue();
+    expect(res.status).not.toBe(404);
+  });
 
   //! Disabled because cannot be reliably tested across different environments
   // describe('maxRequestBodySize', async () => {

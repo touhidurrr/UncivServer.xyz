@@ -3,7 +3,8 @@ import { treaty } from '@elysiajs/eden';
 import { app } from '@index';
 import { getAppBaseURL, getRandomSave } from '@lib';
 import cache from '@services/cache';
-import { describe, expect, test } from 'bun:test';
+import db from '@services/mongodb';
+import { afterAll, describe, expect, test } from 'bun:test';
 import { randomUUID } from 'node:crypto';
 import { sep } from 'node:path';
 
@@ -11,16 +12,21 @@ const api = treaty(app, {
   onRequest: (_path, init) => {
     if (typeof init.body === 'string') {
       init.headers ??= {};
-      //@ts-ignore
       init.headers['content-length'] = init.body.length;
     }
   },
 });
 
+const options = {
+  headers: {
+    authorization: `Basic ${Buffer.from(`${TEST_GAME_ID}:${Bun.env.SYNC_TOKEN}`).toString('base64')}`,
+  },
+};
+
 test('GET /isalive', async () => {
   await api.isalive.get().then(({ status, data }) => {
     expect(status).toBe(200);
-    expect(data).toBe(true);
+    expect(data).toStrictEqual({ authVersion: 1 });
   });
 });
 
@@ -48,7 +54,7 @@ describe('PUT /files', () => {
   test('Fail on Small File', async () => {
     await api
       .files({ gameId: TEST_GAME_ID })
-      .put('test')
+      .put('test', options)
       .then(({ status }) => {
         expect(status).toBe(400);
       });
@@ -57,7 +63,7 @@ describe('PUT /files', () => {
   test('Fail on files larger than MAX_FILE_SIZE', async () => {
     await api
       .files({ gameId: TEST_GAME_ID })
-      .put(getRandomSave(MAX_FILE_SIZE + 100))
+      .put(getRandomSave(MAX_FILE_SIZE + 100), options)
       .then(({ status }) => {
         expect(status).toBe(413);
       });
@@ -69,7 +75,7 @@ describe('PUT /files', () => {
     test('Fail on Bad ID', async () => {
       await api
         .files({ gameId: 'bad-id' })
-        .put(fileData)
+        .put(fileData, options)
         .then(({ status }) => {
           expect(status).toBe(422);
         });
@@ -78,7 +84,7 @@ describe('PUT /files', () => {
     test('Upload Success', async () => {
       await api
         .files({ gameId: TEST_GAME_ID })
-        .put(fileData)
+        .put(fileData, options)
         .then(({ status, data }) => {
           expect(status).toBe(200);
           expect(data).toBeString();
@@ -124,4 +130,89 @@ test('All static assets can be accessed', async () => {
       expect(res.status).toBe(200);
     })
   );
+});
+
+const getAuthHeaders = (uuid: string, password: string) => ({
+  authorization: `Basic ${Buffer.from(`${uuid}:${password}`).toString('base64')}`,
+});
+
+describe('Auth', () => {
+  const uuid = Bun.randomUUIDv7();
+  const password = '0'.repeat(6);
+
+  afterAll(async () => {
+    await db.Auth.deleteOne({ _id: uuid }).then(console.log);
+  });
+
+  test('Initial GET /auth', async () => {
+    const res = await api.auth.get({
+      headers: getAuthHeaders(uuid, ''),
+    });
+    expect(res.status).toBe(204);
+  });
+
+  test('Initial PUT /auth', async () => {
+    const res = await api.auth.put(password, {
+      headers: getAuthHeaders(uuid, ''),
+    });
+    expect(res.status).toBe(200);
+    expect(res.data).toBe('Successfully assigned a new password');
+  });
+
+  test('PUT /auth with no password', async () => {
+    const res = await api.auth.put(password, {
+      headers: getAuthHeaders(uuid, ''),
+    });
+    expect(res.status).toBe(401);
+  });
+
+  test('GET /auth with no password', async () => {
+    const res = await api.auth.get({
+      headers: getAuthHeaders(uuid, ''),
+    });
+    expect(res.status).toBe(401);
+  });
+
+  test('PUT /auth with wrong password', async () => {
+    const res = await api.auth.put(password, {
+      headers: getAuthHeaders(uuid, password + '1'),
+    });
+    expect(res.status).toBe(401);
+  });
+
+  test('GET /auth with wrong password', async () => {
+    const res = await api.auth.get({
+      headers: getAuthHeaders(uuid, password + '1'),
+    });
+    expect(res.status).toBe(401);
+  });
+
+  test('GET /auth with correct password', async () => {
+    const res = await api.auth.get({
+      headers: getAuthHeaders(uuid, password),
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('PUT /auth with correct password', async () => {
+    const res = await api.auth.put(password + '1', {
+      headers: getAuthHeaders(uuid, password),
+    });
+    expect(res.status).toBe(200);
+    expect(res.data).toBe('Successfully updated password');
+  });
+
+  test('GET /auth with incorrect password after update', async () => {
+    const res = await api.auth.get({
+      headers: getAuthHeaders(uuid, password),
+    });
+    expect(res.status).toBe(401);
+  });
+
+  test('GET /auth with correct password after update', async () => {
+    const res = await api.auth.get({
+      headers: getAuthHeaders(uuid, password + '1'),
+    });
+    expect(res.status).toBe(200);
+  });
 });

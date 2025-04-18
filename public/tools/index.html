@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Toolbox</title>
+    <link rel="stylesheet" href="/tools/index.css" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Toolbox</h1>
+
+      <div class="card">
+        <h2>User ID / Password Validator</h2>
+        <form id="validate-form">
+          <label for="userId">User ID:</label>
+          <input type="text" id="userId" required placeholder="Enter your User ID" />
+          <label for="password">Password:</label>
+          <input type="password" id="password" placeholder="Enter your password" />
+          <button type="submit">Validate</button>
+        </form>
+        <p id="validate-status" class="status"></p>
+        <p id="validate-result" class="result"></p>
+      </div>
+
+      <div class="card">
+        <h2>Password Changer</h2>
+        <form id="change-password-form">
+          <label for="changeUserId">User ID:</label>
+          <input type="text" id="changeUserId" required placeholder="Enter User ID" />
+          <label for="oldPassword">Old Password:</label>
+          <input
+            type="password"
+            id="oldPassword"
+            placeholder="Enter old password (leave empty for no previous password)"
+          />
+          <label for="newPassword">New Password:</label>
+          <input type="password" id="newPassword" required placeholder="Enter a new password" />
+          <label for="confirmPassword">Confirm Password:</label>
+          <input type="password" id="confirmPassword" required placeholder="Confirm new password" />
+          <button type="submit">Change Password</button>
+        </form>
+        <p id="change-status" class="status"></p>
+        <p id="change-result" class="result"></p>
+      </div>
+    </div>
+
+    <script>
+      const ID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
+
+      function extractUserId(elementId) {
+        const elem = document.getElementById(elementId);
+
+        elem.value = elem.value.trim();
+        if (!ID_REGEX.test(elem.value)) {
+          elem.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+          alert('Invalid User ID format. A valid UUID is expected.');
+          return null;
+        }
+
+        return elem.value;
+      }
+
+      function extractPassword(elementId, allowEmpty = false) {
+        const elem = document.getElementById(elementId);
+
+        if (allowEmpty && elem.value.length === 0) {
+          return '';
+        }
+
+        if (elem.value.length < 6) {
+          elem.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+          alert('Password must be at least 6 characters long.');
+          return null;
+        }
+
+        return elem.value;
+      }
+
+      document.getElementById('validate-form').addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        const userId = extractUserId('userId');
+        if (userId === null) return;
+        const password = extractPassword('password', true);
+        if (password === null) return;
+
+        const response = await fetch('/auth', {
+          method: 'GET',
+          headers: {
+            Authorization: 'Basic ' + btoa(userId + ':' + password),
+          },
+        });
+
+        const responseBody = await response.text();
+        const statusElement = document.getElementById('validate-status');
+        statusElement.textContent = `${response.status} ${response.statusText}`;
+        statusElement.className = response.ok ? 'status success' : 'status error';
+
+        let AuthStatus = 'Unknown';
+        switch (response.status) {
+          case 200:
+            AuthStatus = 'Authenticated';
+            break;
+          case 204:
+            AuthStatus = 'Unregistered';
+            break;
+          case 401:
+            AuthStatus = 'Unauthorized';
+            break;
+          default:
+            AuthStatus = response.statusText;
+        }
+
+        document.getElementById('validate-result').textContent = AuthStatus;
+      });
+
+      document
+        .getElementById('change-password-form')
+        .addEventListener('submit', async function (event) {
+          event.preventDefault();
+
+          const userId = extractUserId('changeUserId');
+          if (userId === null) return;
+          const oldPassword = extractPassword('oldPassword', true);
+          if (oldPassword === null) return;
+          const newPassword = extractPassword('newPassword');
+          if (newPassword === null) return;
+          const confirmPassword = extractPassword('confirmPassword');
+          if (confirmPassword === null) return;
+
+          if (newPassword !== confirmPassword) {
+            alert('New password and confirmation do not match.');
+            return;
+          }
+
+          const response = await fetch('/auth', {
+            method: 'PUT',
+            headers: {
+              Authorization: 'Basic ' + btoa(userId + ':' + oldPassword),
+              'Content-Type': 'text/plain',
+            },
+            body: newPassword,
+          });
+
+          const responseBody = await response.text();
+          const statusElement = document.getElementById('change-status');
+          statusElement.textContent = `${response.status} ${response.statusText}`;
+          statusElement.className = response.ok ? 'status success' : 'status error';
+          document.getElementById('change-result').textContent = responseBody;
+        });
+    </script>
+  </body>
+</html>

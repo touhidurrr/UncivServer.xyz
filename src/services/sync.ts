@@ -12,9 +12,9 @@ const MAX_RECONNECTION_ATTEMPTS = 100;
 
 // initialize a websocket connection with a sync server
 const initWs = (baseURL: string) => {
+  //@ts-ignore: perMessageDeflate pull request is pending
   const ws = new WebSocket(`${baseURL}/sync`, {
     headers: { Authorization: `Bearer ${SYNC_TOKEN}` },
-    //@ts-ignore
     perMessageDeflate: true,
   });
 
@@ -50,7 +50,6 @@ const initWs = (baseURL: string) => {
       () => {
         reconnectionAttemptsLeft--;
         console.info(`[Sync] Reconnecting to:`, baseURL);
-        //@ts-ignore
         Servers[baseURL] = initWs(baseURL);
       },
       randInt(5_000, 10_000)
@@ -66,7 +65,6 @@ const initWs = (baseURL: string) => {
 SYNC_SERVERS.split(/[\n\s]+/)
   .filter(Boolean)
   .forEach(baseURL => {
-    //@ts-ignore
     Servers[baseURL] = initWs(baseURL);
   });
 

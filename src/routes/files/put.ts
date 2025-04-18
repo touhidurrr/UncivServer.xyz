@@ -1,5 +1,5 @@
-import { MAX_FILE_SIZE, MIN_FILE_SIZE } from '@constants';
-import { generateRandomNotification, getCurrentPlayerCivilization } from '@lib';
+import { GAME_ID_REGEX, MAX_FILE_SIZE, MIN_FILE_SIZE } from '@constants';
+import { generateRandomNotification, getCurrentPlayerCivilization, parseBasicHeader } from '@lib';
 import type { UncivJSON } from '@localTypes/unciv';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import cache from '@services/cache';
@@ -15,7 +15,27 @@ export const putFile = (app: Elysia) =>
   // ctx.game is null if parsing fails
   app.state('game', null as UncivJSON | null).put(
     '/:gameId',
-    async ({ body, params: { gameId } }) => {
+    async ({ body, params: { gameId }, error, store, headers }) => {
+      const previewId = gameId.endsWith('_Preview') ? gameId : `${gameId}_Preview`;
+      const [userId, password] = parseBasicHeader(headers.authorization);
+      if (!GAME_ID_REGEX.test(userId)) error('Bad Request');
+
+      const [dbAuth, dbGame] = await Promise.all([
+        db.Auth.findById(userId, { hash: 1 }),
+        db.UncivGame.findById(previewId, { players: 1 }),
+      ]);
+
+      const userInGame =
+        (dbGame === null || dbGame.players.includes(userId)) &&
+        store.game!.civilizations.some(p => p.playerId === userId);
+
+      if (!userInGame) return error('Unauthorized');
+
+      if (dbAuth) {
+        const verified = await Bun.password.verify(password, dbAuth.hash);
+        if (!verified) return error('Unauthorized');
+      }
+
       // for performance reasons, just store the file in cache and return ok
       // try to do everything else asynchronously in afterResponse
       await cache.set(gameId, body as string);
@@ -27,6 +47,8 @@ export const putFile = (app: Elysia) =>
         minLength: MIN_FILE_SIZE,
         maxLength: MAX_FILE_SIZE,
       }),
+
+      headers: t.Object({ authorization: t.String({ minLength: 56, maxLength: 512 }) }),
 
       afterResponse: async ({ body, server, params: { gameId }, store: { game } }) => {
         // save on mongodb

@@ -9,7 +9,7 @@ export const isDevelopment = !isProduction;
 // server
 export const DEFAULT_PORT = '1557';
 export const DEFAULT_HOST = '::';
-export const MIN_CONTENT_LENGTH = bytes.parse('10b')!;
+export const MIN_CONTENT_LENGTH = bytes.parse('6b')!;
 export const MAX_CONTENT_LENGTH = bytes.parse('2mb')!;
 
 // redis
@@ -35,7 +35,7 @@ export const GAME_ID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
 
 // test
 export const START_TEST_TIMEOUT = 30_000;
-export const START_TEST_FETCH_TIMEOUT = 5_000;
+export const START_TEST_FETCH_TIMEOUT = 1_000;
 export const TEST_GAME_ID = '00000000-0000-0000-0000-000000000000';
 
 // support
