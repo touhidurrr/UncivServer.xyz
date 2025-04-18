@@ -72,7 +72,7 @@
           return '';
         }
 
-        if (elem.value < 6) {
+        if (elem.value.length < 6) {
           elem.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
           alert('Password must be at least 6 characters long.');
           return null;
