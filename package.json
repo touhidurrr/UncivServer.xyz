@@ -48,7 +48,7 @@
   "devDependencies": {
     "@elysiajs/eden": "^1.2.0",
     "@elysiajs/swagger": "^1.2.2",
-    "@types/bun": "^1.2.9",
+    "@types/bun": "^1.2.10",
     "@types/bytes": "^3.1.5",
     "@types/showdown": "^2.0.6",
     "prettier": "^3.5.3",
