@@ -20,7 +20,7 @@
           <label for="userId">User ID:</label>
           <input type="text" id="userId" required placeholder="Enter your User ID" />
           <label for="password">Password:</label>
-          <input type="password" id="password" required placeholder="Enter your password" />
+          <input type="password" id="password" placeholder="Enter your password" />
           <button type="submit">Validate</button>
         </form>
         <p id="validate-status" class="status"></p>
@@ -85,15 +85,9 @@
         event.preventDefault();
 
         const userId = extractUserId('userId');
-        if (!userId) return;
-        const password = extractPassword('password');
-        if (!password) return;
-
-        if (!ID_REGEX.test(userId)) {
-          document.getElementById('validate-status').textContent = 'Invalid User ID format';
-          document.getElementById('validate-status').className = 'status error';
-          return;
-        }
+        if (userId === null) return;
+        const password = extractPassword('password', true);
+        if (password === null) return;
 
         const response = await fetch('/auth', {
           method: 'GET',
@@ -131,18 +125,16 @@
           event.preventDefault();
 
           const userId = extractUserId('changeUserId');
-          if (!userId) return;
+          if (userId === null) return;
           const oldPassword = extractPassword('oldPassword', true);
-          if (!oldPassword) return;
+          if (oldPassword === null) return;
           const newPassword = extractPassword('newPassword');
-          if (!newPassword) return;
+          if (newPassword === null) return;
           const confirmPassword = extractPassword('confirmPassword');
-          if (!confirmPassword) return;
+          if (confirmPassword === null) return;
 
           if (newPassword !== confirmPassword) {
-            const statusElement = document.getElementById('change-status');
-            statusElement.textContent = 'Passwords do not match';
-            statusElement.className = 'status error';
+            alert('New password and confirmation do not match.');
             return;
           }
 
