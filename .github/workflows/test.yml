@@ -19,16 +19,16 @@ jobs:
         with:
           bun-version: latest
 
-      - name: Start MongoDB
-        uses: supercharge/mongodb-github-action@1.12.0
-        with:
-          mongodb-db: unciv
-
       - name: Run Build Script
         run: bun run build
 
       - name: Lint TypeScript
         run: bun lint
+
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.12.0
+        with:
+          mongodb-db: unciv
 
       - name: Run tests
         run: |
