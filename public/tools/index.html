@@ -50,10 +50,50 @@
     </div>
 
     <script>
+      const ID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
+
+      function extractUserId(elementId) {
+        const elem = document.getElementById(elementId);
+
+        elem.value = elem.value.trim();
+        if (!ID_REGEX.test(elem.value)) {
+          elem.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+          alert('Invalid User ID format. A valid UUID is expected.');
+          return null;
+        }
+
+        return elem.value;
+      }
+
+      function extractPassword(elementId, allowEmpty = false) {
+        const elem = document.getElementById(elementId);
+
+        if (allowEmpty && elem.value.length === 0) {
+          return '';
+        }
+
+        if (elem.value < 6) {
+          elem.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+          alert('Password must be at least 6 characters long.');
+          return null;
+        }
+
+        return elem.value;
+      }
+
       document.getElementById('validate-form').addEventListener('submit', async function (event) {
         event.preventDefault();
-        const userId = document.getElementById('userId').value;
-        const password = document.getElementById('password').value;
+
+        const userId = extractUserId('userId');
+        if (!userId) return;
+        const password = extractPassword('password');
+        if (!password) return;
+
+        if (!ID_REGEX.test(userId)) {
+          document.getElementById('validate-status').textContent = 'Invalid User ID format';
+          document.getElementById('validate-status').className = 'status error';
+          return;
+        }
 
         const response = await fetch('/auth', {
           method: 'GET',
@@ -79,7 +119,7 @@
             AuthStatus = 'Unauthorized';
             break;
           default:
-            AuthStatus = 'Unknown';
+            AuthStatus = response.statusText;
         }
 
         document.getElementById('validate-result').textContent = AuthStatus;
@@ -89,14 +129,20 @@
         .getElementById('change-password-form')
         .addEventListener('submit', async function (event) {
           event.preventDefault();
-          const userId = document.getElementById('changeUserId').value;
-          const oldPassword = document.getElementById('oldPassword').value;
-          const newPassword = document.getElementById('newPassword').value;
-          const confirmPassword = document.getElementById('confirmPassword').value;
+
+          const userId = extractUserId('changeUserId');
+          if (!userId) return;
+          const oldPassword = extractPassword('oldPassword', true);
+          if (!oldPassword) return;
+          const newPassword = extractPassword('newPassword');
+          if (!newPassword) return;
+          const confirmPassword = extractPassword('confirmPassword');
+          if (!confirmPassword) return;
 
           if (newPassword !== confirmPassword) {
-            document.getElementById('change-status').textContent = 'Passwords do not match';
-            document.getElementById('change-status').className = 'status error';
+            const statusElement = document.getElementById('change-status');
+            statusElement.textContent = 'Passwords do not match';
+            statusElement.className = 'status error';
             return;
           }
 
