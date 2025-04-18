@@ -13,7 +13,6 @@ describe('App Start Test', () => {
       while (!proc.killed) {
         try {
           const isAlive = await fetch(url, {
-            //@ts-ignore
             signal: AbortSignal.timeout(START_TEST_FETCH_TIMEOUT),
           }).then(res => res.text());
           if (isAlive) {
