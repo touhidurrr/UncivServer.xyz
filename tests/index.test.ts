@@ -144,7 +144,7 @@ const getAuthHeaders = (uuid: string, password: string) => ({
 });
 
 describe('Auth', () => {
-  const uuid = Bun.randomUUIDv7();
+  const uuid = randomUUID();
   const password = '0'.repeat(6);
 
   afterAll(async () => {
