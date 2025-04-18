@@ -23,8 +23,8 @@ export const getRandomSave = (size: number | string): string => {
     mid = low + Math.floor((high - low) / 2);
     save = pack({
       gameId: TEST_GAME_ID,
-      civilizations: [],
-      version: { number: 0 },
+      civilizations: [{ playerId: TEST_GAME_ID }],
+      version: { number: 0, createdWith: { number: 0 } },
       data: getRandomBase64String(mid),
     });
 

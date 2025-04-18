@@ -4,7 +4,7 @@ import { app } from '@index';
 import { getAppBaseURL, getRandomSave } from '@lib';
 import cache from '@services/cache';
 import db from '@services/mongodb';
-import { afterAll, describe, expect, test } from 'bun:test';
+import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
 import { randomUUID } from 'node:crypto';
 import { sep } from 'node:path';
 
@@ -51,6 +51,13 @@ describe('GET /files', () => {
 });
 
 describe('PUT /files', () => {
+  beforeAll(async () => {
+    const result = await db.UncivGame.deleteMany({
+      _id: { $in: [TEST_GAME_ID, `${TEST_GAME_ID}_Preview`] },
+    });
+    console.log('PUT /files beforeAll Result:', result);
+  });
+
   test('Fail on Small File', async () => {
     await api
       .files({ gameId: TEST_GAME_ID })
@@ -141,7 +148,8 @@ describe('Auth', () => {
   const password = '0'.repeat(6);
 
   afterAll(async () => {
-    await db.Auth.deleteOne({ _id: uuid }).then(console.log);
+    const result = await db.Auth.deleteOne({ _id: uuid });
+    console.log('Auth afterAll Result:', result);
   });
 
   test('Initial GET /auth', async () => {
