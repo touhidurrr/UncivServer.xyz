@@ -20,13 +20,30 @@ export const putFile = (app: Elysia) =>
       const [userId, password] = parseBasicHeader(headers.authorization);
       if (!GAME_ID_REGEX.test(userId)) error('Bad Request');
 
-      const [dbAuth, dbGame] = await Promise.all([
+      let [dbAuth, dbGame] = await Promise.all([
         db.Auth.findById(userId, { hash: 1 }),
         db.UncivGame.findById(previewId, { players: 1 }),
       ]);
 
+      if (dbGame === null) {
+        const players = [
+          ...new Set(
+            [
+              ...store.game!.civilizations.map(c => c.playerId),
+              ...store.game!.gameParameters?.players?.map(p => p.playerId),
+            ].filter(Boolean)
+          ),
+        ] as string[];
+
+        dbGame = await db.UncivGame.create({
+          _id: previewId,
+          text: body as string,
+          players,
+        });
+      }
+
       const userInGame =
-        (dbGame === null || dbGame.players.includes(userId)) &&
+        dbGame.players.includes(userId) &&
         store.game!.civilizations.some(p => p.playerId === userId);
 
       if (!userInGame) return error('Unauthorized');
