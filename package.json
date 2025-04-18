@@ -43,7 +43,7 @@
     "lru-cache": "^11.1.0",
     "mongoose": "^8.13.2",
     "node-cache": "^5.1.2",
-    "randomcryp": "^2.1.0"
+    "randomcryp": "^2.1.1"
   },
   "devDependencies": {
     "@elysiajs/eden": "^1.2.0",
