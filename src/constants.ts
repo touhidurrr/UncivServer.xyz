@@ -35,7 +35,7 @@ export const GAME_ID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
 
 // test
 export const START_TEST_TIMEOUT = 30_000;
-export const START_TEST_FETCH_TIMEOUT = 5_000;
+export const START_TEST_FETCH_TIMEOUT = 1_000;
 export const TEST_GAME_ID = '00000000-0000-0000-0000-000000000000';
 
 // support
