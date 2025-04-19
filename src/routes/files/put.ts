@@ -2,6 +2,7 @@ import { GAME_ID_REGEX, MAX_FILE_SIZE, MIN_FILE_SIZE } from '@constants';
 import {
   generateRandomNotification,
   getCurrentPlayerCivilization,
+  getPlayers,
   getPreview,
   parseBasicHeader,
 } from '@lib';
@@ -31,21 +32,17 @@ export const putFile = (app: Elysia) =>
       ]);
 
       if (dbGame === null) {
-        const players = [
-          ...new Set(
-            [
-              ...store.game!.civilizations.map(c => c.playerId),
-              ...store.game!.gameParameters?.players?.map(p => p.playerId),
-            ].filter(Boolean)
-          ),
-        ] as string[];
-
         dbGame = await db.UncivGame.create({
-          players,
           _id: previewId,
           turns: !store.game!.turns || 0,
+          players: getPlayers(store.game!),
           text: pack(getPreview(store.game!)),
         });
+      }
+
+      if (dbGame.players.length === 0) {
+        dbGame.players = getPlayers(store.game!);
+        await dbGame.save();
       }
 
       const userInGame =

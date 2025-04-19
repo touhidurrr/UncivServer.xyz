@@ -1,6 +1,6 @@
 import { SUPPORT_EMBED } from '@constants';
 import { REST } from '@discordjs/rest';
-import { getRandomColor } from '@lib';
+import { getPlayers, getRandomColor } from '@lib';
 import type { UncivJSON } from '@localTypes/unciv';
 import {
   Routes,
@@ -46,7 +46,7 @@ const getDMChannel = async (discordId: string) => {
 };
 
 export const sendNewTurnNotification = async (game: UncivJSON) => {
-  const { turns, gameId, civilizations, currentPlayer, gameParameters } = game;
+  const { turns, gameId, civilizations, currentPlayer } = game;
 
   // find currentPlayer's ID
   const currentCiv = civilizations.find(c => c.civName === currentPlayer);
@@ -78,14 +78,7 @@ export const sendNewTurnNotification = async (game: UncivJSON) => {
   }
 
   // Unique list of Players
-  const players = [
-    ...new Set(
-      [
-        ...civilizations.map(c => c.playerId),
-        ...gameParameters.players.map(p => p.playerId),
-      ].filter(Boolean)
-    ),
-  ] as string[];
+  const players = getPlayers(game);
 
   // update game info on DB and return game name
   const name = await db.UncivGame.findByIdAndUpdate(
