@@ -11,7 +11,7 @@ await mongoose.connect(process.env.MONGO_URL!, {
 const UncivGameSchema = new Schema(
   {
     _id: { type: String, required: true, match: GAME_ID_WITH_PREVIEW_REGEX },
-    text: { type: String, required: true },
+    text: { type: String, default: '', required: true },
     timestamp: { type: Number, default: Date.now, required: true },
     name: String,
     currentPlayer: String,

@@ -1,5 +1,10 @@
 import { GAME_ID_REGEX, MAX_FILE_SIZE, MIN_FILE_SIZE } from '@constants';
-import { generateRandomNotification, getCurrentPlayerCivilization, parseBasicHeader } from '@lib';
+import {
+  generateRandomNotification,
+  getCurrentPlayerCivilization,
+  getPreview,
+  parseBasicHeader,
+} from '@lib';
 import type { UncivJSON } from '@localTypes/unciv';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import cache from '@services/cache';
@@ -36,9 +41,10 @@ export const putFile = (app: Elysia) =>
         ] as string[];
 
         dbGame = await db.UncivGame.create({
-          _id: previewId,
-          text: body as string,
           players,
+          _id: previewId,
+          turns: !store.game!.turns || 0,
+          text: pack(getPreview(store.game!)),
         });
       }
 
