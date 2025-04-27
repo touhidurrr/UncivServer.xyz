@@ -7,9 +7,7 @@ Wants=network-online.target
 ExecStart=bun start
 Restart=always
 RestartSec=1
-StartLimitBurst=3600
-User=nobody
-Group=nogroup
+User=admons
 # Replace `/path/to/bun/directory/bin` with `dirname $(which bun)` output
 ExecSearchPath=/path/to/bun/directory/bin
 # replace `/path/to/UncivServer.xyz` with server repo path

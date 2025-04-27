@@ -1,0 +1,20 @@
+{
+        email admin@uncivserver.xyz
+        admin off
+}
+
+uncivserver.xyz {
+        reverse_proxy [::1]:1557
+        encoding zstd gzip
+
+        tls {
+                dns cloudflare {
+                        zone_token {env.CF_ZONE_TOKEN}
+                        api_token {env.CF_API_TOKEN}
+                }
+        }
+}
+
+[Service]
+EnvironmentFile=/etc/caddy/.env
+
