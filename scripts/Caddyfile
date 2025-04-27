@@ -8,9 +8,6 @@ uncivserver.xyz {
         encode zstd gzip
 
         tls {
-                dns cloudflare {
-                        zone_token {env.CF_ZONE_TOKEN}
-                        api_token {env.CF_API_TOKEN}
-                }
+                dns cloudflare {env.CF_API_TOKEN}
         }
 }
