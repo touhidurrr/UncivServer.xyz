@@ -1,6 +1,6 @@
 {
   "name": "uncivserver.xyz",
-  "version": "4.26.4",
+  "version": "4.26.5",
   "description": "An Open Source, Free to Play, Unciv Multiplayer Server written in Javascript",
   "author": "Md. Touhidur Rahman",
   "license": "BSD-3-Clause",
@@ -48,7 +48,7 @@
   "devDependencies": {
     "@elysiajs/eden": "^1.2.0",
     "@elysiajs/swagger": "^1.2.2",
-    "@types/bun": "^1.2.10",
+    "@types/bun": "^1.2.11",
     "@types/bytes": "^3.1.5",
     "@types/showdown": "^2.0.6",
     "prettier": "^3.5.3",

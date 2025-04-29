@@ -78,19 +78,25 @@ export const putFile = (app: Elysia) =>
           { upsert: true }
         ).catch(err => console.error(`[MongoDB] Error saving game ${gameId}:`, err));
 
-        // sync with other servers
-        server?.publish(
-          'sync',
-          JSON.stringify({
-            type: 'SyncData',
-            data: { gameId, content: body },
-          } as Static<typeof SYNC_RESPONSE_SCHEMA>),
-          true
-        );
+        try {
+          // sync with other servers
+          server?.publish(
+            'sync',
+            JSON.stringify({
+              type: 'SyncData',
+              data: { gameId, content: body },
+            } as Static<typeof SYNC_RESPONSE_SCHEMA>),
+            true
+          );
+        } catch (err) {
+          console.error(`[Sync] Error syncing game ${gameId}:`, err);
+        }
 
         // send turn notification
         if (game !== null && isDiscordTokenValid && gameId.endsWith('_Preview')) {
-          await sendNewTurnNotification(game!);
+          await sendNewTurnNotification(game!).catch(err =>
+            console.error(`[Turn Notifier] Error:`, err)
+          );
         }
       },
 
