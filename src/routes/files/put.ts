@@ -40,16 +40,13 @@ export const putFile = (app: Elysia) =>
         });
       }
 
+      // if a players list doesn't exist, regenerate it
       if (dbGame.players.length === 0) {
         dbGame.players = getPlayers(store.game!);
         await dbGame.save();
       }
 
-      const userInGame =
-        dbGame.players.includes(userId) &&
-        store.game!.civilizations.some(p => p.playerId === userId);
-
-      if (!userInGame) return error('Unauthorized');
+      if (!dbGame.players.includes(userId)) return error('Unauthorized');
 
       if (dbAuth) {
         const verified = await Bun.password.verify(password, dbAuth.hash);
