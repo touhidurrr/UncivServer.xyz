@@ -19,7 +19,7 @@ const UncivGameSchema = new Schema(
     players: { type: [{ type: String, match: GAME_ID_REGEX }] },
     turns: Number,
   },
-  { collection: 'UncivServer' }
+  { collection: 'UncivServer', timestamps: true }
 );
 
 const PlayerProfileSchema = new Schema(
