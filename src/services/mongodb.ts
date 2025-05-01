@@ -12,7 +12,6 @@ const UncivGameSchema = new Schema(
   {
     _id: { type: String, required: true, match: GAME_ID_WITH_PREVIEW_REGEX },
     text: { type: String, default: '', required: true },
-    timestamp: { type: Number, default: Date.now, required: true },
     name: String,
     currentPlayer: String,
     playerId: { type: String, match: GAME_ID_REGEX },
@@ -42,10 +41,9 @@ const PlayerProfileSchema = new Schema(
 const ErrorLogSchema = new Schema(
   {
     type: { type: String, required: true },
-    timestamp: { type: Number, default: Date.now },
     data: { type: Schema.Types.Mixed, required: true },
   },
-  { collection: 'ErrorLogs', timestamps: true }
+  { collection: 'ErrorLogs', timestamps: { createdAt: true, updatedAt: false } }
 );
 
 const VariableSchema = new Schema(
