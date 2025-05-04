@@ -46,7 +46,13 @@ export const putFile = (app: Elysia) =>
         await dbGame.save();
       }
 
-      if (!dbGame.players.includes(userId)) return error('Unauthorized');
+      const playersInGame =
+        dbGame.players.includes(userId) &&
+        store.game!.civilizations.every(
+          ({ playerId }) => !playerId || dbGame.players.includes(playerId)
+        );
+
+      if (!playersInGame) return error('Unauthorized');
 
       if (dbAuth) {
         const verified = await Bun.password.verify(password, dbAuth.hash);
