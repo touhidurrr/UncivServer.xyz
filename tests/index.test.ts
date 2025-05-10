@@ -12,6 +12,7 @@ const api = treaty(app, {
   onRequest: (_path, init) => {
     if (typeof init.body === 'string') {
       init.headers ??= {};
+      //@ts-ignore
       init.headers['content-length'] = init.body.length;
     }
   },

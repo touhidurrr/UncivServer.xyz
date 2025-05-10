@@ -24,6 +24,7 @@ export const getRandomSave = (size: number | string): string => {
     save = pack({
       gameId: TEST_GAME_ID,
       civilizations: [{ playerId: TEST_GAME_ID }],
+      gameParameters: { players: [{ playerId: TEST_GAME_ID }] },
       version: { number: 0, createdWith: { number: 0 } },
       data: getRandomBase64String(mid),
     });

@@ -25,12 +25,21 @@ import './services/sync';
 const port = process.env.PORT ?? DEFAULT_PORT;
 const hostname = process.env.HOST ?? DEFAULT_HOST;
 
+// loggers for debugging in development
+const devPlugin = (app: Elysia) => {
+  if (!isDevelopment) return app;
+  return app.onError(({ error }) => {
+    console.error(error);
+  });
+};
+
 export const app = new Elysia({
   serve: { maxRequestBodySize: 1.1 * MAX_CONTENT_LENGTH },
   websocket: {
     perMessageDeflate: true,
   },
 })
+  .use(devPlugin)
   .use(
     swagger({
       path: '/swagger',
