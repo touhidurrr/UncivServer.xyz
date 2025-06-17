@@ -50,12 +50,12 @@ export const app = new Elysia({
     })
   )
   .use(statsPlugin)
-  .onRequest(({ request, error }) => {
+  .onRequest(({ request, status }) => {
     if (isDevelopment) console.info(`${request.method} ${request.url}`);
     if (request.body !== null) {
       const contentLen = Number(request.headers.get('content-length'));
-      if (!contentLen || contentLen < MIN_CONTENT_LENGTH) return error(400);
-      if (+contentLen > MAX_CONTENT_LENGTH) return error(413);
+      if (!contentLen || contentLen < MIN_CONTENT_LENGTH) return status(400);
+      if (+contentLen > MAX_CONTENT_LENGTH) return status(413);
     }
   })
   .use(filesRoute)

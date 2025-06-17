@@ -41,7 +41,7 @@
     "discord-api-types": "^0.38.12",
     "elysia": "^1.3.5",
     "lru-cache": "^11.1.0",
-    "mongoose": "^8.15.2",
+    "mongoose": "^8.16.0",
     "node-cache": "^5.1.2",
     "randomcryp": "^2.1.1"
   },

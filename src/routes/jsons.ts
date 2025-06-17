@@ -15,7 +15,7 @@ const CACHE_CONTROL = stringify({
 export const jsonsRoute = (app: Elysia) =>
   app.get(
     '/jsons/:gameId',
-    async ({ error, set, params: { gameId } }) => {
+    async ({ status, set, params: { gameId } }) => {
       set.headers['content-type'] = 'application/json';
       set.headers['cache-control'] = CACHE_CONTROL;
 
@@ -23,7 +23,7 @@ export const jsonsRoute = (app: Elysia) =>
       if (gameData) return unpackJSON(gameData);
 
       const dbGame = await db.UncivGame.findById(gameId, { _id: 0, text: 1 });
-      if (!dbGame) return error(404);
+      if (!dbGame) return status(404);
 
       await cache.set(gameId, dbGame.text);
       return unpackJSON(dbGame.text);

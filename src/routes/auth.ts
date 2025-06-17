@@ -12,37 +12,28 @@ export const authRoute = new Elysia({ prefix: '/auth' }).guard(
 
   app =>
     app
-      .get('', async ({ set, error, headers }) => {
+      .get('', async ({ set, status, headers }) => {
         set.headers['cache-control'] = NO_CACHE_CONTROL;
 
         const [userId, password] = parseBasicHeader(headers.authorization);
-        if (!GAME_ID_REGEX.test(userId)) {
-          set.status = 400;
-          return 'Invalid userId!';
-        }
+        if (!GAME_ID_REGEX.test(userId)) return status(400, 'Invalid userId!');
 
         const dbAuth = await db.Auth.findById(userId, { hash: 1 });
-        if (dbAuth === null) {
-          set.status = 204;
-          return;
-        }
+        if (dbAuth === null) return status(204);
 
         const verified = await Bun.password.verify(password, dbAuth.hash);
-        if (!verified) return error('Unauthorized');
+        if (!verified) return status('Unauthorized');
 
         return 'Authenticated';
       })
 
       .put(
         '',
-        async ({ set, error, headers, body: newPassword }) => {
+        async ({ set, status, headers, body: newPassword }) => {
           set.headers['cache-control'] = NO_CACHE_CONTROL;
 
           const [userId, password] = parseBasicHeader(headers.authorization);
-          if (!GAME_ID_REGEX.test(userId)) {
-            set.status = 400;
-            return 'Invalid userId!';
-          }
+          if (!GAME_ID_REGEX.test(userId)) return status(400, 'Invalid userId!');
 
           const dbAuth = await db.Auth.findById(userId, { hash: 1 });
           if (dbAuth === null) {
@@ -52,7 +43,7 @@ export const authRoute = new Elysia({ prefix: '/auth' }).guard(
           }
 
           const verified = await Bun.password.verify(password, dbAuth.hash);
-          if (!verified) return error('Unauthorized');
+          if (!verified) return status('Unauthorized');
 
           dbAuth.hash = await Bun.password.hash(newPassword);
           await dbAuth.save();

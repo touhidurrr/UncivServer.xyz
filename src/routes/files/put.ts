@@ -21,10 +21,10 @@ export const putFile = (app: Elysia) =>
   // ctx.game is null if parsing fails
   app.state('game', null as UncivJSON | null).put(
     '/:gameId',
-    async ({ body, params: { gameId }, error, store, headers }) => {
+    async ({ body, params: { gameId }, status, store, headers }) => {
       const previewId = gameId.endsWith('_Preview') ? gameId : `${gameId}_Preview`;
       const [userId, password] = parseBasicHeader(headers.authorization);
-      if (!GAME_ID_REGEX.test(userId)) error('Bad Request');
+      if (!GAME_ID_REGEX.test(userId)) status('Bad Request');
 
       let [dbAuth, dbGame] = await Promise.all([
         db.Auth.findById(userId, { hash: 1 }),
@@ -52,11 +52,11 @@ export const putFile = (app: Elysia) =>
           ({ playerId }) => !playerId || dbGame.players.includes(playerId)
         );
 
-      if (!playersInGame) return error('Unauthorized');
+      if (!playersInGame) return status('Unauthorized');
 
       if (dbAuth) {
         const verified = await Bun.password.verify(password, dbAuth.hash);
-        if (!verified) return error('Unauthorized');
+        if (!verified) return status('Unauthorized');
       }
 
       // for performance reasons, just store the file in cache and return ok

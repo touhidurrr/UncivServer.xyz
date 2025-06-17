@@ -6,10 +6,10 @@ import type { Elysia } from 'elysia';
 export const getFile = (app: Elysia) =>
   app.get(
     '/:gameId',
-    async ({ error, params: { gameId } }) => {
+    async ({ status, params: { gameId } }) => {
       const game = await db.UncivGame.findById(gameId, { _id: 0, text: 1 });
 
-      if (!game || !game.text) return error(404);
+      if (!game || !game.text) return status(404);
 
       await cache.set(gameId, game.text);
       return game.text;
