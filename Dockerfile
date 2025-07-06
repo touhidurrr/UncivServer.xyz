@@ -16,8 +16,8 @@ RUN bun run build
 RUN bun install --production --frozen-lockfile
 
 # remove unnecessary files
-RUN rm -rf package.json bun.lock
-RUN rm -rf scripts site .eleventy.js
+RUN rm -rf scripts bun.lock
+RUN rm -rf site .eleventy.js
 
 # run the app
 EXPOSE 1557/tcp
