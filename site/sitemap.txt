@@ -1,6 +1,6 @@
 https://uncivserver.xyz/
-https://uncivserver.xyz/logo.png
 https://uncivserver.xyz/robots.txt
+https://uncivserver.xyz/_assets/logo.png
 
 https://uncivserver.xyz/info
 https://uncivserver.xyz/stats

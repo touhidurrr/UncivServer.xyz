@@ -2,6 +2,7 @@
 .*
 test*
 
+
 # test
 !tests/
 
@@ -19,6 +20,10 @@ test*
 # prettier
 !.prettierignore
 !.prettierrc.yaml
+
+# eleventy
+!.eleventy.js
+/public/
 
 # nodejs
 node_modules/
