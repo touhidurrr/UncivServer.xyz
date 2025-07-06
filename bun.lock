@@ -4,9 +4,9 @@
     "": {
       "name": "uncivserver.xyz",
       "dependencies": {
-        "@11ty/eleventy": "latest",
         "@discordjs/rest": "latest",
         "@elysiajs/static": "latest",
+        "@elysiajs/swagger": "latest",
         "@mongodb-js/zstd": "latest",
         "bytes": "latest",
         "cache-control-parser": "latest",
@@ -19,8 +19,8 @@
         "randomcryp": "latest",
       },
       "devDependencies": {
+        "@11ty/eleventy": "latest",
         "@elysiajs/eden": "latest",
-        "@elysiajs/swagger": "latest",
         "@types/bun": "latest",
         "@types/bytes": "latest",
         "prettier": "latest",
