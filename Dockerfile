@@ -12,7 +12,6 @@ COPY src src
 COPY site site
 COPY .eleventy.js .eleventy.js
 RUN bun run build
-COPY public public
 
 # run the app
 EXPOSE 1557/tcp
