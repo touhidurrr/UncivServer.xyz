@@ -9,7 +9,6 @@ import {
   SUPPORT_URL,
 } from '@constants';
 import { staticPlugin } from '@elysiajs/static';
-import { swagger } from '@elysiajs/swagger';
 import { authRoute } from '@routes/auth';
 import { chatPlugin } from '@routes/chat';
 import { filesRoute } from '@routes/files';
@@ -18,7 +17,6 @@ import { jsonsRoute } from '@routes/jsons';
 import { statsPlugin } from '@routes/stats';
 import { syncRoute } from '@routes/sync';
 import { Elysia } from 'elysia';
-import { version } from '../package.json';
 
 // start sync service
 import './services/sync';
@@ -42,15 +40,6 @@ export const app = new Elysia({
   },
 })
   .use(devPlugin)
-  .use(
-    swagger({
-      path: '/swagger',
-      documentation: {
-        info: { title: 'UncivServer.xyz API', version },
-      },
-      exclude: /^(?!\/(ws|files|jsons))/,
-    })
-  )
   .use(statsPlugin)
   .onRequest(({ request, status }) => {
     if (isDevelopment) console.info(`${request.method} ${request.url}`);
