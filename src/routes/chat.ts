@@ -9,7 +9,11 @@ function publishChat(ws: ElysiaWS, chat: WSChatRelay) {
   const civNames = (
     ws as any as { data: { gameId2CivNames: Map<string, string[]> } }
   ).data.gameId2CivNames.get(chat.gameId);
-  if (!civNames || !civNames.includes(chat.civName)) return;
+  if (!civNames || !civNames.includes(chat.civName)) {
+    chat.civName = 'Server';
+    chat.message = `Unauthorized Civ: ${chat.civName}`;
+    return ws.send(chat);
+  }
 
   chat.message = chat.message.replaceAll(/\s+/g, ' ').trim();
   ws.publish(chat.gameId, JSON.stringify(chat));
@@ -46,23 +50,19 @@ export const chatPlugin = (app: Elysia) =>
         .ws('/chat', {
           message: async (ws, message: WSChatMessage) => {
             if (typeof message !== 'object' || !message.type) {
-              const error: WSChatResponseError = {
+              return ws.send({
                 type: 'error',
                 message: 'Expecting valid JSON data with a "type" field',
-              };
-
-              return ws.send(error);
+              } satisfies WSChatResponseError);
             }
 
             switch (message.type) {
               case 'chat':
                 if (ws.isSubscribed(message.gameId)) {
                   if (message.message.length > 1024) {
-                    const error: WSChatResponseError = {
-                      type: 'error',
-                      message: 'Message too long. Maximum allowed characters: 1024.',
-                    };
-                    return ws.send(error);
+                    message.civName = 'Server';
+                    message.message = 'Message too long. Maximum allowed characters: 1024.';
+                    return ws.send(message);
                   }
                   publishChat(ws as any, message);
                 }
@@ -99,11 +99,10 @@ export const chatPlugin = (app: Elysia) =>
                 });
                 break;
               default:
-                const error: WSChatResponseError = {
+                return ws.send({
                   type: 'error',
                   message: `Unknown message type: ${(message as { type: any }).type}`,
-                };
-                ws.send(error);
+                } satisfies WSChatResponseError);
             }
           },
         })
