@@ -1,9 +1,17 @@
-import { START_TEST_FETCH_TIMEOUT, START_TEST_TIMEOUT } from '@constants';
+import {
+  START_TEST_FETCH_RETRY_INTERVAL,
+  START_TEST_FETCH_TIMEOUT,
+  START_TEST_TIMEOUT,
+} from '@constants';
 import { getAppBaseURL } from '@lib/getAppBaseURL';
 import { describe, expect, test } from 'bun:test';
 
 describe('App Start Test', () => {
-  const proc = Bun.spawn(['bun', 'start'], { stdout: Bun.stdout });
+  const port = 10_000 + Math.floor(Math.random() * (65535 - 10_000));
+  const proc = Bun.spawn(['bun', 'start'], {
+    stdout: Bun.stdout,
+    env: { PORT: port.toString() },
+  });
   const baseURL = getAppBaseURL();
 
   test(
@@ -19,6 +27,7 @@ describe('App Start Test', () => {
             expect(isAlive).toStrictEqual({ authVersion: 1 });
             break;
           }
+          await Bun.sleep(START_TEST_FETCH_RETRY_INTERVAL);
         } catch {}
       }
     },

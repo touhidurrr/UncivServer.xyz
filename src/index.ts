@@ -9,15 +9,14 @@ import {
   SUPPORT_URL,
 } from '@constants';
 import { staticPlugin } from '@elysiajs/static';
-import { swagger } from '@elysiajs/swagger';
 import { authRoute } from '@routes/auth';
+import { chatPlugin } from '@routes/chat';
 import { filesRoute } from '@routes/files';
 import { infoPlugin } from '@routes/info';
 import { jsonsRoute } from '@routes/jsons';
 import { statsPlugin } from '@routes/stats';
 import { syncRoute } from '@routes/sync';
 import { Elysia } from 'elysia';
-import { version } from '../package.json';
 
 // start sync service
 import './services/sync';
@@ -37,18 +36,10 @@ export const app = new Elysia({
   serve: { maxRequestBodySize: 1.1 * MAX_CONTENT_LENGTH },
   websocket: {
     perMessageDeflate: true,
+    publishToSelf: true,
   },
 })
   .use(devPlugin)
-  .use(
-    swagger({
-      path: '/swagger',
-      documentation: {
-        info: { title: 'UncivServer.xyz API', version },
-      },
-      exclude: /^(?!\/(ws|files|jsons))/,
-    })
-  )
   .use(statsPlugin)
   .onRequest(({ request, status }) => {
     if (isDevelopment) console.info(`${request.method} ${request.url}`);
@@ -59,13 +50,14 @@ export const app = new Elysia({
     }
   })
   .use(filesRoute)
+  .use(chatPlugin)
   .use(syncRoute)
   .use(authRoute)
   .use(jsonsRoute)
   .use(infoPlugin)
   .get('/isalive', ({ set }) => {
     set.headers['cache-control'] = NO_CACHE_CONTROL;
-    return { authVersion: 1 };
+    return { authVersion: 1, chatVersion: 1 };
   })
   .all('/support', ctx => ctx.redirect(SUPPORT_URL, 303))
   .all('/discord', ctx => ctx.redirect(DISCORD_INVITE, 303))
