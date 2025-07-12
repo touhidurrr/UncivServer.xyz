@@ -10,8 +10,8 @@ function publishChat(ws: ElysiaWS, chat: WSChatRelay) {
     ws as any as { data: { gameId2CivNames: Map<string, string[]> } }
   ).data.gameId2CivNames.get(chat.gameId);
   if (!civNames || !civNames.includes(chat.civName)) {
-    chat.civName = 'Server';
     chat.message = `Unauthorized Civ: ${chat.civName}`;
+    chat.civName = 'Server';
     return ws.send(chat);
   }
 
