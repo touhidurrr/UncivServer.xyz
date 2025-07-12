@@ -11,6 +11,7 @@ import {
 import { staticPlugin } from '@elysiajs/static';
 import { swagger } from '@elysiajs/swagger';
 import { authRoute } from '@routes/auth';
+import { chatPlugin } from '@routes/chat';
 import { filesRoute } from '@routes/files';
 import { infoPlugin } from '@routes/info';
 import { jsonsRoute } from '@routes/jsons';
@@ -37,6 +38,7 @@ export const app = new Elysia({
   serve: { maxRequestBodySize: 1.1 * MAX_CONTENT_LENGTH },
   websocket: {
     perMessageDeflate: true,
+    publishToSelf: true,
   },
 })
   .use(devPlugin)
@@ -59,13 +61,14 @@ export const app = new Elysia({
     }
   })
   .use(filesRoute)
+  .use(chatPlugin)
   .use(syncRoute)
   .use(authRoute)
   .use(jsonsRoute)
   .use(infoPlugin)
   .get('/isalive', ({ set }) => {
     set.headers['cache-control'] = NO_CACHE_CONTROL;
-    return { authVersion: 1 };
+    return { authVersion: 1, chatVersion: 1 };
   })
   .all('/support', ctx => ctx.redirect(SUPPORT_URL, 303))
   .all('/discord', ctx => ctx.redirect(DISCORD_INVITE, 303))

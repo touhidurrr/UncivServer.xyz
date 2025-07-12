@@ -24,7 +24,7 @@ export const putFile = (app: Elysia) =>
     async ({ body, params: { gameId }, status, store, headers }) => {
       const previewId = gameId.endsWith('_Preview') ? gameId : `${gameId}_Preview`;
       const [userId, password] = parseBasicHeader(headers.authorization);
-      if (!GAME_ID_REGEX.test(userId)) status('Bad Request');
+      if (!GAME_ID_REGEX.test(userId)) return status('Bad Request');
 
       let [dbAuth, dbGame] = await Promise.all([
         db.Auth.findById(userId, { hash: 1 }),

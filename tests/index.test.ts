@@ -27,7 +27,7 @@ const options = {
 test('GET /isalive', async () => {
   await api.isalive.get().then(({ status, data }) => {
     expect(status).toBe(200);
-    expect(data).toStrictEqual({ authVersion: 1 });
+    expect(data).toStrictEqual({ authVersion: 1, chatVersion: 1 });
   });
 });
 
