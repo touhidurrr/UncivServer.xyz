@@ -108,17 +108,17 @@ export const putFile = (app: Elysia) =>
 
         // notifications provider
         let hasNotifications = false;
-        if (
-          !ctx.params.gameId.endsWith('_Preview') &&
-          ctx.store.game.isVersionAtLeast({ number: 4, createdWithNumber: 1075 }) &&
-          // 52.5% chance of a notification being shown per turn
-          // weighted average of a poll in Unciv the discord server
-          // decreased to 10% at least for this year because yair thinks it's too much
-          percentage(10)
-        ) {
-          hasNotifications = true;
-          ctx.store.game.addRandomNotificationToCurrentCiv();
-        }
+        // if (
+        //   !ctx.params.gameId.endsWith('_Preview') &&
+        //   ctx.store.game.isVersionAtLeast({ number: 4, createdWithNumber: 1075 }) &&
+        //   // 52.5% chance of a notification being shown per turn
+        //   // weighted average of a poll in Unciv the discord server
+        //   // decreased to 10% at least for this year because yair thinks it's too much
+        //   percentage(10)
+        // ) {
+        //   hasNotifications = true;
+        //   ctx.store.game.addRandomNotificationToCurrentCiv();
+        // }
 
         // repack game data if there are modifications or notifications
         if (hasModifications || hasNotifications) {
