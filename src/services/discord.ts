@@ -1,13 +1,13 @@
 import { SUPPORT_EMBED } from '@constants';
 import { REST } from '@discordjs/rest';
-import { getPlayers, getRandomColor } from '@lib';
-import type { UncivJSON } from '@localTypes/unciv';
+import { getRandomColor } from '@lib/getRandomColor';
 import {
   Routes,
   type RESTPostAPIChannelMessageJSONBody,
   type RESTPostAPIChannelMessageResult,
   type RESTPostAPICurrentUserCreateDMChannelResult,
 } from 'discord-api-types/rest/v10';
+import type { UncivGame } from '../models/uncivGame';
 import { db } from './mongodb';
 
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
@@ -45,8 +45,8 @@ const getDMChannel = async (discordId: string) => {
   return res.id;
 };
 
-export const sendNewTurnNotification = async (game: UncivJSON) => {
-  const { turns, gameId, civilizations, currentPlayer } = game;
+export const sendNewTurnNotification = async (game: UncivGame) => {
+  const { turns, gameId, civilizations, currentPlayer } = game.data;
 
   // find currentPlayer's ID
   const currentCiv = civilizations.find(c => c.civName === currentPlayer);
@@ -78,7 +78,7 @@ export const sendNewTurnNotification = async (game: UncivJSON) => {
   }
 
   // Unique list of Players
-  const players = getPlayers(game);
+  const players = game.getPlayers();
 
   // update game info on DB and return game name
   const name = await db.UncivGame.findByIdAndUpdate(

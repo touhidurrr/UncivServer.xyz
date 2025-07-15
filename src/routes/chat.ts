@@ -1,7 +1,7 @@
 import { GAME_ID_REGEX, NO_CACHE_CONTROL } from '@constants';
 import { parseBasicHeader } from '@lib/parseBasicHeader';
 import db from '@services/mongodb';
-import { unpack } from '@services/uncivGame';
+import { unpack } from '@services/uncivJSON';
 import { Elysia, t } from 'elysia';
 import type { ElysiaWS } from 'elysia/ws';
 

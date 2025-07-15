@@ -1,5 +1,5 @@
 import { TEST_GAME_ID } from '@constants';
-import { pack } from '@services/uncivGame';
+import { pack } from '@services/uncivJSON';
 import bytes from 'bytes';
 import { getRandomBase64String } from './getRandomBase64String';
 

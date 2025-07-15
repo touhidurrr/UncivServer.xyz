@@ -1,7 +1,7 @@
 import { GAME_ID_WITH_PREVIEW_REGEX } from '@constants';
 import cache from '@services/cache';
 import { db } from '@services/mongodb';
-import { unpackJSON } from '@services/uncivGame';
+import { unpackJSON } from '@services/uncivJSON';
 import { stringify } from 'cache-control-parser';
 import { type Elysia, t } from 'elysia';
 

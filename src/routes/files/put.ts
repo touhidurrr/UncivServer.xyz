@@ -1,25 +1,19 @@
 import { GAME_ID_REGEX, MAX_FILE_SIZE, MIN_FILE_SIZE } from '@constants';
-import {
-  generateRandomNotification,
-  getCurrentPlayerCivilization,
-  getPlayers,
-  getPreview,
-  parseBasicHeader,
-} from '@lib';
-import type { UncivJSON } from '@localTypes/unciv';
+import { parseBasicHeader } from '@lib/parseBasicHeader';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import cache from '@services/cache';
 import { isDiscordTokenValid, sendNewTurnNotification } from '@services/discord';
 import { gameDataSecurityModifier } from '@services/gameDataSecurity';
 import { db } from '@services/mongodb';
-import { pack, unpack } from '@services/uncivGame';
+import { pack } from '@services/uncivJSON';
 import { type Elysia, type Static, t } from 'elysia';
 import { percentage } from 'randomcryp';
+import { UncivGame } from '../../models/uncivGame';
 
 export const putFile = (app: Elysia) =>
   // ctx.game should contain parsed game data
   // ctx.game is null if parsing fails
-  app.state('game', null as UncivJSON | null).put(
+  app.state('game', null as UncivGame | null).put(
     '/:gameId',
     async ({ body, params: { gameId }, status, store, headers }) => {
       const previewId = gameId.endsWith('_Preview') ? gameId : `${gameId}_Preview`;
@@ -34,21 +28,21 @@ export const putFile = (app: Elysia) =>
       if (dbGame === null) {
         dbGame = await db.UncivGame.create({
           _id: previewId,
-          turns: !store.game!.turns || 0,
-          players: getPlayers(store.game!),
-          text: pack(getPreview(store.game!)),
+          turns: !store.game!.getTurns(),
+          players: store.game!.getPlayers(),
+          text: pack(store.game!.getPreview()),
         });
       }
 
       // if a players list doesn't exist, regenerate it
       if (dbGame.players.length === 0) {
-        dbGame.players = getPlayers(store.game!);
+        dbGame.players = store.game!.getPlayers();
         await dbGame.save();
       }
 
       const playersInGame =
         dbGame.players.includes(userId) &&
-        store.game!.civilizations.every(
+        store.game!.data.civilizations.every(
           ({ playerId }) => !playerId || dbGame.players.includes(playerId)
         );
 
@@ -107,7 +101,7 @@ export const putFile = (app: Elysia) =>
       // used for notifications, security provider and discord notifications
       // in case an injection is possible, we need to repack the body to update it
       transform: ctx => {
-        ctx.store.game = unpack(ctx.body as string);
+        ctx.store.game = new UncivGame(ctx.body as string);
 
         // run security modifier on game data
         const hasModifications = gameDataSecurityModifier(ctx.store.game);
@@ -116,20 +110,14 @@ export const putFile = (app: Elysia) =>
         let hasNotifications = false;
         if (
           !ctx.params.gameId.endsWith('_Preview') &&
-          ctx.store.game.version.number >= 4 &&
-          ctx.store.game.version.createdWith.number > 1074 &&
+          ctx.store.game.isVersionAtLeast({ number: 4, createdWithNumber: 1075 }) &&
           // 52.5% chance of a notification being shown per turn
           // weighted average of a poll in Unciv the discord server
           // decreased to 10% at least for this year because yair thinks it's too much
           percentage(10)
         ) {
           hasNotifications = true;
-          const targetCiv = getCurrentPlayerCivilization(ctx.store.game);
-          if (targetCiv) {
-            const newNotification = generateRandomNotification(ctx.store.game);
-            if (targetCiv.notifications) targetCiv.notifications.push(newNotification);
-            else targetCiv.notifications = [newNotification];
-          }
+          ctx.store.game.addRandomNotificationToCurrentCiv();
         }
 
         // repack game data if there are modifications or notifications

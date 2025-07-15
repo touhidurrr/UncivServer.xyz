@@ -1,8 +1,8 @@
 import { MINIMAL_CACHE_CONTROL } from '@constants';
+import { dependencies, version } from '@package.json';
 import { format } from 'bytes';
 import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
 import type { Elysia } from 'elysia';
-import { version, dependencies } from '@package.json';
 
 export const infoPlugin = (app: Elysia) =>
   app.get('/info', ({ set }) => {

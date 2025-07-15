@@ -1,6 +1,6 @@
 import allowedDomains from '@data/security/allowedDomains.json';
-import type { UncivJSON } from '@localTypes/unciv';
 import { URL } from 'node:url';
+import type { UncivGame } from '../models/uncivGame';
 
 const allowedDomainsSet = new Set(allowedDomains);
 
@@ -28,11 +28,11 @@ export const isAllowedURL = (candidateURL: string): boolean => {
 
 // run security checks and returns true if game data is modified
 // game data should be modified in place
-export const gameDataSecurityModifier = (game: UncivJSON): boolean => {
+export const gameDataSecurityModifier = (game: UncivGame): boolean => {
   let hasModifications = false;
 
   // LinkAction security
-  game.civilizations.forEach(civ => {
+  game.forEachCivilizations(civ => {
     if (!civ.notifications) return;
 
     civ.notifications.forEach(ntf => {
