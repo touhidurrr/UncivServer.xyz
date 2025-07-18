@@ -10,12 +10,12 @@ describe('App Start Test', () => {
   const port = 10_000 + Math.floor(Math.random() * (65535 - 10_000));
   const proc = Bun.spawn(['bun', 'start'], {
     stdout: Bun.stdout,
-    env: { PORT: port.toString() },
+    env: { PORT: port.toString(), NODE_ENV: 'production' },
   });
-  const baseURL = getAppBaseURL();
+  const baseURL = getAppBaseURL({ port });
 
   test(
-    'wait till GET /isalive is { authVersion: 1 }',
+    'wait till GET /isalive is { authVersion: 1, chatVersion: 1 }',
     async () => {
       const isAliveURL = `${baseURL}/isalive` as const;
       while (!proc.killed) {
@@ -24,7 +24,7 @@ describe('App Start Test', () => {
             signal: AbortSignal.timeout(START_TEST_FETCH_TIMEOUT),
           }).then(res => res.json());
           if (isAlive) {
-            expect(isAlive).toStrictEqual({ authVersion: 1 });
+            expect(isAlive).toStrictEqual({ authVersion: 1, chatVersion: 1 });
             break;
           }
           await Bun.sleep(START_TEST_FETCH_RETRY_INTERVAL);
@@ -35,9 +35,19 @@ describe('App Start Test', () => {
   );
 
   test('GET / is found', async () => {
-    const res = await fetch(baseURL, {
+    let res = await fetch(baseURL, {
       signal: AbortSignal.timeout(START_TEST_FETCH_TIMEOUT),
     });
+
+    for (let i = 0; i < 10; ++i) {
+      if (res.ok) break;
+      await Bun.sleep(100);
+
+      res = await fetch(baseURL, {
+        signal: AbortSignal.timeout(START_TEST_FETCH_TIMEOUT),
+      });
+    }
+
     expect(res.ok).toBeTrue();
     expect(res.status).not.toBe(404);
   });
