@@ -5,6 +5,28 @@ import { unpack } from '@services/uncivJSON';
 import { Elysia, t } from 'elysia';
 import type { ElysiaWS } from 'elysia/ws';
 
+type ChatCommand = (info: { ws: ElysiaWS; name: string; input: string; chat: WSChatRelay }) => void;
+
+const commands = new Map<string, ChatCommand>();
+
+commands.set('help', ({ ws }) =>
+  ws.send({
+    type: 'chat',
+    gameId: '',
+    civName: 'Server',
+    message: `Available commands: ${[...commands.keys()].map(c => '/' + c).join(', ')}`,
+  } as WSChatRelay)
+);
+
+commands.set('ping', ({ ws }) =>
+  ws.send({
+    type: 'chat',
+    gameId: '',
+    civName: 'Server',
+    message: `Pong!`,
+  } as WSChatRelay)
+);
+
 function publishChat(ws: ElysiaWS, chat: WSChatRelay) {
   const civNames = (
     ws as any as { data: { gameId2CivNames: Map<string, string[]> } }
@@ -16,7 +38,35 @@ function publishChat(ws: ElysiaWS, chat: WSChatRelay) {
   }
 
   chat.message = chat.message.replaceAll(/\s+/g, ' ').trim();
-  ws.publish(chat.gameId, JSON.stringify(chat));
+
+  // commands scheme
+  if (chat.message.startsWith('/')) {
+    chat.message = chat.message.slice(1);
+
+    // commands ignore scheme
+    if (chat.message.startsWith('/')) {
+      return ws.publish(chat.gameId, JSON.stringify(chat));
+    }
+
+    // proceed with commands
+    let sIdx = chat.message.indexOf(' ');
+    if (sIdx < 0) sIdx = chat.message.length;
+    const name = chat.message.slice(0, sIdx);
+
+    const command = commands.get(name);
+    if (!command) {
+      chat.message = `Unrecognized command: '${name}'. Use /help to know more about commands.`;
+      chat.civName = 'Server';
+      return ws.send(chat);
+    }
+
+    const input = chat.message.slice(name.length + 1);
+    return command({ ws, name, input, chat });
+  }
+
+  if (chat.message.length > 0) {
+    return ws.publish(chat.gameId, JSON.stringify(chat));
+  }
 }
 
 export const chatPlugin = (app: Elysia) =>
