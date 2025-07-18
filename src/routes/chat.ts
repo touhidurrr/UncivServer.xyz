@@ -14,16 +14,20 @@ commands.set('help', ({ ws }) =>
     type: 'chat',
     gameId: '',
     civName: 'Server',
-    message: `Available commands: ${[...commands.keys()].map(c => '/' + c).join(', ')}`,
+    message:
+      `Welcome to UncivServer.xyz Chat Commands Help Page!` +
+      `\nCommands starts with / and are ignored by //` +
+      `\nAvailable commands:` +
+      `\n${[...commands.keys()].map((c, i) => `${i + 1}. /${c}`).join('\n')}`,
   } as WSChatRelay)
 );
 
-commands.set('ping', ({ ws }) =>
+commands.set('ping', ({ ws, chat: { civName } }) =>
   ws.send({
     type: 'chat',
     gameId: '',
     civName: 'Server',
-    message: `Pong!`,
+    message: `Hi ${civName}, Pong!`,
   } as WSChatRelay)
 );
 
@@ -55,7 +59,7 @@ function publishChat(ws: ElysiaWS, chat: WSChatRelay) {
 
     const command = commands.get(name);
     if (!command) {
-      chat.message = `Unrecognized command: '${name}'. Use /help to know more about commands.`;
+      chat.message = `Unrecognized command: '/${name}'. Use /help to know more about commands.`;
       chat.civName = 'Server';
       return ws.send(chat);
     }
