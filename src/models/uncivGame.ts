@@ -12,12 +12,14 @@ const SPN_PROBABILITY = 0.2;
 
 export class UncivGame {
   data: UncivJSON;
+  previewId: string;
 
   constructor(json: string) {
     this.data = unpack(json);
+    this.previewId = `${this.data.gameId}_Preview`;
   }
 
-  getTurns = () => this.data.turns || 0;
+  getTurns = () => this.data.turns ?? 0;
 
   isVersionAtLeast({ number, createdWithNumber }: { number?: number; createdWithNumber?: number }) {
     if (typeof number === 'number' && this.data.version.number < number) return false;
@@ -39,13 +41,22 @@ export class UncivGame {
       ),
     ] as string[];
 
+  getHumanCivNames = () =>
+    this.data.civilizations
+      .filter(civ => civ.playerType === 'Human' || typeof civ.playerId === 'string')
+      .map(civ => civ.civName);
+
   forEachCivilizations = (
     callbackfn: (value: Civilization, index: number, array: Civilization[]) => void,
     thisArg?: any
   ) => this.data.civilizations.forEach(callbackfn, thisArg);
 
+  getCurrentPlayer = () => this.data.currentPlayer;
+
   getCurrentPlayerCivilization = () =>
     this.data.civilizations.find(civ => civ.civName === this.data.currentPlayer);
+
+  getCurrentPlayerId = () => this.getCurrentPlayerCivilization()?.playerId;
 
   getNextPlayerCivilization = (): Civilization | undefined => {
     const humanCivs = this.data.civilizations.filter(civ => civ.playerType === 'Human');

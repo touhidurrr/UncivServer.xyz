@@ -45,18 +45,11 @@ const getDMChannel = async (discordId: string) => {
   return res.id;
 };
 
-export const sendNewTurnNotification = async (game: UncivGame) => {
-  const { turns, gameId, civilizations, currentPlayer } = game.data;
-
-  // find currentPlayer's ID
-  const currentCiv = civilizations.find(c => c.civName === currentPlayer);
-  if (!currentCiv) {
-    console.error('[TurnNotifier] currentPlayer not found for gameId:', gameId);
-    return;
-  }
+export const sendNewTurnNotification = async (game: UncivGame, name?: string | void | null) => {
+  const { gameId, currentPlayer } = game.data;
 
   // Check if the Player exists in DB
-  const { playerId } = currentCiv;
+  const playerId = game.getCurrentPlayerId();
   const playerProfile = await db.PlayerProfile.findOne(
     { uncivUserIds: playerId },
     { notifications: 1, dmChannel: 1 }
@@ -76,17 +69,6 @@ export const sendNewTurnNotification = async (game: UncivGame) => {
       return;
     }
   }
-
-  // Unique list of Players
-  const players = game.getPlayers();
-
-  // update game info on DB and return game name
-  const name = await db.UncivGame.findByIdAndUpdate(
-    //? always save metadata to preview file
-    `${gameId}_Preview`,
-    { $set: { currentPlayer, playerId, turns: turns || 0, players } },
-    { projection: { _id: 0, name: 1 } }
-  ).then(game => game?.name);
 
   await createMessage(playerProfile.dmChannel, {
     embeds: [
@@ -118,15 +100,12 @@ export const sendNewTurnNotification = async (game: UncivGame) => {
           },
           {
             name: 'Current Turn',
-            value: `\`\`\`${turns ?? 0}\`\`\``,
+            value: `\`\`\`${game.getTurns()}\`\`\``,
             inline: true,
           },
           {
             name: 'Players',
-            value: `\`\`\`${civilizations
-              .filter(c => c.playerType === 'Human')
-              .map(c => c.civName)
-              .join(', ')}\`\`\``,
+            value: `\`\`\`${game.getHumanCivNames().join(', ')}\`\`\``,
             inline: false,
           },
         ],

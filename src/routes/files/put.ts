@@ -7,7 +7,7 @@ import { gameDataSecurityModifier } from '@services/gameDataSecurity';
 import { db } from '@services/mongodb';
 import { pack } from '@services/uncivJSON';
 import { type Elysia, type Static, t } from 'elysia';
-import { percentage } from 'randomcryp';
+import type { UpdateQuery } from 'mongoose';
 import { UncivGame } from '../../models/uncivGame';
 
 export const putFile = (app: Elysia) =>
@@ -16,18 +16,17 @@ export const putFile = (app: Elysia) =>
   app.state('game', null as UncivGame | null).put(
     '/:gameId',
     async ({ body, params: { gameId }, status, store, headers }) => {
-      const previewId = gameId.endsWith('_Preview') ? gameId : `${gameId}_Preview`;
       const [userId, password] = parseBasicHeader(headers.authorization);
       if (!GAME_ID_REGEX.test(userId)) return status('Bad Request');
 
       let [dbAuth, dbGame] = await Promise.all([
         db.Auth.findById(userId, { hash: 1 }),
-        db.UncivGame.findById(previewId, { players: 1 }),
+        db.UncivGame.findById(store.game!.previewId, { players: 1 }),
       ]);
 
       if (dbGame === null) {
         dbGame = await db.UncivGame.create({
-          _id: previewId,
+          _id: store.game!.previewId,
           turns: !store.game!.getTurns(),
           players: store.game!.getPlayers(),
           text: pack(store.game!.getPreview()),
@@ -68,12 +67,23 @@ export const putFile = (app: Elysia) =>
       headers: t.Object({ authorization: t.String({ minLength: 56, maxLength: 512 }) }),
 
       afterResponse: async ({ body, server, params: { gameId }, store: { game } }) => {
-        // save on mongodb
-        await db.UncivGame.updateOne(
-          { _id: gameId },
-          { $set: { text: body as string } },
-          { upsert: true }
-        ).catch(err => console.error(`[MongoDB] Error saving game ${gameId}:`, err));
+        const isPreview = gameId.endsWith('_Preview');
+        const update: UpdateQuery<object> = { $set: { text: body as string } };
+        if (isPreview) {
+          update.$set = Object.assign(update.$set!, {
+            currentPlayer: game!.getCurrentPlayer(),
+            playerId: game!.getCurrentPlayerId(),
+            turns: game!.getTurns(),
+            players: game!.getPlayers(),
+          });
+        }
+
+        const name = await db.UncivGame.findByIdAndUpdate(gameId, update, {
+          projection: { _id: 0, name: 1 },
+          upsert: true,
+        })
+          .then(game => game?.name)
+          .catch(err => console.error(`[MongoDB] Error saving game ${gameId}:`, err));
 
         try {
           // sync with other servers
@@ -90,8 +100,8 @@ export const putFile = (app: Elysia) =>
         }
 
         // send turn notification
-        if (game !== null && isDiscordTokenValid && gameId.endsWith('_Preview')) {
-          await sendNewTurnNotification(game!).catch(err =>
+        if (isPreview && isDiscordTokenValid) {
+          await sendNewTurnNotification(game!, name).catch(err =>
             console.error(`[Turn Notifier] Error:`, err)
           );
         }
