@@ -45,7 +45,7 @@ const getDMChannel = async (discordId: string) => {
   return res.id;
 };
 
-export const sendNewTurnNotification = async (game: UncivGame, name?: string | void | null) => {
+export const sendNewTurnNotification = async (game: UncivGame, name?: string | null) => {
   const { gameId, currentPlayer } = game.data;
 
   // Check if the Player exists in DB

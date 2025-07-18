@@ -67,24 +67,36 @@ export const putFile = (app: Elysia) =>
       headers: t.Object({ authorization: t.String({ minLength: 56, maxLength: 512 }) }),
 
       afterResponse: async ({ body, server, params: { gameId }, store: { game } }) => {
-        const name = await db.UncivGame.findByIdAndUpdate(
-          gameId,
-          {
-            $set: {
-              text: body as string,
-              currentPlayer: game!.getCurrentPlayer(),
-              playerId: game!.getCurrentPlayerId(),
-              turns: game!.getTurns(),
+        const isPreview = gameId.endsWith('_Preview');
+        const [_, name] = await Promise.allSettled([
+          db.UncivGame.updateOne(
+            { _id: gameId },
+            {
+              $set: {
+                text: body as string,
+              },
             },
-            $addToSet: { players: { $each: game!.getPlayers() } },
-          },
-          {
-            projection: { _id: 0, name: 1 },
-            upsert: true,
-          }
-        )
-          .then(game => game?.name)
-          .catch(err => console.error(`[MongoDB] Error saving game ${gameId}:`, err));
+            {
+              projection: { _id: 0, name: 1 },
+              upsert: true,
+            }
+          ),
+          db.UncivGame.findByIdAndUpdate(
+            game!.previewId,
+            {
+              $set: {
+                currentPlayer: game!.getCurrentPlayer(),
+                playerId: game!.getCurrentPlayerId(),
+                turns: game!.getTurns(),
+              },
+              $addToSet: { players: { $each: game!.getPlayers() } },
+            },
+            {
+              projection: { _id: 0, name: 1 },
+              upsert: true,
+            }
+          ).then(game => game?.name),
+        ]);
 
         try {
           // sync with other servers
@@ -101,10 +113,11 @@ export const putFile = (app: Elysia) =>
         }
 
         // send turn notification
-        if (gameId.endsWith('_Preview') && isDiscordTokenValid) {
-          await sendNewTurnNotification(game!, name).catch(err =>
-            console.error(`[Turn Notifier] Error:`, err)
-          );
+        if (isPreview && isDiscordTokenValid) {
+          await sendNewTurnNotification(
+            game!,
+            name.status === 'fulfilled' ? name.value : null
+          ).catch(err => console.error(`[Turn Notifier] Error:`, err));
         }
       },
 
