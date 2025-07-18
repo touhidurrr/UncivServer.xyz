@@ -5,31 +5,62 @@ import { unpack } from '@services/uncivJSON';
 import { Elysia, t } from 'elysia';
 import type { ElysiaWS } from 'elysia/ws';
 
-type ChatCommand = (info: { ws: ElysiaWS; name: string; input: string; chat: WSChatRelay }) => void;
+type ChatCommand = {
+  description: string;
+  run: (info: { ws: ElysiaWS; name: string; input: string; chat: WSChatRelay }) => any;
+};
 
 const commands = new Map<string, ChatCommand>();
 
-commands.set('help', ({ ws }) =>
-  ws.send({
-    type: 'chat',
-    gameId: '',
-    civName: 'Server',
-    message:
-      `\nWelcome to UncivServer.xyz Chat Commands Help Page!` +
-      `\nCommands starts with / and are ignored by //` +
-      `\nAvailable commands:` +
-      `\n${[...commands.keys()].map((c, i) => `${i + 1}. /${c}`).join('\n')}`,
-  } as WSChatRelay)
-);
+commands.set('help', {
+  description: 'shows this help page',
+  run: ({ ws }) =>
+    ws.send({
+      type: 'chat',
+      gameId: '',
+      civName: 'Server',
+      message:
+        `\nWelcome to UncivServer.xyz Chat Commands Help Page!` +
+        `\nCommands starts with / and are ignored by //` +
+        `\n\nAvailable commands (${commands.size}):\n` +
+        [...commands.entries()]
+          .map(([name, cmd], i) => `${i + 1}. /${name} -> ${cmd.description}`)
+          .join('\n'),
+    } as WSChatRelay),
+});
 
-commands.set('ping', ({ ws, chat: { civName } }) =>
-  ws.send({
-    type: 'chat',
-    gameId: '',
-    civName: 'Server',
-    message: `Hi ${civName}, Pong!`,
-  } as WSChatRelay)
-);
+commands.set('ping', {
+  description: 'sends you a pong',
+  run: ({ ws, chat: { civName } }) =>
+    ws.send({
+      type: 'chat',
+      gameId: '',
+      civName: 'Server',
+      message: `Hi ${civName}, Pong!`,
+    } as WSChatRelay),
+});
+
+commands.set('access', {
+  description: 'shows who has access to this game',
+  run: async ({ ws, chat: { civName, gameId } }) => {
+    const players = await db.UncivGame.findById(`${gameId}_Preview`, { _id: 0, players: 1 }).then(
+      game => game?.players
+    );
+
+    let message = `Game not found! ID: ${gameId}`;
+    if (players) {
+      message = `\ngameId: ${gameId}, players (${players.length}):\n`;
+      message += players.map((p, i) => `${i + 1}. ${p}`).join('\n');
+    }
+
+    ws.send({
+      type: 'chat',
+      gameId: '',
+      civName: 'Server',
+      message,
+    } as WSChatRelay);
+  },
+});
 
 function publishChat(ws: ElysiaWS, chat: WSChatRelay) {
   const civNames = (
@@ -68,7 +99,7 @@ function publishChat(ws: ElysiaWS, chat: WSChatRelay) {
     }
 
     const input = chat.message.slice(name.length + 1);
-    return command({ ws, name, input, chat });
+    return command.run({ ws, name, input, chat });
   }
 
   if (chat.message.length > 0) {
@@ -121,7 +152,7 @@ export const chatPlugin = (app: Elysia) =>
                     message.message = 'Message too long. Maximum allowed characters: 1024.';
                     return ws.send(message);
                   }
-                  publishChat(ws as any, message);
+                  await publishChat(ws as any, message);
                 }
                 break;
               case 'join':
