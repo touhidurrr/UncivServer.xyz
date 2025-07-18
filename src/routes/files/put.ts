@@ -7,7 +7,6 @@ import { gameDataSecurityModifier } from '@services/gameDataSecurity';
 import { db } from '@services/mongodb';
 import { pack } from '@services/uncivJSON';
 import { type Elysia, type Static, t } from 'elysia';
-import type { UpdateQuery } from 'mongoose';
 import { UncivGame } from '../../models/uncivGame';
 
 export const putFile = (app: Elysia) =>

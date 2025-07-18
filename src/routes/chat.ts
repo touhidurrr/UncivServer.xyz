@@ -42,7 +42,7 @@ commands.set('ping', {
 
 commands.set('access', {
   description: 'shows who has access to this game',
-  run: async ({ ws, chat: { civName, gameId } }) => {
+  run: async ({ ws, chat: { gameId } }) => {
     const players = await db.UncivGame.findById(`${gameId}_Preview`, { _id: 0, players: 1 }).then(
       game => game?.players
     );
