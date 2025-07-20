@@ -10,7 +10,7 @@ describe('App Start Test', () => {
   const port = 10_000 + Math.floor(Math.random() * (65535 - 10_000));
   const proc = Bun.spawn(['bun', 'start'], {
     stdout: Bun.stdout,
-    env: { PORT: port.toString(), NODE_ENV: 'production' },
+    env: { ...Bun.env, PORT: port.toString(), NODE_ENV: 'production' },
   });
   const baseURL = getAppBaseURL({ port });
 
