@@ -5,7 +5,6 @@ import { getAppBaseURL, getRandomSave } from '@lib';
 import cache from '@services/cache';
 import db from '@services/mongodb';
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
-import { randomUUID } from 'node:crypto';
 import { sep } from 'node:path';
 
 const api = treaty(app, {
@@ -43,7 +42,7 @@ describe('GET /files', () => {
 
   test('Fail on Nonexistent ID', async () => {
     await api
-      .files({ gameId: randomUUID() })
+      .files({ gameId: Bun.randomUUIDv7() })
       .get()
       .then(({ status }) => {
         expect(status).toBe(404);
@@ -53,9 +52,13 @@ describe('GET /files', () => {
 
 describe('PUT /files', () => {
   beforeAll(async () => {
-    const result = await db.UncivGame.deleteMany({
-      _id: { $in: [TEST_GAME_ID, `${TEST_GAME_ID}_Preview`] },
-    });
+    const testIds = [];
+    for (const c of '0123456789abcde') {
+      const id = TEST_GAME_ID.replaceAll('0', c);
+      testIds.push(id);
+      testIds.push(`${id}_Preview`);
+    }
+    const result = await db.UncivGame.deleteMany({ _id: { $in: testIds } });
     console.log('PUT /files beforeAll Result:', result);
   });
 
@@ -145,7 +148,7 @@ const getAuthHeaders = (uuid: string, password: string) => ({
 });
 
 describe('Auth', () => {
-  const uuid = randomUUID();
+  const uuid = Bun.randomUUIDv7();
   const password = '0'.repeat(6);
 
   afterAll(async () => {

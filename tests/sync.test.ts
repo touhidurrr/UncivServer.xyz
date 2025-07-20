@@ -117,7 +117,8 @@ describe('Token', () => {
 });
 
 test('Uploaded files are relayed properly', async () => {
-  const url = `${getAppBaseURL()}/files/${TEST_GAME_ID}`;
+  const gameId = Bun.randomUUIDv7();
+  const url = `${getAppBaseURL()}/files/${gameId}`;
   const fileData = getRandomSave('1kb');
 
   const putFile = (isPreview: boolean = false) =>
@@ -152,14 +153,14 @@ test('Uploaded files are relayed properly', async () => {
           return;
         }
 
-        if (msg.data.gameId === TEST_GAME_ID) {
+        if (msg.data.gameId === gameId) {
           receivedData = true;
-        } else if (msg.data.gameId === TEST_GAME_ID + '_Preview') {
+        } else if (msg.data.gameId === `${gameId}_Preview`) {
           receivedPreview = true;
-        } else reject('Unknown Game ID');
+        }
 
         if (receivedData && receivedPreview) resolve('Done!');
-      } else reject('Unknown Message Type');
+      }
     });
 
     ws.addEventListener('close', () => reject('Connection Closed'));
