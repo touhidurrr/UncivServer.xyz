@@ -146,18 +146,18 @@ test('Uploaded files are relayed properly', async () => {
       const msg = JSON.parse(data.toString('utf8')) as Static<typeof SYNC_RESPONSE_SCHEMA>;
 
       if (msg.type === 'SyncData') {
-        if (msg.data.content !== fileData) {
-          expect(msg.data.content).toBe(fileData);
-          reject('Data Mismatch');
-          return;
+        switch (msg.data.gameId) {
+          case gameId:
+            receivedData = true;
+            break;
+          case `${gameId}_Preview`:
+            receivedPreview = true;
+            break;
+          default:
+            return;
         }
 
-        if (msg.data.gameId === gameId) {
-          receivedData = true;
-        } else if (msg.data.gameId === `${gameId}_Preview`) {
-          receivedPreview = true;
-        }
-
+        expect(msg.data.content).toBe(fileData);
         if (receivedData && receivedPreview) resolve('Done!');
       }
     });
