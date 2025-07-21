@@ -16,7 +16,6 @@ export const jsonsRoute = (app: Elysia) =>
   app.get(
     '/jsons/:gameId',
     async ({ status, set, params: { gameId } }) => {
-      set.headers['content-type'] = 'application/json';
       set.headers['cache-control'] = CACHE_CONTROL;
 
       const gameData = await cache.get(gameId);
@@ -25,6 +24,7 @@ export const jsonsRoute = (app: Elysia) =>
       const dbGame = await db.UncivGame.findById(gameId, { _id: 0, text: 1 });
       if (!dbGame) return status(404);
 
+      set.headers['content-type'] = 'application/json';
       await cache.set(gameId, dbGame.text);
       return unpackJSON(dbGame.text);
     },
