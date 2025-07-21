@@ -1,66 +1,16 @@
 import { GAME_ID_REGEX, NO_CACHE_CONTROL } from '@constants';
 import { parseBasicHeader } from '@lib/parseBasicHeader';
+import type {
+  WSChatMessage,
+  WSChatRelay,
+  WSChatResponseError,
+  WSChatResponseJoinSuccess,
+} from '@localTypes/chat';
 import db from '@services/mongodb';
 import { unpack } from '@services/uncivJSON';
 import { type Elysia, t } from 'elysia';
 import type { ElysiaWS } from 'elysia/ws';
-
-type ChatCommand = {
-  description: string;
-  run: (info: { ws: ElysiaWS; name: string; input: string; chat: WSChatRelay }) => any;
-};
-
-const commands = new Map<string, ChatCommand>();
-
-commands.set('help', {
-  description: 'shows this help page',
-  run: ({ ws }) =>
-    ws.send({
-      type: 'chat',
-      gameId: '',
-      civName: 'Server',
-      message:
-        `\nWelcome to UncivServer.xyz Chat Commands Help Page!` +
-        `\nCommands starts with / and are ignored by //` +
-        `\n\nAvailable commands (${commands.size}):\n` +
-        [...commands.entries()]
-          .map(([name, cmd], i) => `${i + 1}. /${name} -> ${cmd.description}`)
-          .join('\n'),
-    } as WSChatRelay),
-});
-
-commands.set('ping', {
-  description: 'sends you a pong',
-  run: ({ ws, chat: { civName } }) =>
-    ws.send({
-      type: 'chat',
-      gameId: '',
-      civName: 'Server',
-      message: `Hi ${civName}, Pong!`,
-    } as WSChatRelay),
-});
-
-commands.set('access', {
-  description: 'shows who has access to this game',
-  run: async ({ ws, chat: { gameId } }) => {
-    const players = await db.UncivGame.findById(`${gameId}_Preview`, { _id: 0, players: 1 }).then(
-      game => game?.players
-    );
-
-    let message = `Game not found! ID: ${gameId}`;
-    if (players) {
-      message = `\ngameId: ${gameId}, players (${players.length}):\n`;
-      message += players.map((p, i) => `${i + 1}. ${p}`).join('\n');
-    }
-
-    ws.send({
-      type: 'chat',
-      gameId: '',
-      civName: 'Server',
-      message,
-    } as WSChatRelay);
-  },
-});
+import { commands } from './commands';
 
 function publishChat(ws: ElysiaWS, chat: WSChatRelay) {
   const civNames = (

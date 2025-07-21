@@ -1,31 +1,39 @@
+import type { ElysiaWS } from 'elysia/ws';
+
 // a chat message to be relayed to all clients in a game
-type WSChatRelay = {
+export type WSChatRelay = {
   type: 'chat';
   civName: string;
   gameId: string;
   message: string;
 };
 
-type WSChatMessage = WSChatRelay | WSChatMessageGameSubscribe | WSChatMessageGameUnsubscribe;
+export type WSChatMessage = WSChatRelay | WSChatMessageGameSubscribe | WSChatMessageGameUnsubscribe;
 
-type WSChatMessageGameSubscribe = {
+export type WSChatMessageGameSubscribe = {
   type: 'join';
   gameIds: string[];
 };
 
-type WSChatMessageGameUnsubscribe = {
+export type WSChatMessageGameUnsubscribe = {
   type: 'leave';
   gameIds: string[];
 };
 
-type WSChatResponse = WSChatRelay | WSChatResponseJoinSuccess | WSChatResponseError;
+export type WSChatResponse = WSChatRelay | WSChatResponseJoinSuccess | WSChatResponseError;
 
-type WSChatResponseJoinSuccess = {
+export type WSChatResponseJoinSuccess = {
   type: 'joinSuccess';
   gameIds: string[];
 };
 
-type WSChatResponseError = {
+export type WSChatResponseError = {
   type: 'error';
   message: string;
+};
+
+export type ChatCommand = {
+  name: string;
+  description: string;
+  run: (info: { ws: ElysiaWS; name: string; input: string; chat: WSChatRelay }) => any;
 };
