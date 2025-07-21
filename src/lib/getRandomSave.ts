@@ -3,7 +3,7 @@ import { pack } from '@services/uncivJSON';
 import bytes from 'bytes';
 import { getRandomBase64String } from './getRandomBase64String';
 
-export const getRandomSave = (size: number | string): string => {
+export const getRandomSave = (size: number | string, gameId?: string): string => {
   if (typeof size === 'string') {
     const parsedSize = bytes.parse(size);
     if (parsedSize === null) {
@@ -11,7 +11,6 @@ export const getRandomSave = (size: number | string): string => {
     }
     size = parsedSize;
   }
-
   let save = '';
   let mid = 0;
   let low = 0;
@@ -22,7 +21,8 @@ export const getRandomSave = (size: number | string): string => {
     i += 1;
     mid = low + Math.floor((high - low) / 2);
     save = pack({
-      gameId: TEST_GAME_ID,
+      gameId: gameId ?? TEST_GAME_ID,
+      currentPlayer: 'Unknown',
       civilizations: [{ playerId: TEST_GAME_ID }],
       gameParameters: { players: [{ playerId: TEST_GAME_ID }] },
       version: { number: 0, createdWith: { number: 0 } },

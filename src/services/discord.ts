@@ -46,10 +46,11 @@ const getDMChannel = async (discordId: string) => {
 };
 
 export const sendNewTurnNotification = async (game: UncivGame, name?: string | null) => {
-  const { gameId, currentPlayer } = game.data;
+  const { currentPlayer, currentCiv, gameId } = game;
 
   // Check if the Player exists in DB
-  const playerId = game.getCurrentPlayerId();
+  const playerId = currentCiv?.playerId;
+  if (!playerId) return;
   const playerProfile = await db.PlayerProfile.findOne(
     { uncivUserIds: playerId },
     { notifications: 1, dmChannel: 1 }
@@ -115,8 +116,8 @@ export const sendNewTurnNotification = async (game: UncivGame, name?: string | n
   }).catch(err => {
     console.error('[TurnNotifier] error sending notification:', {
       gameId,
-      playerId,
       currentPlayer,
+      playerId,
       dmChannel: playerProfile.dmChannel,
     });
     console.error(err);

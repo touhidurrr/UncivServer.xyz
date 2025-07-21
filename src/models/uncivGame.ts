@@ -12,11 +12,33 @@ const SPN_PROBABILITY = 0.2;
 
 export class UncivGame {
   data: UncivJSON;
+  gameId: string;
   previewId: string;
+  currentPlayer: string;
+  currentCiv: Civilization | undefined;
+  players: string[];
 
   constructor(json: string) {
     this.data = unpack(json);
+    this.gameId = this.data.gameId;
     this.previewId = `${this.data.gameId}_Preview`;
+    this.currentPlayer = this.data.currentPlayer;
+    this.currentCiv = this.data.civilizations.find(civ => civ.civName === this.data.currentPlayer);
+
+    this.players = new Set(
+      [
+        ...this.data.civilizations.map(c => c.playerId),
+        ...this.data.gameParameters?.players?.map(p => p.playerId),
+      ].filter(id => typeof id === 'string')
+    )
+      .values()
+      .toArray();
+
+    if (
+      [this.data, this.gameId, this.currentPlayer, this.data.civilizations].some(p => !Boolean(p))
+    ) {
+      throw new Error('Invalid Game Data!');
+    }
   }
 
   getTurns = () => this.data.turns ?? 0;
@@ -31,16 +53,6 @@ export class UncivGame {
     return true;
   }
 
-  getPlayers = () =>
-    [
-      ...new Set(
-        [
-          ...this.data.civilizations.map(c => c.playerId),
-          ...this.data.gameParameters?.players?.map(p => p.playerId),
-        ].filter(Boolean)
-      ),
-    ] as string[];
-
   getHumanCivNames = () =>
     this.data.civilizations
       .filter(civ => civ.playerType === 'Human' || typeof civ.playerId === 'string')
@@ -50,13 +62,6 @@ export class UncivGame {
     callbackfn: (value: Civilization, index: number, array: Civilization[]) => void,
     thisArg?: any
   ) => this.data.civilizations.forEach(callbackfn, thisArg);
-
-  getCurrentPlayer = () => this.data.currentPlayer;
-
-  getCurrentPlayerCivilization = () =>
-    this.data.civilizations.find(civ => civ.civName === this.data.currentPlayer);
-
-  getCurrentPlayerId = () => this.getCurrentPlayerCivilization()?.playerId;
 
   getNextPlayerCivilization = (): Civilization | undefined => {
     const humanCivs = this.data.civilizations.filter(civ => civ.playerType === 'Human');
@@ -124,11 +129,10 @@ export class UncivGame {
   };
 
   addRandomNotificationToCurrentCiv() {
-    const targetCiv = this.getCurrentPlayerCivilization();
-    if (targetCiv) {
+    if (this.currentCiv) {
       const newNotification = this.generateRandomNotification();
-      if (targetCiv.notifications) targetCiv.notifications.push(newNotification);
-      else targetCiv.notifications = [newNotification];
+      if (this.currentCiv.notifications) this.currentCiv.notifications.push(newNotification);
+      else this.currentCiv.notifications = [newNotification];
     }
   }
 }

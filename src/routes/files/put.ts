@@ -27,14 +27,14 @@ export const putFile = (app: Elysia) =>
         dbGame = await db.UncivGame.create({
           _id: store.game!.previewId,
           turns: !store.game!.getTurns(),
-          players: store.game!.getPlayers(),
+          players: store.game!.players,
           text: pack(store.game!.getPreview()),
         });
       }
 
       // if a players list doesn't exist, regenerate it
       if (dbGame.players.length === 0) {
-        dbGame.players = store.game!.getPlayers();
+        dbGame.players = store.game!.players;
         await dbGame.save();
       }
 
@@ -84,11 +84,11 @@ export const putFile = (app: Elysia) =>
             game!.previewId,
             {
               $set: {
-                currentPlayer: game!.getCurrentPlayer(),
-                playerId: game!.getCurrentPlayerId(),
+                currentPlayer: game!.currentPlayer,
+                playerId: game!.currentCiv?.playerId,
                 turns: game!.getTurns(),
               },
-              $addToSet: { players: { $each: game!.getPlayers() } },
+              $addToSet: { players: { $each: game!.players } },
             },
             {
               projection: { _id: 0, name: 1 },

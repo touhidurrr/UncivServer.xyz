@@ -13,8 +13,10 @@ export default {
         `\nWelcome to UncivServer.xyz Chat Commands Help Page!` +
         `\nCommands starts with / and are ignored by //` +
         `\n\nAvailable commands (${commands.size}):\n` +
-        Array.from(commands.values())
+        commands
+          .values()
           .map(({ name, description }, i) => `${i + 1}. /${name} -> ${description}`)
+          .toArray()
           .join('\n'),
     } as WSChatRelay),
 } satisfies ChatCommand;
