@@ -1,4 +1,4 @@
-import { GAME_ID_REGEX, NO_CACHE_CONTROL } from '@constants';
+import { GAME_ID_REGEX, MAX_CHAT_MESSAGE_LENGTH, NO_CACHE_CONTROL } from '@constants';
 import { parseBasicHeader } from '@lib/parseBasicHeader';
 import type {
   WSChatMessage,
@@ -86,6 +86,18 @@ export const chatPlugin = (app: Elysia) =>
           };
         })
         .ws('/chat', {
+          open: () =>
+            ({
+              type: 'chat',
+              gameId: '',
+              civName: 'Server',
+              message: [
+                'Welcome to UncivServer.xyz!',
+                'Type /help to get help regarding server commands.',
+                'The chat is not moderated and the data is not stored.',
+                'Proceed at your own discretion!',
+              ].join(' '),
+            }) satisfies WSChatRelay,
           message: async (ws, message: WSChatMessage) => {
             if (typeof message !== 'object' || !message.type) {
               return ws.send({
@@ -97,9 +109,9 @@ export const chatPlugin = (app: Elysia) =>
             switch (message.type) {
               case 'chat':
                 if (ws.isSubscribed(message.gameId)) {
-                  if (message.message.length > 1024) {
+                  if (message.message.length > MAX_CHAT_MESSAGE_LENGTH) {
                     message.civName = 'Server';
-                    message.message = 'Message too long. Maximum allowed characters: 1024.';
+                    message.message = `Message too long. Maximum allowed characters: ${MAX_CHAT_MESSAGE_LENGTH}.`;
                     return ws.send(message);
                   }
                   await publishChat(ws as any, message);

@@ -1,7 +1,7 @@
 import classicJSON from './classic.json';
-import iconsJSON from './icons.json';
+import iconsTOML from './icons.toml';
 import promotionJSON from './promotion.json';
 
-export const icons = iconsJSON;
+export const icons = iconsTOML;
 export const classic = classicJSON;
 export const promotion = promotionJSON;

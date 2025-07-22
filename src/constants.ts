@@ -66,3 +66,6 @@ export const NO_CACHE_CONTROL = stringifyCacheControl({
   'no-store': true,
   'no-cache': true,
 });
+
+// chat
+export const MAX_CHAT_MESSAGE_LENGTH = 1024;

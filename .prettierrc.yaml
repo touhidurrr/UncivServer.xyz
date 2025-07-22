@@ -9,3 +9,5 @@ arrowParens: 'avoid'
 trailingComma: 'es5'
 bracketSpacing: true
 quoteProps: 'as-needed'
+plugins:
+  - prettier-plugin-toml
