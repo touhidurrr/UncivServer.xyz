@@ -94,7 +94,8 @@ export const chatPlugin = (app: Elysia) =>
               message: [
                 'Welcome to UncivServer.xyz!',
                 'Type /help to get help regarding server commands.',
-                'The chat is not moderated and the data is not stored.',
+                'The chat is realtime, unmoderated and the data is not stored.',
+                'For now, players can only see your messages if they are online.',
                 'Proceed at your own discretion!',
               ].join(' '),
             }) satisfies WSChatRelay,
