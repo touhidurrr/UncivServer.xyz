@@ -2,9 +2,12 @@ import bytes from 'bytes';
 import { stringify as stringifyCacheControl } from 'cache-control-parser';
 import type { APIEmbed } from 'discord-api-types/v10';
 
+// isAlive
+export const IS_ALIVE = { authVersion: 1, chatVersion: 1 };
+
 // utils
-export const isProduction = process.env.NODE_ENV === 'production';
-export const isDevelopment = !isProduction;
+export const IS_PRODUCTION = process.env.NODE_ENV === 'production';
+export const IS_DEVELOPMENT = !IS_PRODUCTION;
 
 // server
 export const DEFAULT_PORT = '1557';

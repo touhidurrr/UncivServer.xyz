@@ -1,4 +1,4 @@
-import type { ChatCommand, WSChatRelay } from '@localTypes/chat';
+import type { ChatCommand, WSChatResponseRelay } from '@localTypes/chat';
 import db from '@services/mongodb';
 
 export default {
@@ -20,6 +20,6 @@ export default {
       gameId: '',
       civName: 'Server',
       message,
-    } as WSChatRelay);
+    } as WSChatResponseRelay);
   },
 } satisfies ChatCommand;

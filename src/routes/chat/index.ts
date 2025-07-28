@@ -2,9 +2,10 @@ import { GAME_ID_REGEX, MAX_CHAT_MESSAGE_LENGTH, NO_CACHE_CONTROL } from '@const
 import { parseBasicHeader } from '@lib/parseBasicHeader';
 import type {
   WSChatMessage,
-  WSChatRelay,
+  WSChatMessageRelay,
   WSChatResponseError,
   WSChatResponseJoinSuccess,
+  WSChatResponseRelay,
 } from '@localTypes/chat';
 import db from '@services/mongodb';
 import { unpack } from '@services/uncivJSON';
@@ -12,7 +13,7 @@ import { type Elysia, t } from 'elysia';
 import type { ElysiaWS } from 'elysia/ws';
 import { commands } from './commands';
 
-function publishChat(ws: ElysiaWS, chat: WSChatRelay) {
+function publishChat(ws: ElysiaWS, chat: WSChatMessageRelay) {
   const civNames = (
     ws as any as { data: { gameId2CivNames: Map<string, string[]> } }
   ).data.gameId2CivNames.get(chat.gameId);
@@ -45,7 +46,7 @@ function publishChat(ws: ElysiaWS, chat: WSChatRelay) {
         gameId: '',
         civName: 'Server',
         message: `Unrecognized command: '/${name}'. Use /help to know more about commands.`,
-      } as WSChatRelay);
+      } as WSChatResponseRelay);
     }
 
     const input = chat.message.slice(name.length + 1);
@@ -98,7 +99,7 @@ export const chatPlugin = (app: Elysia) =>
                 'For now, players can only see your messages if they are online.',
                 'Proceed at your own discretion!',
               ].join(' '),
-            }) satisfies WSChatRelay,
+            }) satisfies WSChatResponseRelay,
           message: async (ws, message: WSChatMessage) => {
             if (typeof message !== 'object' || !message.type) {
               return ws.send({

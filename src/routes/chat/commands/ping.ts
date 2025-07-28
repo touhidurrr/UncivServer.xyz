@@ -1,4 +1,4 @@
-import type { ChatCommand, WSChatRelay } from '@localTypes/chat';
+import type { ChatCommand, WSChatResponseRelay } from '@localTypes/chat';
 
 export default {
   name: 'ping',
@@ -9,5 +9,5 @@ export default {
       gameId: '',
       civName: 'Server',
       message: `Hi ${civName}, Pong!`,
-    } as WSChatRelay),
+    } as WSChatResponseRelay),
 } satisfies ChatCommand;

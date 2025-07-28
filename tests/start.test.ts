@@ -1,4 +1,5 @@
 import {
+  IS_ALIVE,
   START_TEST_FETCH_RETRY_INTERVAL,
   START_TEST_FETCH_TIMEOUT,
   START_TEST_TIMEOUT,
@@ -24,7 +25,7 @@ describe('App Start Test', () => {
             signal: AbortSignal.timeout(START_TEST_FETCH_TIMEOUT),
           }).then(res => res.json());
           if (isAlive) {
-            expect(isAlive).toStrictEqual({ authVersion: 1, chatVersion: 1 });
+            expect(isAlive).toStrictEqual(IS_ALIVE);
             break;
           }
           await Bun.sleep(START_TEST_FETCH_RETRY_INTERVAL);

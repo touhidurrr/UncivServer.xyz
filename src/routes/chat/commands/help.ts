@@ -1,4 +1,4 @@
-import type { ChatCommand, WSChatRelay } from '@localTypes/chat';
+import type { ChatCommand, WSChatResponseRelay } from '@localTypes/chat';
 import { commands } from '.';
 
 export default {
@@ -18,5 +18,5 @@ export default {
           .map(({ name, description }, i) => `${i + 1}. /${name} -> ${description}`)
           .toArray()
           .join('\n'),
-    } as WSChatRelay),
+    } as WSChatResponseRelay),
 } satisfies ChatCommand;

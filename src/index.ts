@@ -2,7 +2,8 @@ import {
   DEFAULT_HOST,
   DEFAULT_PORT,
   DISCORD_INVITE,
-  isDevelopment,
+  IS_ALIVE,
+  IS_DEVELOPMENT,
   MAX_CONTENT_LENGTH,
   MIN_CONTENT_LENGTH,
   NO_CACHE_CONTROL,
@@ -26,7 +27,7 @@ const hostname = process.env.HOST ?? DEFAULT_HOST;
 
 // loggers for debugging in development
 const devPlugin = (app: Elysia) => {
-  if (!isDevelopment) return app;
+  if (!IS_DEVELOPMENT) return app;
   return app.onError(({ error }) => {
     console.error(error);
   });
@@ -42,7 +43,7 @@ export const app = new Elysia({
   .use(devPlugin)
   .use(statsPlugin)
   .onRequest(({ request, status }) => {
-    if (isDevelopment) console.info(`${request.method} ${request.url}`);
+    if (IS_DEVELOPMENT) console.info(`${request.method} ${request.url}`);
     if (request.body !== null) {
       const contentLen = Number(request.headers.get('content-length'));
       if (!contentLen || contentLen < MIN_CONTENT_LENGTH) return status(400);
@@ -57,7 +58,7 @@ export const app = new Elysia({
   .use(infoPlugin)
   .get('/isalive', ({ set }) => {
     set.headers['cache-control'] = NO_CACHE_CONTROL;
-    return { authVersion: 1, chatVersion: 1 };
+    return IS_ALIVE;
   })
   .all('/support', ctx => ctx.redirect(SUPPORT_URL, 303))
   .all('/discord', ctx => ctx.redirect(DISCORD_INVITE, 303))

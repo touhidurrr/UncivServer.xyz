@@ -1,14 +1,18 @@
 import type { ElysiaWS } from 'elysia/ws';
 
-// a chat message to be relayed to all clients in a game
-export type WSChatRelay = {
+export type WSChatMessageRelay = {
   type: 'chat';
   civName: string;
-  gameId: string;
   message: string;
+  gameId: string;
 };
 
-export type WSChatMessage = WSChatRelay | WSChatMessageGameSubscribe | WSChatMessageGameUnsubscribe;
+export type WSChatResponseRelay = WSChatMessageRelay & { gameId?: string };
+
+export type WSChatMessage =
+  | WSChatMessageRelay
+  | WSChatMessageGameSubscribe
+  | WSChatMessageGameUnsubscribe;
 
 export type WSChatMessageGameSubscribe = {
   type: 'join';
@@ -20,7 +24,7 @@ export type WSChatMessageGameUnsubscribe = {
   gameIds: string[];
 };
 
-export type WSChatResponse = WSChatRelay | WSChatResponseJoinSuccess | WSChatResponseError;
+export type WSChatResponse = WSChatResponseRelay | WSChatResponseJoinSuccess | WSChatResponseError;
 
 export type WSChatResponseJoinSuccess = {
   type: 'joinSuccess';
@@ -35,5 +39,5 @@ export type WSChatResponseError = {
 export type ChatCommand = {
   name: string;
   description: string;
-  run: (info: { ws: ElysiaWS; name: string; input: string; chat: WSChatRelay }) => any;
+  run: (info: { ws: ElysiaWS; name: string; input: string; chat: WSChatMessageRelay }) => any;
 };
