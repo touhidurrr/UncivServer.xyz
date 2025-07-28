@@ -161,6 +161,7 @@ describe('Auth', () => {
       headers: getAuthHeaders(uuid, ''),
     });
     expect(res.status).toBe(204);
+    expect(res).not.toContainKey('body')
   });
 
   test('Initial PUT /auth', async () => {
