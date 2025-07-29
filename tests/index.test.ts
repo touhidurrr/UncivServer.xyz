@@ -137,8 +137,9 @@ test('All static assets can be accessed', async () => {
   // test each path
   await Promise.all(
     paths.map(async path => {
-      const res = await app.handle(new Request(`${getAppBaseURL()}${path}`));
-      expect(res.status).toBe(200);
+      const { ok, status } = await app.handle(new Request(`${getAppBaseURL()}${path}`));
+      expect(ok).toBeTrue();
+      expect(status).toBe(200);
     })
   );
 });
@@ -157,75 +158,104 @@ describe('Auth', () => {
   });
 
   test('Initial GET /auth', async () => {
-    const res = await api.auth.get({
+    const { data, status, headers } = await api.auth.get({
       headers: getAuthHeaders(uuid, ''),
     });
-    expect(res.status).toBe(204);
-    expect(res).not.toContainKey('body')
+    expect(status).toBe(204);
+    //@ts-ignore on 204 data should be ''
+    expect(data).toBe('');
+    expect(headers).not.toContainKey('content-length');
   });
 
   test('Initial PUT /auth', async () => {
-    const res = await api.auth.put(password, {
+    const { status, data } = await api.auth.put(password, {
       headers: getAuthHeaders(uuid, ''),
     });
-    expect(res.status).toBe(200);
-    expect(res.data).toBe('Successfully assigned a new password');
+    expect(status).toBe(200);
+    expect(data).toBe('Successfully assigned a new password');
   });
 
   test('PUT /auth with no password', async () => {
-    const res = await api.auth.put(password, {
+    const { status } = await api.auth.put(password, {
       headers: getAuthHeaders(uuid, ''),
     });
-    expect(res.status).toBe(401);
+    expect(status).toBe(401);
   });
 
   test('GET /auth with no password', async () => {
-    const res = await api.auth.get({
+    const { status } = await api.auth.get({
       headers: getAuthHeaders(uuid, ''),
     });
-    expect(res.status).toBe(401);
+    expect(status).toBe(401);
   });
 
   test('PUT /auth with wrong password', async () => {
-    const res = await api.auth.put(password, {
+    const { status } = await api.auth.put(password, {
       headers: getAuthHeaders(uuid, password + '1'),
     });
-    expect(res.status).toBe(401);
+    expect(status).toBe(401);
   });
 
   test('GET /auth with wrong password', async () => {
-    const res = await api.auth.get({
+    const { status } = await api.auth.get({
       headers: getAuthHeaders(uuid, password + '1'),
     });
-    expect(res.status).toBe(401);
+    expect(status).toBe(401);
   });
 
   test('GET /auth with correct password', async () => {
-    const res = await api.auth.get({
+    const { status } = await api.auth.get({
       headers: getAuthHeaders(uuid, password),
     });
-    expect(res.status).toBe(200);
+    expect(status).toBe(200);
   });
 
   test('PUT /auth with correct password', async () => {
-    const res = await api.auth.put(password + '1', {
+    const { status, data } = await api.auth.put(password + '1', {
       headers: getAuthHeaders(uuid, password),
     });
-    expect(res.status).toBe(200);
-    expect(res.data).toBe('Successfully updated password');
+    expect(status).toBe(200);
+    expect(data).toBe('Successfully updated password');
   });
 
   test('GET /auth with incorrect password after update', async () => {
-    const res = await api.auth.get({
+    const { status } = await api.auth.get({
       headers: getAuthHeaders(uuid, password),
     });
-    expect(res.status).toBe(401);
+    expect(status).toBe(401);
   });
 
   test('GET /auth with correct password after update', async () => {
-    const res = await api.auth.get({
+    const { status } = await api.auth.get({
       headers: getAuthHeaders(uuid, password + '1'),
     });
-    expect(res.status).toBe(200);
+    expect(status).toBe(200);
+  });
+});
+
+describe('GET /jsons', () => {
+  const gameId = Bun.randomUUIDv7();
+
+  beforeAll(() => api.files({ gameId }).put(getRandomSave('100kb', gameId), options));
+  afterAll(() =>
+    Promise.all([
+      cache.del(gameId),
+      cache.del(`${gameId}_Preview`),
+      db.UncivGame.deleteMany({ _id: { $in: [gameId, `${gameId}_Preview`] } }),
+    ])
+  );
+
+  test('404 Not Found on Nonexistent ID', async () => {
+    const res = await app.handle(new Request(`${getAppBaseURL()}/jsons/${Bun.randomUUIDv7()}`));
+    expect(res.status).toBe(404);
+    expect(res.text()).resolves.toBe('Not Found');
+    expect(res.headers.get('content-type')).toBe('text/plain');
+  });
+
+  test('Valid JSON on Existing ID', async () => {
+    const res = await app.handle(new Request(`${getAppBaseURL()}/jsons/${gameId}`));
+    expect(res.ok).toBeTrue();
+    expect(res.json()).resolves.toBeObject();
+    expect(res.headers.get('content-type')).toBe('application/json');
   });
 });

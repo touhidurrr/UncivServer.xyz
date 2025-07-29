@@ -20,10 +20,7 @@ export const authRoute = (app: Elysia) =>
           if (!GAME_ID_REGEX.test(userId)) return status(400, 'Invalid userId!');
 
           const dbAuth = await db.Auth.findById(userId, { hash: 1 });
-          if (dbAuth === null) {
-            set.status = 204;
-            return ''
-          }
+          if (dbAuth === null) return status(204, '');
 
           const verified = await Bun.password.verify(password, dbAuth.hash);
           if (!verified) return status('Unauthorized');

@@ -17,14 +17,17 @@ export const jsonsRoute = (app: Elysia) =>
     '/jsons/:gameId',
     async ({ status, set, params: { gameId } }) => {
       set.headers['cache-control'] = CACHE_CONTROL;
+      set.headers['content-type'] = 'application/json';
 
       const gameData = await cache.get(gameId);
       if (gameData) return unpackJSON(gameData);
 
       const dbGame = await db.UncivGame.findById(gameId, { _id: 0, text: 1 });
-      if (!dbGame) return status(404);
+      if (!dbGame) {
+        set.headers['content-type'] = 'text/plain';
+        return status(404);
+      }
 
-      set.headers['content-type'] = 'application/json';
       await cache.set(gameId, dbGame.text);
       return unpackJSON(dbGame.text);
     },
