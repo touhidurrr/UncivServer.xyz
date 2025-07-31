@@ -1,20 +1,16 @@
-import allowedDomains from '@data/security/allowedDomains.json';
+import { promotion } from '@data/notifications';
 import { URL } from 'node:url';
 import type { UncivGame } from '../models/uncivGame';
+import { DISCORD_INVITE, SUPPORT_URL } from '@constants';
 
-const allowedDomainsSet = new Set(allowedDomains);
+const allowedUrlSet = new Set([DISCORD_INVITE, SUPPORT_URL, ...promotion.map(p => p.url)]);
 
 export const isAllowedURL = (candidateURL: string): boolean => {
   if (!candidateURL) return false;
 
-  let url: URL | null = null;
   try {
-    url = new URL(candidateURL);
-    if (
-      url.protocol !== 'https:' ||
-      (!allowedDomainsSet.has(url.hostname) &&
-        !allowedDomains.some(domain => url!.hostname.endsWith(`.${domain}`)))
-    ) {
+    const { protocol } = new URL(candidateURL);
+    if (protocol !== 'https:' || !allowedUrlSet.has(candidateURL)) {
       console.error(`[SecurityProvider] Insecure LinkAction URL: *${candidateURL}*`);
       return false;
     }

@@ -1,3 +1,4 @@
+import { DISCORD_INVITE, SUPPORT_URL } from '@constants';
 import { promotion } from '@data/notifications';
 import { isAllowedURL } from '@services/gameDataSecurity';
 import { pack, unpack } from '@services/uncivJSON';
@@ -24,13 +25,14 @@ describe('gameDataSecurity', () => {
     });
 
     // base case
-    expect(isAllowedURL('https://uncivserver.xyz')).toBeTrue();
+    expect(isAllowedURL(DISCORD_INVITE)).toBeTrue();
+    expect(isAllowedURL(SUPPORT_URL)).toBeTrue();
 
     // protocol not https:
-    expect(isAllowedURL('http://uncivserver.xyz')).toBeFalse();
-    expect(isAllowedURL('ftp://uncivserver.xyz')).toBeFalse();
+    expect(isAllowedURL('http://uncivserver.xyz/discord')).toBeFalse();
+    expect(isAllowedURL('ftp://uncivserver.xyz/discord')).toBeFalse();
 
-    // valid but not allowed
+    // some random url
     expect(isAllowedURL('https://example.com')).toBeFalse();
 
     // invalid urls
