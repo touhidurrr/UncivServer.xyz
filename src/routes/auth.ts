@@ -1,4 +1,4 @@
-import { GAME_ID_REGEX, NO_CACHE_CONTROL } from '@constants';
+import { AUTH_HEADER_SCHEMA, GAME_ID_REGEX, NO_CACHE_CONTROL } from '@constants';
 import { parseBasicHeader } from '@lib/parseBasicHeader';
 import db from '@services/mongodb';
 import { type Elysia, t } from 'elysia';
@@ -6,10 +6,7 @@ import { type Elysia, t } from 'elysia';
 // unlike in files route, this route checks the db every time
 export const authRoute = (app: Elysia) =>
   app.guard(
-    {
-      parse: 'text',
-      headers: t.Object({ authorization: t.String({ minLength: 56, maxLength: 512 }) }),
-    },
+    { parse: 'text', headers: AUTH_HEADER_SCHEMA },
 
     app =>
       app

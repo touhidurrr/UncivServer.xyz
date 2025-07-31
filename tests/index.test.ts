@@ -8,7 +8,7 @@ import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
 import { sep } from 'node:path';
 
 const api = treaty(app, {
-  onRequest: (_path, init) => {
+  onRequest: (_, init) => {
     if (typeof init.body === 'string') {
       init.headers ??= {};
       //@ts-ignore

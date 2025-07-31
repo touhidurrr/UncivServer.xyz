@@ -1,6 +1,7 @@
 import bytes from 'bytes';
 import { stringify as stringifyCacheControl } from 'cache-control-parser';
 import type { APIEmbed } from 'discord-api-types/v10';
+import { t } from 'elysia';
 
 // isAlive
 export const IS_ALIVE = { authVersion: 1, chatVersion: 1 };
@@ -35,6 +36,9 @@ export const MAX_FILE_SIZE = Math.min(MAX_CONTENT_LENGTH, bytes.parse('2mb')!);
 // auth
 export const GAME_ID_WITH_PREVIEW_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}(_Preview)?$/;
 export const GAME_ID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
+export const AUTH_HEADER_SCHEMA = t.Object({
+  authorization: t.String({ minLength: 56, maxLength: 512 }),
+});
 
 // test
 export const START_TEST_TIMEOUT = 30_000;

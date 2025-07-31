@@ -1,4 +1,4 @@
-import { GAME_ID_REGEX, MAX_FILE_SIZE, MIN_FILE_SIZE } from '@constants';
+import { AUTH_HEADER_SCHEMA, GAME_ID_REGEX, MAX_FILE_SIZE, MIN_FILE_SIZE } from '@constants';
 import { parseBasicHeader } from '@lib/parseBasicHeader';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import cache from '@services/cache';
@@ -63,22 +63,15 @@ export const putFile = (app: Elysia) =>
         maxLength: MAX_FILE_SIZE,
       }),
 
-      headers: t.Object({ authorization: t.String({ minLength: 56, maxLength: 512 }) }),
+      headers: AUTH_HEADER_SCHEMA,
 
       afterResponse: async ({ body, server, params: { gameId }, store: { game } }) => {
         const isPreview = gameId.endsWith('_Preview');
-        const [_, name] = await Promise.allSettled([
+        const [, name] = await Promise.allSettled([
           db.UncivGame.updateOne(
             { _id: gameId },
-            {
-              $set: {
-                text: body as string,
-              },
-            },
-            {
-              projection: { _id: 0, name: 1 },
-              upsert: true,
-            }
+            { $set: { text: body as string } },
+            { upsert: true }
           ),
           db.UncivGame.findByIdAndUpdate(
             game!.previewId,
