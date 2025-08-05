@@ -1,7 +1,7 @@
+import { DISCORD_INVITE, SUPPORT_URL } from '@constants';
 import { promotion } from '@data/notifications';
 import { URL } from 'node:url';
 import type { UncivGame } from '../models/uncivGame';
-import { DISCORD_INVITE, SUPPORT_URL } from '@constants';
 
 const allowedUrlSet = new Set([DISCORD_INVITE, SUPPORT_URL, ...promotion.map(p => p.url)]);
 
