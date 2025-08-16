@@ -108,14 +108,14 @@ export class UncivGame {
     if (this.data.turns) {
       // Self promotion notifications
       if (probability(SPN_PROBABILITY)) {
-        const { message, url, icon } = choice(notificationsData.promotion)!;
+        const { message, url, icon } = choice(notificationsData.promotions)!;
         text = message;
         icons[0] = icon || DEFAULT_SPN_ICON;
         if (this.data.version.createdWith.number > 1076) {
           actions[0] = { LinkAction: { url } };
         }
       } else {
-        text = choice(notificationsData.classic)!;
+        text = choice(notificationsData.messages)!;
         icons[0] = choice(notificationsData.icons.classic)!;
       }
     }

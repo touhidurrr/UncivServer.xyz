@@ -1,9 +1,9 @@
 import { DISCORD_INVITE, SUPPORT_URL } from '@constants';
-import { promotion } from '@data/notifications';
+import { promotions } from '@data/notifications';
 import { URL } from 'node:url';
 import type { UncivGame } from '../models/uncivGame';
 
-const allowedUrlSet = new Set([DISCORD_INVITE, SUPPORT_URL, ...promotion.map(p => p.url)]);
+const allowedUrlSet = new Set([DISCORD_INVITE, SUPPORT_URL, ...promotions.map(p => p.url)]);
 
 export const isAllowedURL = (candidateURL: string): boolean => {
   if (!candidateURL) return false;

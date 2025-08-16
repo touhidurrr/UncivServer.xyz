@@ -1,7 +1,16 @@
-import classicJSON from './classic.json';
 import iconsTOML from './icons.toml';
-import promotionJSON from './promotion.json';
+import messagesJSON from './messages.json';
+import promotionsTOML from './promotions.toml';
 
-export const icons = iconsTOML;
-export const classic = classicJSON;
-export const promotion = promotionJSON;
+export const messages = messagesJSON;
+export const icons = iconsTOML as {
+  classic: string[];
+  promotion: string[];
+};
+export const { promotions } = promotionsTOML as {
+  promotions: {
+    icon?: string;
+    url: string;
+    message: string;
+  }[];
+};

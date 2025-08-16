@@ -1,5 +1,5 @@
 import { DISCORD_INVITE, SUPPORT_URL } from '@constants';
-import { promotion } from '@data/notifications';
+import { promotions } from '@data/notifications';
 import { isAllowedURL } from '@services/gameDataSecurity';
 import { pack, unpack } from '@services/uncivJSON';
 import { describe, expect, test } from 'bun:test';
@@ -20,7 +20,7 @@ describe('uncivGame', () => {
 describe('gameDataSecurity', () => {
   test(isAllowedURL.name, () => {
     // all promotion URLs should be valid
-    promotion.forEach(({ url }) => {
+    promotions.forEach(({ url }) => {
       expect(isAllowedURL(url)).toBeTrue();
     });
 
