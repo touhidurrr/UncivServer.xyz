@@ -1,16 +1,22 @@
-import iconsTOML from './icons.toml';
-import messagesJSON from './messages.json';
-import promotionsTOML from './promotions.toml';
+import iconsYAML from './icons.yaml';
+import messagesYAML from './messages.yaml';
+import promotionsYAML from './promotions.yaml';
 
-export const messages = messagesJSON;
-export const icons = iconsTOML as {
+export const messages = messagesYAML;
+
+export const icons = iconsYAML as {
   classic: string[];
   promotion: string[];
 };
-export const { promotions } = promotionsTOML as {
+
+export const { promotions } = promotionsYAML as {
   promotions: {
     icon?: string;
     url: string;
     message: string;
   }[];
 };
+
+promotions.forEach(o => {
+  o.message = o.message.trim();
+});
