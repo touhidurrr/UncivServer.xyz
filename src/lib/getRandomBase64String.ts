@@ -10,5 +10,5 @@ export const getRandomBase64String = (targetLength: number | string = 10): strin
     targetLength = parsedByteLength;
   }
   const buffSize = Math.ceil((targetLength * 3) / 4);
-  return randomBytes(buffSize).toString('base64');
+  return randomBytes(buffSize).toBase64();
 };

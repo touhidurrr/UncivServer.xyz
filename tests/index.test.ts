@@ -19,7 +19,7 @@ const api = treaty(app, {
 
 const options = {
   headers: {
-    authorization: `Basic ${Buffer.from(`${TEST_GAME_ID}:${Bun.env.SYNC_TOKEN}`).toString('base64')}`,
+    authorization: `Basic ${Buffer.from(`${TEST_GAME_ID}:${Bun.env.SYNC_TOKEN}`).toBase64()}`,
   },
 };
 
@@ -145,7 +145,7 @@ test('All static assets can be accessed', async () => {
 });
 
 const getAuthHeaders = (uuid: string, password: string) => ({
-  authorization: `Basic ${Buffer.from(`${uuid}:${password}`).toString('base64')}`,
+  authorization: `Basic ${Buffer.from(`${uuid}:${password}`).toBase64()}`,
 });
 
 describe('Auth', () => {

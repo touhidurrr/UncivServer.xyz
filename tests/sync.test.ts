@@ -1,3 +1,4 @@
+import { TEST_GAME_ID } from '@constants';
 import '@index';
 import { getAppBaseURL, getRandomSave } from '@lib';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
@@ -127,6 +128,7 @@ test('Uploaded files are relayed properly', async () => {
       headers: {
         'Content-Type': 'text/plain',
         'Content-Length': fileData.length.toString(),
+        Authorization: `Basic ${Buffer.from(`${gameId}:`).toBase64()}:`,
       },
     }).catch(console.error);
 

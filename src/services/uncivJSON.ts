@@ -14,7 +14,7 @@ export const pack = (data: object): string => {
   const json = JSON.stringify(data);
   const compressed = Bun.gzipSync(json, { library: 'libdeflate', level: 7 });
   // return base64 string
-  return Buffer.from(compressed).toString('base64');
+  return Buffer.from(compressed).toBase64();
 };
 
 export const packToFile = (data: object, path: string) => Bun.write(path, pack(data));

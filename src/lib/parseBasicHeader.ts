@@ -1,6 +1,6 @@
 export const parseBasicHeader = (header: string): [string, string] => {
-  const [type, credentials] = header.split(' ');
-  if (type !== 'Basic') throw new Error('Header type is not Basic');
+  const [type, credentials] = header.trim().split(/\s+/);
+  if (type.toLowerCase() !== 'basic') throw new Error('Header type is not Basic');
 
   const authStr = Buffer.from(credentials, 'base64').toString();
   const sepIdx = authStr.indexOf(':');
