@@ -1,4 +1,3 @@
-import { TEST_GAME_ID } from '@constants';
 import '@index';
 import { getAppBaseURL, getRandomSave } from '@lib';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
