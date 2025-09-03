@@ -13,7 +13,7 @@ COPY .eleventy.js .eleventy.js
 RUN bun run build
 
 # remove dev dependencies
-RUN bun install --production --frozen-lockfile
+RUN bun install --omit=dev --frozen-lockfile
 
 # remove unnecessary files
 RUN rm -rf scripts bun.lock
