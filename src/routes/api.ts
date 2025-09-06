@@ -72,7 +72,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
           const filter =
             playing === 'true'
               ? { playerId: profile.uncivUserIds }
-              : { players: profile.uncivUserIds };
+              : { players: { $in: profile.uncivUserIds } };
 
           const games = await db.UncivGame.find(
             filter,
