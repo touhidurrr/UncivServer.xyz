@@ -1,4 +1,4 @@
-import { AUTH_HEADER_SCHEMA, GAME_ID_REGEX, MAX_FILE_SIZE, MIN_FILE_SIZE } from '@constants';
+import { AUTH_HEADER_SCHEMA, UUID_REGEX, MAX_FILE_SIZE, MIN_FILE_SIZE } from '@constants';
 import { parseBasicHeader } from '@lib/parseBasicHeader';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import cache from '@services/cache';
@@ -23,10 +23,10 @@ export const putFile = (app: Elysia) =>
       app
         .derive(({ body }) => ({ game: new UncivGame(body) }))
         .put(
-          '/:gameId',
+          ':gameId',
           async ({ body, params: { gameId }, status, game, headers }) => {
             const [userId, password] = parseBasicHeader(headers.authorization);
-            if (!GAME_ID_REGEX.test(userId)) return status('Bad Request');
+            if (!UUID_REGEX.test(userId)) return status('Bad Request');
 
             let [dbAuth, dbGame] = await Promise.all([
               db.Auth.findById(userId, { hash: 1 }),

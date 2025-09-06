@@ -1,4 +1,4 @@
-import { AUTH_HEADER_SCHEMA, GAME_ID_REGEX, NO_CACHE_CONTROL } from '@constants';
+import { AUTH_HEADER_SCHEMA, UUID_REGEX, NO_CACHE_CONTROL } from '@constants';
 import { parseBasicHeader } from '@lib/parseBasicHeader';
 import db from '@services/mongodb';
 import { type Elysia, t } from 'elysia';
@@ -14,7 +14,7 @@ export const authRoute = (app: Elysia) =>
           set.headers['cache-control'] = NO_CACHE_CONTROL;
 
           const [userId, password] = parseBasicHeader(headers.authorization);
-          if (!GAME_ID_REGEX.test(userId)) return status(400, 'Invalid userId!');
+          if (!UUID_REGEX.test(userId)) return status(400, 'Invalid userId!');
 
           const dbAuth = await db.Auth.findById(userId, { hash: 1 });
           if (dbAuth === null) return status(204);
@@ -31,7 +31,7 @@ export const authRoute = (app: Elysia) =>
             set.headers['cache-control'] = NO_CACHE_CONTROL;
 
             const [userId, password] = parseBasicHeader(headers.authorization);
-            if (!GAME_ID_REGEX.test(userId)) return status(400, 'Invalid userId!');
+            if (!UUID_REGEX.test(userId)) return status(400, 'Invalid userId!');
 
             const dbAuth = await db.Auth.findById(userId, { hash: 1 });
             if (dbAuth === null) {

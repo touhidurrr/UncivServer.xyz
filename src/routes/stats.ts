@@ -4,7 +4,7 @@ import { type Elysia } from 'elysia';
 const stats: { [route: string]: number } = {};
 const pathStart = /(?<=\/\/[^/]+)\/[^/]*/;
 
-export const statsPlugin = (app: Elysia) =>
+export const statsRoute = (app: Elysia) =>
   app
     .onRequest(({ request: { method, url } }) => {
       let key = `${method} ${pathStart.exec(url)![0]}`;

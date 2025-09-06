@@ -5,7 +5,7 @@ import type { Elysia } from 'elysia';
 
 export const getFile = (app: Elysia) =>
   app.get(
-    '/:gameId',
+    ':gameId',
     async ({ status, params: { gameId } }) => {
       const game = await db.UncivGame.findById(gameId, { _id: 0, text: 1 });
 

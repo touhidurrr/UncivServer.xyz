@@ -4,7 +4,7 @@ import { format } from 'bytes';
 import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
 import type { Elysia } from 'elysia';
 
-export const infoPlugin = (app: Elysia) =>
+export const infoRoute = (app: Elysia) =>
   app.get('/info', ({ set }) => {
     const uptime = process.uptime();
     const { rss, heapUsed, heapTotal, external, arrayBuffers } = process.memoryUsage();

@@ -1,4 +1,4 @@
-import { GAME_ID_WITH_PREVIEW_REGEX } from '@constants';
+import { GAME_ID_REGEX } from '@constants';
 import cache from '@services/cache';
 import { db } from '@services/mongodb';
 import { unpackJSON } from '@services/uncivJSON';
@@ -32,6 +32,6 @@ export const jsonsRoute = (app: Elysia) =>
       return unpackJSON(dbGame.text);
     },
     {
-      params: t.Object({ gameId: t.RegExp(GAME_ID_WITH_PREVIEW_REGEX) }),
+      params: t.Object({ gameId: t.RegExp(GAME_ID_REGEX) }),
     }
   );

@@ -34,8 +34,8 @@ export const MIN_FILE_SIZE = Math.max(MIN_CONTENT_LENGTH, bytes.parse('10b')!);
 export const MAX_FILE_SIZE = Math.min(MAX_CONTENT_LENGTH, bytes.parse('2mb')!);
 
 // auth
-export const GAME_ID_WITH_PREVIEW_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}(_Preview)?$/;
-export const GAME_ID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
+export const GAME_ID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}(_Preview)?$/;
+export const UUID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
 export const AUTH_HEADER_SCHEMA = t.Object({
   authorization: t.String({ minLength: 56, maxLength: 512 }),
 });

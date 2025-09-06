@@ -1,7 +1,7 @@
-import { GAME_ID_REGEX, GAME_ID_WITH_PREVIEW_REGEX } from '@constants';
+import { UUID_REGEX, GAME_ID_REGEX } from '@constants';
 import mongoose, { Schema } from 'mongoose';
 
-await mongoose.connect(process.env.MONGO_URL!, {
+mongoose.connect(process.env.MONGO_URL!, {
   dbName: 'unciv',
   appName: 'UncivServer.xyz',
   retryWrites: true,
@@ -10,12 +10,12 @@ await mongoose.connect(process.env.MONGO_URL!, {
 
 const UncivGameSchema = new Schema(
   {
-    _id: { type: String, required: true, match: GAME_ID_WITH_PREVIEW_REGEX },
+    _id: { type: String, required: true, match: GAME_ID_REGEX },
     text: { type: String, default: '', required: true },
     name: String,
     currentPlayer: String,
-    playerId: { type: String, match: GAME_ID_REGEX },
-    players: { type: [{ type: String, match: GAME_ID_REGEX }] },
+    playerId: { type: String, match: UUID_REGEX },
+    players: { type: [{ type: String, match: UUID_REGEX }] },
     turns: Number,
   },
   { collection: 'UncivServer', timestamps: true }
@@ -31,7 +31,7 @@ const PlayerProfileSchema = new Schema(
       winPercentage: { type: Number, default: null },
     },
     rating: { type: Number, default: null },
-    uncivUserIds: { type: [{ type: String, match: GAME_ID_REGEX }], default: [] },
+    uncivUserIds: { type: [{ type: String, match: UUID_REGEX }], default: [] },
     notifications: { type: String, enum: ['enabled', 'disabled'], default: 'enabled' },
     dmChannel: String,
   },

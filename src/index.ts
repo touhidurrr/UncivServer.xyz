@@ -10,12 +10,14 @@ import {
   SUPPORT_URL,
 } from '@constants';
 import { staticPlugin } from '@elysiajs/static';
+import { apiPlugin } from '@routes/api';
 import { authRoute } from '@routes/auth';
-import { chatPlugin } from '@routes/chat';
-import { filesRoute } from '@routes/files';
-import { infoPlugin } from '@routes/info';
+import { chatWebSocket } from '@routes/chat';
+import { filesPlugin } from '@routes/files';
+import { infoRoute } from '@routes/info';
 import { jsonsRoute } from '@routes/jsons';
-import { statsPlugin } from '@routes/stats';
+import { jwtPlugin } from '@routes/jwt';
+import { statsRoute } from '@routes/stats';
 import { syncRoute } from '@routes/sync';
 import { Elysia } from 'elysia';
 
@@ -40,8 +42,6 @@ export const app = new Elysia({
     publishToSelf: true,
   },
 })
-  .use(devPlugin)
-  .use(statsPlugin)
   .onRequest(({ request, status }) => {
     if (IS_DEVELOPMENT) console.info(`${request.method} ${request.url}`);
     if (request.body !== null) {
@@ -50,12 +50,16 @@ export const app = new Elysia({
       if (+contentLen > MAX_CONTENT_LENGTH) return status(413);
     }
   })
-  .use(filesRoute)
-  .use(chatPlugin)
+  .use(devPlugin)
+  .use(statsRoute)
+  .use(jwtPlugin)
+  .use(filesPlugin)
+  .use(chatWebSocket)
   .use(syncRoute)
   .use(authRoute)
   .use(jsonsRoute)
-  .use(infoPlugin)
+  .use(apiPlugin)
+  .use(infoRoute)
   .get('/isalive', ({ set }) => {
     set.headers['cache-control'] = NO_CACHE_CONTROL;
     return IS_ALIVE;

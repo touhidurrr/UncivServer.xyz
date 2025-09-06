@@ -1,6 +1,6 @@
 import {
   AUTH_HEADER_SCHEMA,
-  GAME_ID_REGEX,
+  UUID_REGEX,
   MAX_CHAT_MESSAGE_LENGTH,
   NO_CACHE_CONTROL,
 } from '@constants';
@@ -63,14 +63,14 @@ function publishChat(ws: ElysiaWS, chat: WSChatMessageRelay) {
   }
 }
 
-export const chatPlugin = (app: Elysia) =>
+export const chatWebSocket = (app: Elysia) =>
   app.guard({ headers: AUTH_HEADER_SCHEMA }, app =>
     app
       .derive(async ({ set, headers, status }) => {
         set.headers['cache-control'] = NO_CACHE_CONTROL;
 
         const [userId, password] = parseBasicHeader(headers.authorization);
-        if (!GAME_ID_REGEX.test(userId)) return status('Bad Request');
+        if (!UUID_REGEX.test(userId)) return status('Bad Request');
 
         // password is required for chatting
         if (!password) return status('Unauthorized');
