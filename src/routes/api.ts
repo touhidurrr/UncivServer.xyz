@@ -70,7 +70,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
           if (profile.uncivUserIds.length < 1) return status(204);
 
           const filter =
-            playing !== 'true'
+            playing === 'true'
               ? { playerId: profile.uncivUserIds }
               : { players: profile.uncivUserIds };
 
