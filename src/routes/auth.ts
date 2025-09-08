@@ -1,4 +1,4 @@
-import { AUTH_HEADER_SCHEMA, UUID_REGEX, NO_CACHE_CONTROL } from '@constants';
+import { AUTH_HEADER_SCHEMA, NO_CACHE_CONTROL, UUID_REGEX } from '@constants';
 import { parseBasicHeader } from '@lib/parseBasicHeader';
 import db from '@services/mongodb';
 import { type Elysia, t } from 'elysia';

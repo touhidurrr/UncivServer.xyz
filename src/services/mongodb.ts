@@ -1,4 +1,4 @@
-import { UUID_REGEX, GAME_ID_REGEX } from '@constants';
+import { GAME_ID_REGEX, UUID_REGEX } from '@constants';
 import mongoose, { Schema } from 'mongoose';
 
 mongoose.connect(process.env.MONGO_URL!, {
@@ -26,11 +26,14 @@ const PlayerProfileSchema = new Schema(
     _id: { type: String, required: true },
     games: {
       won: { type: Number, default: 0 },
-      lost: { type: Number, default: 0 },
       played: { type: Number, default: 0 },
-      winPercentage: { type: Number, default: null },
     },
-    rating: { type: Number, default: null },
+    rating: {
+      cur: { type: Number, default: null },
+      peak: { type: Number, default: null },
+      mu: { type: Number, default: 1000 },
+      sigma: { type: Number, default: 235 },
+    },
     uncivUserIds: { type: [{ type: String, match: UUID_REGEX }], default: [] },
     notifications: { type: String, enum: ['enabled', 'disabled'], default: 'enabled' },
     dmChannel: String,

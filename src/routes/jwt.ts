@@ -1,6 +1,6 @@
+import { jwt } from '@elysiajs/jwt';
 import db from '@services/mongodb';
 import { Elysia, t } from 'elysia';
-import { jwt } from '@elysiajs/jwt';
 
 export const jwtPlugin = new Elysia({ name: 'jwt', prefix: 'jwt' })
   .use(

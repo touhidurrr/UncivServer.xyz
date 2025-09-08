@@ -1,4 +1,4 @@
-import { AUTH_HEADER_SCHEMA, UUID_REGEX, MAX_FILE_SIZE, MIN_FILE_SIZE } from '@constants';
+import { AUTH_HEADER_SCHEMA, MAX_FILE_SIZE, MIN_FILE_SIZE, UUID_REGEX } from '@constants';
 import { parseBasicHeader } from '@lib/parseBasicHeader';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import cache from '@services/cache';

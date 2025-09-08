@@ -1,8 +1,8 @@
 import {
   AUTH_HEADER_SCHEMA,
-  UUID_REGEX,
   MAX_CHAT_MESSAGE_LENGTH,
   NO_CACHE_CONTROL,
+  UUID_REGEX,
 } from '@constants';
 import { parseBasicHeader } from '@lib/parseBasicHeader';
 import type {
