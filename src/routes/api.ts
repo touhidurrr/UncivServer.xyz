@@ -79,7 +79,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
             { createdAt: 1, updatedAt: 1, currentPlayer: 1, name: 1, turns: 1 },
             { sort: { updatedAt: -1 }, limit: Math.min(25, limit) }
           );
-          return games;
+          return games.map(({ _id }) => (_id.endsWith('_Preview') ? _id.slice(0, -8) : _id));
         },
         {
           query: t.Object({
