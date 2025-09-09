@@ -80,7 +80,9 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
             { sort: { updatedAt: -1 }, limit: Math.min(25, limit) }
           );
           games.forEach(game => {
-            if (game._id.endsWith('_Preview')) game._id.slice(0, -8);
+            if (game._id.endsWith('_Preview')) {
+              game._id = game._id.slice(0, -8);
+            }
           });
           return games;
         },
