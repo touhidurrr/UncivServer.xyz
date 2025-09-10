@@ -34,6 +34,7 @@ export const MIN_FILE_SIZE = Math.max(MIN_CONTENT_LENGTH, bytes.parse('10b')!);
 export const MAX_FILE_SIZE = Math.min(MAX_CONTENT_LENGTH, bytes.parse('2mb')!);
 
 // auth
+export const NUMERIC_REGEX = /^\d+$/;
 export const GAME_ID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}(_Preview)?$/;
 export const UUID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
 export const AUTH_HEADER_SCHEMA = t.Object({
@@ -76,3 +77,10 @@ export const NO_CACHE_CONTROL = stringifyCacheControl({
 
 // chat
 export const MAX_CHAT_MESSAGE_LENGTH = 1024;
+
+// rating system
+export const INITIAL_MU = 1000;
+export const INITIAL_SIGMA = 235;
+export const DISPLAY_Z = 1.65;
+export const MIN_RATING = 100;
+export const MAX_AFK_SIGMA = 200;

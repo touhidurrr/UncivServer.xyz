@@ -1,4 +1,4 @@
-import { GAME_ID_REGEX, UUID_REGEX } from '@constants';
+import { GAME_ID_REGEX, INITIAL_MU, INITIAL_SIGMA, NUMERIC_REGEX, UUID_REGEX } from '@constants';
 import mongoose, { Schema } from 'mongoose';
 
 mongoose.connect(process.env.MONGO_URL!, {
@@ -23,7 +23,7 @@ const UncivGameSchema = new Schema(
 
 const PlayerProfileSchema = new Schema(
   {
-    _id: { type: String, required: true },
+    _id: { type: String, required: true, match: NUMERIC_REGEX },
     games: {
       won: { type: Number, default: 0 },
       played: { type: Number, default: 0 },
@@ -31,8 +31,8 @@ const PlayerProfileSchema = new Schema(
     rating: {
       cur: { type: Number, default: null },
       peak: { type: Number, default: null },
-      mu: { type: Number, default: 1000 },
-      sigma: { type: Number, default: 235 },
+      mu: { type: Number, default: INITIAL_MU },
+      sigma: { type: Number, default: INITIAL_SIGMA },
     },
     uncivUserIds: { type: [{ type: String, match: UUID_REGEX }], default: [] },
     notifications: { type: String, enum: ['enabled', 'disabled'], default: 'enabled' },
@@ -71,12 +71,15 @@ export const ErrorLog = mongoose.model('ErrorLog', ErrorLogSchema);
 export const Variable = mongoose.model('Variable', VariableSchema);
 export const Auth = mongoose.model('Auth', AuthSchema);
 
+export const stats = () => mongoose.connection.db?.stats();
+
 export const db = {
   UncivGame,
   PlayerProfile,
   ErrorLog,
   Variable,
   Auth,
+  stats,
 };
 
 export default db;

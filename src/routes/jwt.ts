@@ -1,4 +1,5 @@
 import { jwt } from '@elysiajs/jwt';
+import { isValidSyncToken } from '@lib';
 import db from '@services/mongodb';
 import { Elysia, t } from 'elysia';
 
@@ -16,8 +17,8 @@ export const jwtPlugin = new Elysia({ name: 'jwt', prefix: 'jwt' })
   .get(
     ':name',
     async ({ jwt, status, params: { name }, cookie: { auth }, headers: { authorization } }) => {
-      const token = authorization.replace(/^bearer\s+/i, '');
-      if (token !== process.env.SYNC_TOKEN!) {
+      const token = authorization.replace(/^bearer\s+/i, '').trimEnd();
+      if (!isValidSyncToken(token)) {
         return status('Unauthorized');
       }
 
@@ -31,5 +32,5 @@ export const jwtPlugin = new Elysia({ name: 'jwt', prefix: 'jwt' })
 
       return value;
     },
-    { headers: t.Object({ authorization: t.RegExp(/^bearer\s+.+$/i, {}) }) }
+    { headers: t.Object({ authorization: t.RegExp(/^bearer\s+/i, {}) }) }
   );

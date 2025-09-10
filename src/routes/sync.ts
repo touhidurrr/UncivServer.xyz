@@ -1,4 +1,5 @@
 import { GAME_ID_REGEX, NO_CACHE_CONTROL } from '@constants';
+import { isValidSyncToken } from '@lib';
 import { type Elysia, t } from 'elysia';
 
 const SYNC_GAME_DATA_SCHEMA = t.Object({
@@ -14,15 +15,15 @@ export const SYNC_RESPONSE_SCHEMA = t.Union([SYNC_GAME_DATA_SCHEMA, SYNC_ERROR_S
 
 export const syncRoute = (app: Elysia) =>
   app.ws('/sync', {
-    headers: t.Object({ authorization: t.RegExp(/^bearer\s+.+$/i, {}) }),
+    headers: t.Object({ authorization: t.RegExp(/^bearer\s+/i, {}) }),
     response: SYNC_RESPONSE_SCHEMA,
     beforeHandle: ({ set }) => {
       set.headers['cache-control'] = NO_CACHE_CONTROL;
     },
     open: ws => {
-      const token = ws.data.headers.authorization.replace(/^bearer\s+/i, '');
-      if (token !== process.env.SYNC_TOKEN) {
-        ws.send({ type: 'AuthError' }, true);
+      const token = ws.data.headers.authorization.replace(/^bearer\s+/i, '').trimEnd();
+      if (!isValidSyncToken(token)) {
+        ws.send({ type: 'AuthError' });
         ws.close();
         return;
       }
