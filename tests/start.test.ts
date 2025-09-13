@@ -24,6 +24,7 @@ describe('App Start Test', () => {
   const api = axios.create({
     baseURL: getAppBaseURL({ port }),
     timeout: START_TEST_FETCH_TIMEOUT,
+    validateStatus: null,
   });
 
   test(
@@ -31,8 +32,8 @@ describe('App Start Test', () => {
     async () => {
       while (!proc.killed) {
         try {
-          const { data } = await api.get('/isalive');
-          if (data) {
+          const { status, data } = await api.get('/isalive');
+          if (status === 200) {
             expect(data).toStrictEqual(IS_ALIVE);
             break;
           }
@@ -51,7 +52,6 @@ describe('App Start Test', () => {
       await Bun.sleep(START_TEST_FETCH_RETRY_INTERVAL);
 
       res = await api.get('');
-      console.log('status', res.status);
     }
 
     expect(res.status).toBe(200);
