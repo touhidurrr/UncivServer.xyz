@@ -1,9 +1,17 @@
-import '@index';
 import { getAppBaseURL, getRandomSave } from '@lib';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
-import { describe, expect, test } from 'bun:test';
+import db from '@services/mongodb';
+import axios from 'axios';
+import { afterAll, describe, expect, test } from 'bun:test';
 import { parse as parseCacheControl } from 'cache-control-parser';
 import { z } from 'zod';
+
+import '@index';
+
+const api = axios.create({
+  baseURL: getAppBaseURL(),
+  validateStatus: null,
+});
 
 const { SYNC_TOKEN } = process.env;
 if (!SYNC_TOKEN) {
@@ -17,21 +25,25 @@ const getSyncWSClient = (token: string) =>
     perMessageDeflate: true,
   });
 
-test('Cache Control', async () =>
-  await fetch(`${getAppBaseURL()}/sync`, {
+test('Cache Control', async () => {
+  const { headers } = await api.get('/sync', {
     headers: {
       connection: 'upgrade',
       upgrade: 'websocket',
       authorization: `Bearer Test`,
     },
-  }).then(res => {
-    const ccHeaders = res.headers.get('cache-control');
-    expect(ccHeaders).not.toBeNull();
-    const cacheControl = parseCacheControl(ccHeaders!);
-    expect(cacheControl).toBeObject();
-    expect(cacheControl['no-store']).toBeTrue();
-    expect(cacheControl['no-cache']).toBeTrue();
-  }));
+  });
+
+  expect.hasAssertions();
+  const ccHeaders = headers['cache-control'];
+  if (typeof ccHeaders !== 'string') return;
+
+  expect(ccHeaders).toBeString();
+  const cacheControl = parseCacheControl(ccHeaders);
+  expect(cacheControl).toBeObject();
+  expect(cacheControl['no-store']).toBeTrue();
+  expect(cacheControl['no-cache']).toBeTrue();
+});
 
 describe('Token', () => {
   test('Rejects No Token', async () => {
@@ -117,19 +129,24 @@ describe('Token', () => {
 
 test('Uploaded files are relayed properly', async () => {
   const gameId = Bun.randomUUIDv7();
-  const url = `${getAppBaseURL()}/files/${gameId}`;
-  const fileData = getRandomSave('1kb');
+  const userId = Bun.randomUUIDv7();
+  const payload = getRandomSave('1kb', { gameId, userId });
+
+  afterAll(() =>
+    db.UncivGame.deleteMany({
+      _id: { $in: [gameId, `${gameId}_Preview`] },
+    })
+  );
 
   const putFile = (isPreview: boolean = false) =>
-    fetch(url + (isPreview ? '_Preview' : ''), {
-      method: 'PUT',
-      body: fileData,
-      headers: {
-        'Content-Type': 'text/plain',
-        'Content-Length': fileData.length.toString(),
-        Authorization: `Basic ${Buffer.from(`${gameId}:`).toBase64()}:`,
-      },
-    }).catch(console.error);
+    api
+      .put(`/files/${gameId + (isPreview ? '_Preview' : '')}`, payload, {
+        auth: {
+          username: userId,
+          password: '',
+        },
+      })
+      .then(({ status }) => expect(status).toBe(200));
 
   let receivedData = false;
   let receivedPreview = false;
@@ -158,7 +175,7 @@ test('Uploaded files are relayed properly', async () => {
             return;
         }
 
-        expect(msg.data.content).toBe(fileData);
+        expect(msg.data.content).toBe(payload);
         if (receivedData && receivedPreview) resolve('Done!');
       }
     });

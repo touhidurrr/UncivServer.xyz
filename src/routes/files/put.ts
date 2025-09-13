@@ -34,7 +34,9 @@ export const putFile = (app: Elysia) =>
                 turns: !game.getTurns(),
                 players: game.players,
                 text: pack(game.getPreview()),
-              });
+              }).catch(() => db.UncivGame.findById(game.previewId, { players: 1 }));
+
+              if (dbGame == null) return status(500, 'Failed to save game!');
             }
 
             // if a players list doesn't exist, regenerate it

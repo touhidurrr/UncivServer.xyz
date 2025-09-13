@@ -1,53 +1,45 @@
 import { MAX_FILE_SIZE, TEST_GAME_ID } from '@constants';
-import { treaty } from '@elysiajs/eden';
-import { app } from '@index';
 import { getAppBaseURL, getRandomSave } from '@lib';
 import cache from '@services/cache';
 import db from '@services/mongodb';
+import axios from 'axios';
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
 import { sep } from 'node:path';
 
-const api = treaty(app, {
-  onRequest: (_, init) => {
-    if (typeof init.body === 'string') {
-      init.headers ??= {};
-      //@ts-ignore
-      init.headers['content-length'] = init.body.length;
-    }
+import '@index';
+
+const api = axios.create({
+  baseURL: getAppBaseURL(),
+  validateStatus: null,
+  auth: {
+    username: TEST_GAME_ID,
+    password: process.env.SYNC_TOKEN!,
   },
 });
 
-//@ts-ignore zod resolves this, but here it shows type error
-const options = {
-  headers: {
-    authorization: `Basic ${Buffer.from(`${TEST_GAME_ID}:${Bun.env.SYNC_TOKEN}`).toBase64()}`,
-  },
-} as { headers: { authorization: [string, string] } };
-
-test('GET /isalive', async () => {
-  await api.isalive.get().then(({ status, data }) => {
+test('GET /isalive', () =>
+  api.get('/isalive').then(({ status, data }) => {
     expect(status).toBe(200);
+    expect(data).toBeObject();
     expect(data).toStrictEqual({ authVersion: 1, chatVersion: 1 });
-  });
-});
+  }));
 
 describe('GET /files', () => {
-  test('Fail on Bad ID', async () => {
-    await api
-      .files({ gameId: 'bad-id' })
-      .get()
-      .then(({ status }) => {
-        expect(status).toBe(422);
-      });
+  test('Validation Error on Bad ID', async () => {
+    const gameId = 'bad-id';
+    const { status, data } = await api.get(`/files/${gameId}`);
+    expect(status).toBe(422);
+    expect(data).toMatchObject({
+      type: 'validation',
+      on: 'params',
+      property: 'gameId',
+    });
   });
 
   test('Fail on Nonexistent ID', async () => {
-    await api
-      .files({ gameId: Bun.randomUUIDv7() })
-      .get()
-      .then(({ status }) => {
-        expect(status).toBe(404);
-      });
+    const gameId = Bun.randomUUIDv7();
+    const { status } = await api.get(`/files/${gameId}`);
+    expect(status).toBe(404);
   });
 });
 
@@ -64,61 +56,53 @@ describe('PUT /files', () => {
   });
 
   test('Fail on Small File', async () => {
-    await api
-      .files({ gameId: TEST_GAME_ID })
-      .put('test', options)
-      .then(({ status }) => {
-        expect(status).toBe(400);
-      });
+    const gameId = TEST_GAME_ID;
+    const payload = 'test';
+    const { status } = await api.put(`/files/${gameId}`, payload);
+    expect(status).toBe(400);
   });
 
   test('Fail on files larger than MAX_FILE_SIZE', async () => {
-    await api
-      .files({ gameId: TEST_GAME_ID })
-      .put(getRandomSave(MAX_FILE_SIZE + 100), options)
-      .then(({ status }) => {
-        expect(status).toBe(413);
-      });
+    const gameId = TEST_GAME_ID;
+    const payload = getRandomSave(MAX_FILE_SIZE + 100);
+    const { status } = await api.put(`/files/${gameId}`, payload);
+    expect(status).toBe(413);
   });
 
   describe('Good File', () => {
-    const fileData = getRandomSave('100kb');
+    const payload = getRandomSave('100kb');
 
-    test('Fail on Bad ID', async () => {
-      await api
-        .files({ gameId: 'bad-id' })
-        .put(fileData, options)
-        .then(({ status }) => {
-          expect(status).toBe(422);
-        });
+    test('Validation Error on Bad ID', async () => {
+      const gameId = 'bad-id';
+      const { status, data } = await api.put(`/files/${gameId}`, payload);
+      expect(status).toBe(422);
+      expect(data).toMatchObject({
+        type: 'validation',
+        on: 'params',
+        property: 'gameId',
+      });
     });
 
     test('Upload Success', async () => {
-      await api
-        .files({ gameId: TEST_GAME_ID })
-        .put(fileData, options)
-        .then(({ status, data }) => {
-          expect(status).toBe(200);
-          expect(data).toBeString();
-          expect(data).toBe('Done!');
-        });
+      const gameId = TEST_GAME_ID;
+      const { status, data } = await api.put(`/files/${gameId}`, payload);
+      expect(status).toBe(200);
+      expect(data).toBeString();
+      expect(data).toBe('Done!');
     });
 
     test('Cache Hit', async () => {
       const cachedFile = await cache.get(TEST_GAME_ID);
       expect(cachedFile).toBeString();
-      expect(cachedFile).toBe(fileData);
+      expect(cachedFile).toBe(payload);
     });
 
     test('Can be found in GET /files', async () => {
-      await api
-        .files({ gameId: TEST_GAME_ID })
-        .get()
-        .then(({ status, data }) => {
-          expect(status).toBe(200);
-          expect(data).toBeString();
-          expect(data).toBe(fileData);
-        });
+      const gameId = TEST_GAME_ID;
+      const { status, data } = await api.get(`/files/${gameId}`);
+      expect(status).toBe(200);
+      expect(data).toBeString();
+      expect(data).toBe(payload);
     });
   });
 });
@@ -131,106 +115,98 @@ test('All static assets can be accessed', async () => {
     const path = '/' + file.split(sep).slice(1).join('/');
     paths.push(path);
     if (path.endsWith('/index.html')) {
-      paths.push(path.slice(0, -10));
+      paths.push(path.replace(/index\.html$/, ''));
     }
   }
 
   // test each path
   await Promise.all(
     paths.map(async path => {
-      const { ok, status } = await app.handle(new Request(`${getAppBaseURL()}${path}`));
-      expect(ok).toBeTrue();
+      const { status } = await api.get(path);
       expect(status).toBe(200);
     })
   );
 });
 
-const getAuthHeaders = (uuid: string, password: string) =>
-  //@ts-ignore zod resolves this, but here it shows type error
-  ({
-    authorization: `Basic ${Buffer.from(`${uuid}:${password}`).toBase64()}`,
-  }) as { authorization: [string, string] };
-
 describe('Auth', () => {
-  const uuid = Bun.randomUUIDv7();
+  const username = Bun.randomUUIDv7();
   const password = '0'.repeat(6);
 
   afterAll(async () => {
-    const result = await db.Auth.deleteOne({ _id: uuid });
+    const result = await db.Auth.deleteOne({ _id: username });
     console.log('Auth afterAll Result:', result);
   });
 
   test('Initial GET /auth', async () => {
-    const { data, status, headers } = await api.auth.get({
-      headers: getAuthHeaders(uuid, ''),
+    const { data, status, headers } = await api.get('/auth', {
+      auth: { username, password: '' },
     });
     expect(status).toBe(204);
-    //@ts-ignore on 204 data should be ''
     expect(data).toBe('');
-    expect(headers).not.toContainKey('content-length');
+    expect(Number(headers['content-length'])).toBe(0);
   });
 
   test('Initial PUT /auth', async () => {
-    const { status, data } = await api.auth.put(password, {
-      headers: getAuthHeaders(uuid, ''),
+    const { status, data } = await api.put('/auth', password, {
+      auth: { username, password: '' },
     });
     expect(status).toBe(200);
     expect(data).toBe('Successfully assigned a new password');
   });
 
   test('PUT /auth with no password', async () => {
-    const { status } = await api.auth.put(password, {
-      headers: getAuthHeaders(uuid, ''),
+    const { status } = await api.put('/auth', password, {
+      auth: { username, password: '' },
     });
     expect(status).toBe(401);
   });
 
   test('GET /auth with no password', async () => {
-    const { status } = await api.auth.get({
-      headers: getAuthHeaders(uuid, ''),
+    const { status } = await api.get('/auth', {
+      auth: { username, password: '' },
     });
     expect(status).toBe(401);
   });
 
   test('PUT /auth with wrong password', async () => {
-    const { status } = await api.auth.put(password, {
-      headers: getAuthHeaders(uuid, password + '1'),
+    const { status } = await api.put('/auth', password, {
+      auth: { username, password: password + '1' },
     });
     expect(status).toBe(401);
   });
 
   test('GET /auth with wrong password', async () => {
-    const { status } = await api.auth.get({
-      headers: getAuthHeaders(uuid, password + '1'),
+    const { status } = await api.get('/auth', {
+      auth: { username, password: password + '1' },
     });
     expect(status).toBe(401);
   });
 
   test('GET /auth with correct password', async () => {
-    const { status } = await api.auth.get({
-      headers: getAuthHeaders(uuid, password),
+    const { status } = await api.get('/auth', {
+      auth: { username, password },
     });
     expect(status).toBe(200);
   });
 
   test('PUT /auth with correct password', async () => {
-    const { status, data } = await api.auth.put(password + '1', {
-      headers: getAuthHeaders(uuid, password),
+    const { status, data } = await api.put('/auth', password + '1', {
+      auth: { username, password },
     });
     expect(status).toBe(200);
     expect(data).toBe('Successfully updated password');
   });
 
   test('GET /auth with incorrect password after update', async () => {
-    const { status } = await api.auth.get({
-      headers: getAuthHeaders(uuid, password),
+    const { status } = await api.get('/auth', {
+      auth: { username, password },
     });
     expect(status).toBe(401);
   });
 
   test('GET /auth with correct password after update', async () => {
-    const { status } = await api.auth.get({
-      headers: getAuthHeaders(uuid, password + '1'),
+    const { status } = await api.get('/auth', {
+      auth: { username, password: password + '1' },
     });
     expect(status).toBe(200);
   });
@@ -238,8 +214,9 @@ describe('Auth', () => {
 
 describe('GET /jsons', () => {
   const gameId = Bun.randomUUIDv7();
+  const payload = getRandomSave('100kb', { gameId });
 
-  beforeAll(() => api.files({ gameId }).put(getRandomSave('100kb', gameId), options));
+  beforeAll(() => api.put(`/files/${gameId}`, payload));
   afterAll(() =>
     Promise.all([
       cache.del(gameId),
@@ -249,16 +226,17 @@ describe('GET /jsons', () => {
   );
 
   test('404 Not Found on Nonexistent ID', async () => {
-    const res = await app.handle(new Request(`${getAppBaseURL()}/jsons/${Bun.randomUUIDv7()}`));
-    expect(res.status).toBe(404);
-    expect(res.text()).resolves.toBe('Not Found');
-    expect(res.headers.get('content-type')).toBe('text/plain');
+    const { status, data, headers } = await api.get(`/jsons/${Bun.randomUUIDv7()}`);
+    expect(status).toBe(404);
+    expect(data).toBe('Not Found');
+    expect(headers['content-type']).toBe('text/plain');
   });
 
   test('Valid JSON on Existing ID', async () => {
-    const res = await app.handle(new Request(`${getAppBaseURL()}/jsons/${gameId}`));
-    expect(res.ok).toBeTrue();
-    expect(res.json()).resolves.toBeObject();
-    expect(res.headers.get('content-type')).toBe('application/json');
+    const { status, data, headers } = await api.get(`/jsons/${gameId}`);
+    expect(status).toBe(200);
+    expect(data).toBeObject();
+    expect(data).toMatchObject({ gameId });
+    expect(headers['content-type']).toBe('application/json');
   });
 });
