@@ -1,7 +1,9 @@
+import { BEARER_TOKEN_SCHEMA } from '@constants';
 import { jwt } from '@elysiajs/jwt';
 import { isValidSyncToken } from '@lib';
 import db from '@services/mongodb';
-import { Elysia, t } from 'elysia';
+import { Elysia } from 'elysia';
+import { z } from 'zod';
 
 export const jwtPlugin = new Elysia({ name: 'jwt', prefix: 'jwt' })
   .use(
@@ -17,8 +19,7 @@ export const jwtPlugin = new Elysia({ name: 'jwt', prefix: 'jwt' })
   .get(
     ':name',
     async ({ jwt, status, params: { name }, cookie: { auth }, headers: { authorization } }) => {
-      const token = authorization.replace(/^bearer\s+/i, '').trimEnd();
-      if (!isValidSyncToken(token)) {
+      if (!isValidSyncToken(authorization)) {
         return status('Unauthorized');
       }
 
@@ -32,5 +33,14 @@ export const jwtPlugin = new Elysia({ name: 'jwt', prefix: 'jwt' })
 
       return value;
     },
-    { headers: t.Object({ authorization: t.RegExp(/^bearer\s+/i, {}) }) }
+    { headers: z.object({ authorization: BEARER_TOKEN_SCHEMA }) }
+  )
+  .post(
+    'verify',
+    async ({ status, jwt, body: token }) => {
+      const verified = await jwt.verify(token);
+      if (!verified) return status('Unauthorized');
+      return 'OK';
+    },
+    { body: z.string().transform(val => val.trim()) }
   );

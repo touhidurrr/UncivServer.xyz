@@ -1,7 +1,7 @@
 import bytes from 'bytes';
 import { stringify as stringifyCacheControl } from 'cache-control-parser';
 import type { APIEmbed } from 'discord-api-types/v10';
-import { t } from 'elysia';
+import { z } from 'zod';
 
 // isAlive
 export const IS_ALIVE = { authVersion: 1, chatVersion: 1 };
@@ -37,8 +37,54 @@ export const MAX_FILE_SIZE = Math.min(MAX_CONTENT_LENGTH, bytes.parse('2mb')!);
 export const NUMERIC_REGEX = /^\d+$/;
 export const GAME_ID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}(_Preview)?$/;
 export const UUID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
-export const AUTH_HEADER_SCHEMA = t.Object({
-  authorization: t.String({ minLength: 56, maxLength: 512 }),
+export const UUID_SCHEMA = z.uuid().toLowerCase();
+export const BEARER_TOKEN_SCHEMA = z
+  .stringFormat('BearerToken', /^bearer\s+/i)
+  .pipe(z.transform(val => val.replace(/^bearer\s+/i, '').trimEnd()));
+export const UNCIV_BASIC_AUTH_HEADER_SCHEMA = z.object({
+  authorization: z
+    .stringFormat('BasicToken', /^basic\s+/i)
+    .max(512)
+    .pipe(
+      z.transform((val, ctx) => {
+        const userPassBase64 = val.replace(/^basic\s+/i, '').trimEnd();
+
+        let userPass: string;
+        try {
+          userPass = Buffer.from(userPassBase64, 'base64').toString();
+        } catch (e) {
+          ctx.issues.push({
+            code: 'invalid_format',
+            format: 'base64',
+            input: val,
+          });
+          return z.NEVER;
+        }
+
+        const sepIdx = userPass.indexOf(':');
+        if (sepIdx < 0) {
+          ctx.issues.push({
+            code: 'custom',
+            input: val,
+            message: `Malformed basic auth header -> ':' character missing!`,
+          });
+          return z.NEVER;
+        }
+
+        const userId = userPass.slice(0, sepIdx).toLocaleLowerCase();
+        if (!UUID_REGEX.test(userId)) {
+          ctx.issues.push({
+            code: 'custom',
+            input: userId,
+            message: 'Unciv userId must be a valid UUID!',
+          });
+          return z.NEVER;
+        }
+
+        const password = userPass.slice(sepIdx + 1);
+        return [userId, password || ''] as const;
+      })
+    ),
 });
 
 // test

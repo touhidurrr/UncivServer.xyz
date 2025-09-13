@@ -3,7 +3,8 @@ import cache from '@services/cache';
 import { db } from '@services/mongodb';
 import { unpackJSON } from '@services/uncivJSON';
 import { stringify } from 'cache-control-parser';
-import { type Elysia, t } from 'elysia';
+import type { Elysia } from 'elysia';
+import { z } from 'zod';
 
 const CACHE_CONTROL = stringify({
   public: true,
@@ -32,6 +33,6 @@ export const jsonsRoute = (app: Elysia) =>
       return unpackJSON(dbGame.text);
     },
     {
-      params: t.Object({ gameId: t.RegExp(GAME_ID_REGEX) }),
+      params: z.object({ gameId: z.string().regex(GAME_ID_REGEX) }),
     }
   );

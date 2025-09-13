@@ -1,21 +1,25 @@
-import { NUMERIC_REGEX, UUID_REGEX } from '@constants';
+import { BEARER_TOKEN_SCHEMA, NUMERIC_REGEX, UUID_SCHEMA } from '@constants';
 import db from '@services/mongodb';
 import { calculateRating } from '@services/rating';
 import { Elysia, t } from 'elysia';
 import type { AnyBulkWriteOperation } from 'mongoose';
+import { z } from 'zod';
 import { jwtPlugin } from './jwt';
 
 export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugin).guard(
   {
-    headers: t.Object({ authorization: t.Optional(t.RegExp(/^bearer\s+/i, {})) }),
-    beforeHandle: ({ status, jwt, headers: { authorization }, cookie: { auth } }) => {
-      const token = auth.value ?? authorization?.replace(/^bearer\s+/i, '');
-      if (!jwt?.verify(token)) return status('Unauthorized');
+    cookie: t.Cookie({ auth: t.Optional(t.String()) }),
+    headers: z.object({ authorization: z.optional(BEARER_TOKEN_SCHEMA) }),
+    beforeHandle: async ({ status, jwt, headers: { authorization }, cookie: { auth } }) => {
+      const token = auth.value ?? authorization;
+      if (!token) return status(400, 'You must provide one of bearer token or auth cookie!');
+      const verified = await jwt.verify(token);
+      if (!verified) return status('Unauthorized');
     },
   },
   app =>
     app
-      .guard({ params: t.Object({ gameId: t.RegExp(UUID_REGEX) }) }, app =>
+      .guard({ params: z.object({ gameId: UUID_SCHEMA }) }, app =>
         app
           .get('games/:gameId/name', async ({ status, params: { gameId } }) => {
             const game = await db.UncivGame.findById(`${gameId}_Preview`, { _id: 0, name: 1 });
@@ -32,7 +36,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
               );
               return status(matchedCount > 0 ? 'OK' : 'Not Found');
             },
-            { body: t.Object({ name: t.String({ maxLength: 100 }) }) }
+            { body: z.object({ name: z.string().max(100) }) }
           )
           .delete('games/:gameId/name', async ({ status, params: { gameId } }) => {
             const { matchedCount } = await db.UncivGame.updateOne(
@@ -43,7 +47,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
           })
       )
 
-      .guard({ params: t.Object({ _id: t.RegExp(NUMERIC_REGEX) }) }, app =>
+      .guard({ params: z.object({ _id: z.string().regex(NUMERIC_REGEX) }) }, app =>
         app
           .get('profiles/:_id', ({ params: { _id } }) =>
             db.PlayerProfile.findById(_id)
@@ -55,21 +59,21 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
             'profiles/:_id/notifications',
             ({ params: { _id }, body: { status } }) =>
               db.PlayerProfile.updateOne({ _id }, { $set: { notifications: status } }),
-            { body: t.Object({ status: t.UnionEnum(['enabled', 'disabled']) }) }
+            { body: z.object({ status: z.literal(['enabled', 'disabled']) }) }
           )
 
           .post(
             'profiles/:_id/uncivUserIds',
             ({ params: { _id }, body: { userId } }) =>
               db.PlayerProfile.updateOne({ _id }, { $addToSet: { uncivUserIds: userId } }),
-            { body: t.Object({ userId: t.RegExp(UUID_REGEX) }) }
+            { body: z.object({ userId: UUID_SCHEMA }) }
           )
 
           .delete(
             'profiles/:_id/uncivUserIds',
             ({ params: { _id }, body: { userId } }) =>
               db.PlayerProfile.updateOne({ _id }, { $pull: { uncivUserIds: userId } }),
-            { body: t.Object({ userId: t.RegExp(UUID_REGEX) }) }
+            { body: z.object({ userId: UUID_SCHEMA }) }
           )
 
           .get(
@@ -80,14 +84,17 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
               if (profile.uncivUserIds.length < 1) return status(204);
 
               const filter =
-                playing === 'true'
+                `${playing}` === 'true'
                   ? { playerId: profile.uncivUserIds }
                   : { players: { $in: profile.uncivUserIds } };
 
               const games = await db.UncivGame.find(
                 filter,
                 { createdAt: 1, updatedAt: 1, currentPlayer: 1, name: 1, turns: 1 },
-                { sort: { updatedAt: -1 }, limit: Math.min(25, limit) }
+                {
+                  sort: { updatedAt: -1 },
+                  limit: Math.max(1, Math.min(25, (limit ?? 25) || 0)),
+                }
               );
               games.forEach(game => {
                 if (game._id.endsWith('_Preview')) {
@@ -97,9 +104,9 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
               return games;
             },
             {
-              query: t.Object({
-                playing: t.ReadonlyOptional(t.Literal('true')),
-                limit: t.Numeric({ default: Number.MAX_SAFE_INTEGER }),
+              query: z.object({
+                playing: z.optional(z.stringbool().readonly()).default(false),
+                limit: z.optional(z.coerce.number().min(1).max(25)).default(25),
               }),
             }
           )
@@ -112,7 +119,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
           if (!profile) return status(404);
           return profile._id;
         },
-        { params: t.Object({ _id: t.RegExp(UUID_REGEX) }) }
+        { params: z.object({ _id: UUID_SCHEMA }) }
       )
 
       .post(
@@ -177,7 +184,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
 
           return ratings.map(r => r.cur);
         },
-        { body: t.Object({ ids: t.Array(t.RegExp(NUMERIC_REGEX), { maxItems: 32 }) }) }
+        { body: z.object({ ids: z.array(z.string().regex(NUMERIC_REGEX)).max(32) }) }
       )
 
       .post(
@@ -190,7 +197,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
           return [...new Set(profiles.flatMap(p => p.uncivUserIds)).intersection(new Set(userIds))];
         },
         {
-          body: t.Object({ userIds: t.Array(t.RegExp(UUID_REGEX)) }),
+          body: z.object({ userIds: z.array(UUID_SCHEMA) }),
         }
       )
 

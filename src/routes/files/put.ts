@@ -1,23 +1,19 @@
-import { AUTH_HEADER_SCHEMA, MAX_FILE_SIZE, MIN_FILE_SIZE, UUID_REGEX } from '@constants';
-import { parseBasicHeader } from '@lib/parseBasicHeader';
+import { MAX_FILE_SIZE, MIN_FILE_SIZE, UNCIV_BASIC_AUTH_HEADER_SCHEMA } from '@constants';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import cache from '@services/cache';
 import { isDiscordTokenValid, sendNewTurnNotification } from '@services/discord';
 import { gameDataSecurityModifier } from '@services/gameDataSecurity';
 import { db } from '@services/mongodb';
 import { pack } from '@services/uncivJSON';
-import { type Elysia, type Static, t } from 'elysia';
+import type { Elysia } from 'elysia';
+import { z } from 'zod';
 import { UncivGame } from '../../models/uncivGame';
 
 export const putFile = (app: Elysia) =>
   app.guard(
     {
-      body: t.String({
-        minLength: MIN_FILE_SIZE,
-        maxLength: MAX_FILE_SIZE,
-      }),
-
-      headers: AUTH_HEADER_SCHEMA,
+      headers: UNCIV_BASIC_AUTH_HEADER_SCHEMA,
+      body: z.string().min(MIN_FILE_SIZE).max(MAX_FILE_SIZE),
     },
     app =>
       app
@@ -25,8 +21,7 @@ export const putFile = (app: Elysia) =>
         .put(
           ':gameId',
           async ({ body, params: { gameId }, status, game, headers }) => {
-            const [userId, password] = parseBasicHeader(headers.authorization);
-            if (!UUID_REGEX.test(userId)) return status('Bad Request');
+            const [userId, password] = headers.authorization;
 
             let [dbAuth, dbGame] = await Promise.all([
               db.Auth.findById(userId, { hash: 1 }),
@@ -67,6 +62,7 @@ export const putFile = (app: Elysia) =>
             return 'Done!';
           },
           {
+            //@ts-expect-error it works but shows error
             afterResponse: async ({ body, server, params: { gameId }, game }) => {
               const isPreview = gameId.endsWith('_Preview');
               const [, name] = await Promise.allSettled([
@@ -95,7 +91,7 @@ export const putFile = (app: Elysia) =>
                   JSON.stringify({
                     type: 'SyncData',
                     data: { gameId, content: body },
-                  } as Static<typeof SYNC_RESPONSE_SCHEMA>),
+                  } as z.infer<typeof SYNC_RESPONSE_SCHEMA>),
                   true
                 );
               } catch (err) {
@@ -115,6 +111,7 @@ export const putFile = (app: Elysia) =>
             // in case an injection is possible, we need to repack the body to update it
             transform: ctx => {
               // run security modifier on game data
+              //@ts-expect-error it works but shows error
               const hasModifications = gameDataSecurityModifier(ctx.game);
 
               // notifications provider
@@ -133,6 +130,7 @@ export const putFile = (app: Elysia) =>
 
               // repack game data if there are modifications or notifications
               if (hasModifications || hasNotifications) {
+                //@ts-expect-error it works but shows error
                 ctx.body = pack(ctx.game);
               }
             },

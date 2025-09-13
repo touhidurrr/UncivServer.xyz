@@ -17,11 +17,12 @@ const api = treaty(app, {
   },
 });
 
+//@ts-ignore zod resolves this, but here it shows type error
 const options = {
   headers: {
     authorization: `Basic ${Buffer.from(`${TEST_GAME_ID}:${Bun.env.SYNC_TOKEN}`).toBase64()}`,
   },
-};
+} as { headers: { authorization: [string, string] } };
 
 test('GET /isalive', async () => {
   await api.isalive.get().then(({ status, data }) => {
@@ -144,9 +145,11 @@ test('All static assets can be accessed', async () => {
   );
 });
 
-const getAuthHeaders = (uuid: string, password: string) => ({
-  authorization: `Basic ${Buffer.from(`${uuid}:${password}`).toBase64()}`,
-});
+const getAuthHeaders = (uuid: string, password: string) =>
+  //@ts-ignore zod resolves this, but here it shows type error
+  ({
+    authorization: `Basic ${Buffer.from(`${uuid}:${password}`).toBase64()}`,
+  }) as { authorization: [string, string] };
 
 describe('Auth', () => {
   const uuid = Bun.randomUUIDv7();

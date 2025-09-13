@@ -1,5 +1,5 @@
 import { MINIMAL_CACHE_CONTROL } from '@constants';
-import { type Elysia } from 'elysia';
+import type { Elysia } from 'elysia';
 
 const stats: { [route: string]: number } = {};
 const pathStart = /(?<=\/\/[^/]+)\/[^/]*/;
@@ -14,7 +14,7 @@ export const statsRoute = (app: Elysia) =>
       }
       stats[key] = (stats[key] ?? 0) + 1;
     })
-    .get('/stats/', ({ set }) => {
+    .get('/stats', ({ set }) => {
       set.headers['cache-control'] = MINIMAL_CACHE_CONTROL;
       return Object.entries(stats)
         .sort((a, b) => b[1] - a[1])
