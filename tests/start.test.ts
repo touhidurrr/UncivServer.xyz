@@ -13,7 +13,6 @@ import { randInt } from 'randomcryp';
 describe('App Start Test', () => {
   const port = randInt(10_000, 65_535);
   const proc = Bun.spawn(['bun', 'start'], {
-    stdout: Bun.stdout,
     cwd: dirname(__dirname),
     env: {
       ...Bun.env,
