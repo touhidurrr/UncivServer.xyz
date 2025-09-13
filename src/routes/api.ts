@@ -1,4 +1,4 @@
-import { BEARER_TOKEN_SCHEMA, NUMERIC_REGEX, UUID_SCHEMA } from '@constants';
+import { BEARER_JWT_SCHEMA, NUMERIC_REGEX, UUID_SCHEMA } from '@constants';
 import db from '@services/mongodb';
 import { calculateRating } from '@services/rating';
 import { Elysia, t } from 'elysia';
@@ -9,7 +9,7 @@ import { jwtPlugin } from './jwt';
 export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugin).guard(
   {
     cookie: t.Cookie({ auth: t.Optional(t.String()) }),
-    headers: z.object({ authorization: z.optional(BEARER_TOKEN_SCHEMA) }),
+    headers: z.object({ authorization: BEARER_JWT_SCHEMA.optional() }),
     beforeHandle: async ({ status, jwt, headers: { authorization }, cookie: { auth } }) => {
       const token = auth.value ?? authorization;
       if (!token) return status(400, 'You must provide one of bearer token or auth cookie!');
@@ -78,7 +78,15 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
 
           .get(
             'profiles/:_id/games',
-            async ({ status, params: { _id }, query: { playing, limit } }) => {
+            async ({ status, params: { _id }, query }) => {
+              //! temporary fix
+              const { playing, limit } = z
+                .object({
+                  playing: z.stringbool().readonly().default(false),
+                  limit: z.coerce.number().min(1).max(25).default(25),
+                })
+                .parse(query);
+
               const profile = await db.PlayerProfile.findById(_id, { uncivUserIds: 1 });
               if (!profile) return status(404);
               if (profile.uncivUserIds.length < 1) return status(204);
@@ -105,8 +113,8 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
             },
             {
               query: z.object({
-                playing: z.optional(z.stringbool().readonly()).default(false),
-                limit: z.optional(z.coerce.number().min(1).max(25)).default(25),
+                playing: z.stringbool().readonly().default(false),
+                limit: z.coerce.number().min(1).max(25).default(25),
               }),
             }
           )

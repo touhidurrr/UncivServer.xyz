@@ -41,6 +41,7 @@ export const UUID_SCHEMA = z.uuid().toLowerCase();
 export const BEARER_TOKEN_SCHEMA = z
   .stringFormat('BearerToken', /^bearer\s+/i)
   .pipe(z.transform(val => val.replace(/^bearer\s+/i, '').trimEnd()));
+export const BEARER_JWT_SCHEMA = BEARER_TOKEN_SCHEMA.pipe(z.jwt({ alg: 'HS512' }));
 export const UNCIV_BASIC_AUTH_HEADER_SCHEMA = z.object({
   authorization: z
     .stringFormat('BasicToken', /^basic\s+/i)

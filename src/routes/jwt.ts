@@ -42,5 +42,10 @@ export const jwtPlugin = new Elysia({ name: 'jwt', prefix: 'jwt' })
       if (!verified) return status('Unauthorized');
       return 'OK';
     },
-    { body: z.string().transform(val => val.trim()) }
+    {
+      body: z
+        .string()
+        .transform(val => val.trim())
+        .pipe(z.jwt({ alg: 'HS512' })),
+    }
   );
