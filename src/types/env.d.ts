@@ -5,6 +5,7 @@ declare namespace NodeJS {
     NODE_ENV?: 'development' | 'production';
     REDIS_URL?: string;
     REDISCLOUD_URL?: string;
+    JWT_KEY?: string;
     MONGO_URL?: string;
     SYNC_TOKEN?: string;
     SYNC_SERVERS?: string;

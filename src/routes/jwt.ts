@@ -12,7 +12,7 @@ export const jwtPlugin = new Elysia({ name: 'jwt', prefix: 'jwt' })
         name: 'jwt',
         exp: '1d',
         alg: 'HS512',
-        secret: v!.value,
+        secret: `${v?.value ?? process.env.JWT_KEY}`,
       })
     )
   )
