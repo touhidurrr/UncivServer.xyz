@@ -7,14 +7,12 @@ import {
 import { getAppBaseURL } from '@lib/getAppBaseURL';
 import axios from 'axios';
 import { describe, expect, test } from 'bun:test';
-import { dirname } from 'node:path';
 import { randInt } from 'randomcryp';
 
 describe('App Start Test', () => {
   const port = randInt(10_000, 65_535);
   const proc = Bun.spawn(['bun', 'start'], {
     stdout: Bun.stdout,
-    cwd: dirname(__dirname),
     env: {
       HOST: process.env.HOST,
       PORT: port.toString(),
