@@ -52,29 +52,30 @@ export const UNCIV_BASIC_AUTH_SCHEMA = z
     try {
       userPass = Buffer.from(userPassBase64, 'base64').toString();
     } catch (e) {
-      ctx.issues.push({
+      ctx.addIssue({
+        input: val,
         code: 'invalid_format',
         format: 'base64',
-        input: val,
       });
       return z.NEVER;
     }
 
     const sepIdx = userPass.indexOf(':');
     if (sepIdx < 0) {
-      ctx.issues.push({
+      ctx.addIssue({
+        input: userPass,
         code: 'custom',
-        input: val,
-        message: `Malformed basic auth header -> ':' character missing!`,
+        message: `Malformed basic auth header!`,
       });
       return z.NEVER;
     }
 
-    const userId = userPass.slice(0, sepIdx).toLocaleLowerCase();
+    const userId = userPass.slice(0, sepIdx).toLowerCase();
     if (!UUID_REGEX.test(userId)) {
-      ctx.issues.push({
-        code: 'custom',
+      ctx.addIssue({
         input: userId,
+        code: 'invalid_format',
+        format: 'uuid',
         message: 'Unciv userId must be a valid UUID!',
       });
       return z.NEVER;

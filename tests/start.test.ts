@@ -14,7 +14,7 @@ describe('App Start Test', () => {
   const proc = Bun.spawn(['bun', 'start'], {
     stdout: Bun.stdout,
     env: {
-      ... process.env,
+      ...process.env,
       HOST: process.env.HOST,
       PORT: port.toString(),
       NODE_ENV: 'production',
