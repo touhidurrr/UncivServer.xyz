@@ -16,6 +16,7 @@ describe('App Start Test', () => {
     env: {
       HOST: process.env.HOST,
       PORT: port.toString(),
+      PATH: process.env['PATH'],
       NODE_ENV: 'production',
     },
   });
