@@ -40,52 +40,51 @@ export const UUID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
 export const UUID_SCHEMA = z.uuid().toLowerCase();
 export const BEARER_TOKEN_SCHEMA = z
   .stringFormat('BearerToken', /^bearer\s+/i)
-  .pipe(z.transform(val => val.replace(/^bearer\s+/i, '').trimEnd()));
+  .transform(val => val.replace(/^bearer\s+/i, '').trimEnd());
 export const BEARER_JWT_SCHEMA = BEARER_TOKEN_SCHEMA.pipe(z.jwt({ alg: 'HS512' }));
+export const UNCIV_BASIC_AUTH_SCHEMA = z
+  .stringFormat('BasicToken', /^basic\s+/i)
+  .max(512)
+  .transform((val, ctx) => {
+    const userPassBase64 = val.replace(/^basic\s+/i, '').trimEnd();
+
+    let userPass: string;
+    try {
+      userPass = Buffer.from(userPassBase64, 'base64').toString();
+    } catch (e) {
+      ctx.issues.push({
+        code: 'invalid_format',
+        format: 'base64',
+        input: val,
+      });
+      return z.NEVER;
+    }
+
+    const sepIdx = userPass.indexOf(':');
+    if (sepIdx < 0) {
+      ctx.issues.push({
+        code: 'custom',
+        input: val,
+        message: `Malformed basic auth header -> ':' character missing!`,
+      });
+      return z.NEVER;
+    }
+
+    const userId = userPass.slice(0, sepIdx).toLocaleLowerCase();
+    if (!UUID_REGEX.test(userId)) {
+      ctx.issues.push({
+        code: 'custom',
+        input: userId,
+        message: 'Unciv userId must be a valid UUID!',
+      });
+      return z.NEVER;
+    }
+
+    const password = userPass.slice(sepIdx + 1);
+    return [userId, password || ''] as const;
+  });
 export const UNCIV_BASIC_AUTH_HEADER_SCHEMA = z.object({
-  authorization: z
-    .stringFormat('BasicToken', /^basic\s+/i)
-    .max(512)
-    .pipe(
-      z.transform((val, ctx) => {
-        const userPassBase64 = val.replace(/^basic\s+/i, '').trimEnd();
-
-        let userPass: string;
-        try {
-          userPass = Buffer.from(userPassBase64, 'base64').toString();
-        } catch (e) {
-          ctx.issues.push({
-            code: 'invalid_format',
-            format: 'base64',
-            input: val,
-          });
-          return z.NEVER;
-        }
-
-        const sepIdx = userPass.indexOf(':');
-        if (sepIdx < 0) {
-          ctx.issues.push({
-            code: 'custom',
-            input: val,
-            message: `Malformed basic auth header -> ':' character missing!`,
-          });
-          return z.NEVER;
-        }
-
-        const userId = userPass.slice(0, sepIdx).toLocaleLowerCase();
-        if (!UUID_REGEX.test(userId)) {
-          ctx.issues.push({
-            code: 'custom',
-            input: userId,
-            message: 'Unciv userId must be a valid UUID!',
-          });
-          return z.NEVER;
-        }
-
-        const password = userPass.slice(sepIdx + 1);
-        return [userId, password || ''] as const;
-      })
-    ),
+  authorization: UNCIV_BASIC_AUTH_SCHEMA,
 });
 
 // test

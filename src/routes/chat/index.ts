@@ -2,6 +2,7 @@ import {
   MAX_CHAT_MESSAGE_LENGTH,
   NO_CACHE_CONTROL,
   UNCIV_BASIC_AUTH_HEADER_SCHEMA,
+  UNCIV_BASIC_AUTH_SCHEMA,
 } from '@constants';
 import type {
   WSChatMessage,
@@ -67,7 +68,7 @@ export const chatWebSocket = (app: Elysia) =>
       .derive(async ({ set, headers, status }) => {
         set.headers['cache-control'] = NO_CACHE_CONTROL;
 
-        const [userId, password] = headers.authorization;
+        const [userId, password] = UNCIV_BASIC_AUTH_SCHEMA.parse(headers.authorization);
 
         // password is required for chatting
         if (!password) return status('Unauthorized');
