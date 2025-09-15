@@ -10,7 +10,7 @@ export const jwtPlugin = new Elysia({ name: 'jwt', prefix: 'jwt' })
     db.Variable.findById('jwt-key', { value: 1, _id: 0 }).then(v =>
       jwt({
         name: 'jwt',
-        exp: '1d',
+        exp: '1h',
         alg: 'HS512',
         secret: `${v?.value ?? process.env.JWT_KEY}`,
       })
@@ -28,7 +28,7 @@ export const jwtPlugin = new Elysia({ name: 'jwt', prefix: 'jwt' })
       auth.set({
         value,
         httpOnly: true,
-        maxAge: 86400,
+        maxAge: 3600,
       });
 
       return value;

@@ -1,14 +1,15 @@
-import { BEARER_JWT_SCHEMA, NUMERIC_REGEX, UUID_SCHEMA } from '@constants';
+import { BEARER_JWT_SCHEMA, UUID_SCHEMA } from '@constants';
 import db from '@services/mongodb';
 import { calculateRating } from '@services/rating';
-import { Elysia, t } from 'elysia';
+import { type } from 'arktype';
+import { Elysia } from 'elysia';
 import type { AnyBulkWriteOperation } from 'mongoose';
 import { z } from 'zod';
 import { jwtPlugin } from './jwt';
 
 export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugin).guard(
   {
-    cookie: t.Cookie({ auth: t.Optional(t.String()) }),
+    cookie: type({ 'auth?': type.string }),
     headers: z.object({ authorization: BEARER_JWT_SCHEMA.optional() }),
     beforeHandle: async ({ status, jwt, headers: { authorization }, cookie: { auth } }) => {
       const token = auth.value ?? authorization;
@@ -19,7 +20,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
   },
   app =>
     app
-      .guard({ params: z.object({ gameId: UUID_SCHEMA }) }, app =>
+      .guard({ params: type({ gameId: UUID_SCHEMA }) }, app =>
         app
           .get('games/:gameId/name', async ({ status, params: { gameId } }) => {
             const game = await db.UncivGame.findById(`${gameId}_Preview`, { _id: 0, name: 1 });
@@ -36,7 +37,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
               );
               return status(matchedCount > 0 ? 'OK' : 'Not Found');
             },
-            { body: z.object({ name: z.string().max(100) }) }
+            { body: type({ name: 'string <= 100' }) }
           )
           .delete('games/:gameId/name', async ({ status, params: { gameId } }) => {
             const { matchedCount } = await db.UncivGame.updateOne(
@@ -47,7 +48,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
           })
       )
 
-      .guard({ params: z.object({ _id: z.string().regex(NUMERIC_REGEX) }) }, app =>
+      .guard({ params: type({ _id: 'string.digits > 0' }) }, app =>
         app
           .get('profiles/:_id', ({ params: { _id } }) =>
             db.PlayerProfile.findById(_id)
@@ -59,34 +60,26 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
             'profiles/:_id/notifications',
             ({ params: { _id }, body: { status } }) =>
               db.PlayerProfile.updateOne({ _id }, { $set: { notifications: status } }),
-            { body: z.object({ status: z.literal(['enabled', 'disabled']) }) }
+            { body: type({ status: "'enabled' | 'disabled'" }) }
           )
 
           .post(
             'profiles/:_id/uncivUserIds',
             ({ params: { _id }, body: { userId } }) =>
               db.PlayerProfile.updateOne({ _id }, { $addToSet: { uncivUserIds: userId } }),
-            { body: z.object({ userId: UUID_SCHEMA }) }
+            { body: type({ userId: UUID_SCHEMA }) }
           )
 
           .delete(
             'profiles/:_id/uncivUserIds',
             ({ params: { _id }, body: { userId } }) =>
               db.PlayerProfile.updateOne({ _id }, { $pull: { uncivUserIds: userId } }),
-            { body: z.object({ userId: UUID_SCHEMA }) }
+            { body: type({ userId: UUID_SCHEMA }) }
           )
 
           .get(
             'profiles/:_id/games',
-            async ({ status, params: { _id }, query }) => {
-              //! temporary fix
-              const { playing, limit } = z
-                .object({
-                  playing: z.stringbool().readonly().default(false),
-                  limit: z.coerce.number().min(1).max(25).default(25),
-                })
-                .parse(query);
-
+            async ({ status, params: { _id }, query: { playing, limit } }) => {
               const profile = await db.PlayerProfile.findById(_id, { uncivUserIds: 1 });
               if (!profile) return status(404);
               if (profile.uncivUserIds.length < 1) return status(204);
@@ -127,7 +120,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
           if (!profile) return status(404);
           return profile._id;
         },
-        { params: z.object({ _id: UUID_SCHEMA }) }
+        { params: type({ _id: UUID_SCHEMA.array().atMostLength(128) }) }
       )
 
       .post(
@@ -192,7 +185,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
 
           return ratings.map(r => r.cur);
         },
-        { body: z.object({ ids: z.array(z.string().regex(NUMERIC_REGEX)).max(32) }) }
+        { body: type({ ids: '2 <= (string.digits > 0)[] <= 32' }) }
       )
 
       .post(
@@ -205,7 +198,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
           return [...new Set(profiles.flatMap(p => p.uncivUserIds)).intersection(new Set(userIds))];
         },
         {
-          body: z.object({ userIds: z.array(UUID_SCHEMA) }),
+          body: type({ userIds: UUID_SCHEMA.array().atMostLength(64) }),
         }
       )
 

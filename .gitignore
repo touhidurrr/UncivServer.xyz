@@ -17,6 +17,9 @@ test*
 !.github
 !.github/*/*
 
+# vscode
+!.vscode
+
 # prettier
 !.prettierignore
 !.prettierrc.yaml

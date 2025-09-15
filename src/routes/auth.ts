@@ -1,7 +1,7 @@
 import { NO_CACHE_CONTROL, UNCIV_BASIC_AUTH_HEADER_SCHEMA } from '@constants';
 import db from '@services/mongodb';
+import { type } from 'arktype';
 import type { Elysia } from 'elysia';
-import { z } from 'zod';
 
 // unlike in files route, this route checks the db every time
 export const authRoute = (app: Elysia) =>
@@ -45,8 +45,6 @@ export const authRoute = (app: Elysia) =>
             await dbAuth.save();
             return 'Successfully updated password';
           },
-          {
-            body: z.string().min(6).max(1024),
-          }
+          { body: type('6 <= string <= 1024') }
         )
   );

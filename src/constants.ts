@@ -1,3 +1,4 @@
+import { type } from 'arktype';
 import bytes from 'bytes';
 import { stringify as stringifyCacheControl } from 'cache-control-parser';
 import type { APIEmbed } from 'discord-api-types/v10';
@@ -36,56 +37,42 @@ export const MAX_FILE_SIZE = Math.min(MAX_CONTENT_LENGTH, bytes.parse('2mb')!);
 // auth
 export const NUMERIC_REGEX = /^\d+$/;
 export const GAME_ID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}(_Preview)?$/;
+export const GAME_ID_SCHEMA = type.pipe(
+  type('string == 36 | string == 44'),
+  val => ({
+    uuid: val.slice(0, 36).toLowerCase(),
+    preview: val.endsWith('_Preview'),
+  }),
+  type({ uuid: 'string.uuid', preview: 'boolean' })
+);
 export const UUID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
-export const UUID_SCHEMA = z.uuid().toLowerCase();
+export const UUID_SCHEMA = type('string.lower |> string.uuid');
 export const BEARER_TOKEN_SCHEMA = z
   .stringFormat('BearerToken', /^bearer\s+/i)
   .transform(val => val.replace(/^bearer\s+/i, '').trimEnd());
 export const BEARER_JWT_SCHEMA = BEARER_TOKEN_SCHEMA.pipe(z.jwt({ alg: 'HS512' }));
-export const UNCIV_BASIC_AUTH_SCHEMA = z
-  .stringFormat('BasicToken', /^basic\s+/i)
-  .max(512)
-  .transform((val, ctx) => {
-    const userPassBase64 = val.replace(/^basic\s+/i, '').trimEnd();
+export const UNCIV_BASIC_AUTH_HEADER_SCHEMA = type({
+  authorization: type
+    .pipe(
+      type(/^basic\s+/i),
+      val => val.replace(/^basic\s+/i, '').trimEnd(),
+      type('string.base64 <= 1024'),
+      val => Buffer.from(val, 'base64').toString()
+    )
+    .pipe((val, ctx) => {
+      const sepIdx = val.indexOf(':');
+      if (sepIdx < 0) {
+        return ctx.error('valid basic auth header');
+      }
 
-    let userPass: string;
-    try {
-      userPass = Buffer.from(userPassBase64, 'base64').toString();
-    } catch (e) {
-      ctx.addIssue({
-        input: val,
-        code: 'invalid_format',
-        format: 'base64',
-      });
-      return z.NEVER;
-    }
+      const userId = val.slice(0, sepIdx).toLowerCase();
+      if (!UUID_REGEX.test(userId)) {
+        return ctx.error('valid UUID');
+      }
 
-    const sepIdx = userPass.indexOf(':');
-    if (sepIdx < 0) {
-      ctx.addIssue({
-        input: userPass,
-        code: 'custom',
-        message: `Malformed basic auth header!`,
-      });
-      return z.NEVER;
-    }
-
-    const userId = userPass.slice(0, sepIdx).toLowerCase();
-    if (!UUID_REGEX.test(userId)) {
-      ctx.addIssue({
-        input: userId,
-        code: 'invalid_format',
-        format: 'uuid',
-        message: 'Unciv userId must be a valid UUID!',
-      });
-      return z.NEVER;
-    }
-
-    const password = userPass.slice(sepIdx + 1);
-    return [userId, password || ''] as const;
-  });
-export const UNCIV_BASIC_AUTH_HEADER_SCHEMA = z.object({
-  authorization: UNCIV_BASIC_AUTH_SCHEMA,
+      const password = val.slice(sepIdx + 1);
+      return [userId, password || ''] as const;
+    }),
 });
 
 // test

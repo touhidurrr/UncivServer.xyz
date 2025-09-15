@@ -2,7 +2,6 @@ import {
   MAX_CHAT_MESSAGE_LENGTH,
   NO_CACHE_CONTROL,
   UNCIV_BASIC_AUTH_HEADER_SCHEMA,
-  UNCIV_BASIC_AUTH_SCHEMA,
 } from '@constants';
 import type {
   WSChatMessage,
@@ -13,6 +12,7 @@ import type {
 } from '@localTypes/chat';
 import db from '@services/mongodb';
 import { unpack } from '@services/uncivJSON';
+import { type } from 'arktype';
 import type { Elysia } from 'elysia';
 import type { ElysiaWS } from 'elysia/ws';
 import { commands } from './commands';
@@ -65,10 +65,21 @@ function publishChat(ws: ElysiaWS, chat: WSChatMessageRelay) {
 export const chatWebSocket = (app: Elysia) =>
   app.guard({ headers: UNCIV_BASIC_AUTH_HEADER_SCHEMA }, app =>
     app
-      .derive(async ({ set, headers, status }) => {
+      .derive(async ({ set, status, headers }) => {
         set.headers['cache-control'] = NO_CACHE_CONTROL;
 
-        const [userId, password] = UNCIV_BASIC_AUTH_SCHEMA.parse(headers.authorization);
+        // !temporary fix
+        let [userId, password] = headers.authorization;
+        if (!Array.isArray(headers.authorization)) {
+          // console.log(headers);
+
+          const result = UNCIV_BASIC_AUTH_HEADER_SCHEMA(headers);
+          if (result instanceof type.errors) {
+            return status(401, result.summary);
+          }
+
+          [userId, password] = result.authorization;
+        }
 
         // password is required for chatting
         if (!password) return status('Unauthorized');

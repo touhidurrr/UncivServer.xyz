@@ -1,0 +1,15 @@
+{
+  // arktype
+  "editor.quickSuggestions": {
+    "strings": "on"
+  },
+  "typescript.preferences.autoImportSpecifierExcludeRegexes": [
+    "^(node:)?os$"
+  ],
+
+  // cSpell
+  "cSpell.words": [
+    "arktype",
+    "eleventy"
+  ]
+}

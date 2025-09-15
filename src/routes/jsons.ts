@@ -2,9 +2,9 @@ import { GAME_ID_REGEX } from '@constants';
 import cache from '@services/cache';
 import { db } from '@services/mongodb';
 import { unpackJSON } from '@services/uncivJSON';
+import { type } from 'arktype';
 import { stringify } from 'cache-control-parser';
 import type { Elysia } from 'elysia';
-import { z } from 'zod';
 
 const CACHE_CONTROL = stringify({
   public: true,
@@ -32,7 +32,5 @@ export const jsonsRoute = (app: Elysia) =>
       await cache.set(gameId, dbGame.text);
       return unpackJSON(dbGame.text);
     },
-    {
-      params: z.object({ gameId: z.string().regex(GAME_ID_REGEX) }),
-    }
+    { params: type({ gameId: type('string.lower').pipe(type(GAME_ID_REGEX)) }) }
   );
