@@ -59,7 +59,7 @@ const VariableSchema = new Schema(
 
 const AuthSchema = new Schema(
   {
-    _id: { type: String, required: true },
+    _id: { type: String, required: true, match: UUID_REGEX },
     hash: { type: String, required: true },
   },
   { collection: 'Auth', timestamps: true }

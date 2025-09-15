@@ -66,37 +66,32 @@ function publishChat(ws: ElysiaWS, chat: WSChatMessageRelay) {
 export const chatWebSocket = (app: Elysia) =>
   app.guard({ headers: UNCIV_BASIC_AUTH_HEADER_SCHEMA }, app =>
     app
-      .derive(async ({ set, status, headers }) => {
-        set.headers['cache-control'] = NO_CACHE_CONTROL;
+      .resolve(
+        async ({
+          set,
+          status,
+          headers: {
+            authorization: [userId, password],
+          },
+        }) => {
+          set.headers['cache-control'] = NO_CACHE_CONTROL;
 
-        //! temporary fix
-        let [userId, password] = headers.authorization;
-        if (!Array.isArray(headers.authorization)) {
-          if (IS_DEVELOPMENT) console.log(headers);
+          // password is required for chatting
+          if (!password) return status('Unauthorized');
 
-          const result = UNCIV_BASIC_AUTH_HEADER_SCHEMA(headers);
-          if (result instanceof type.errors) {
-            return status(401, result.summary);
+          const dbAuth = await db.Auth.findById(userId, { hash: 1 });
+          if (!dbAuth) return status('Unauthorized');
+          if (dbAuth) {
+            const verified = await Bun.password.verify(password, dbAuth.hash);
+            if (!verified) return status('Unauthorized');
           }
 
-          [userId, password] = result.authorization;
+          return {
+            userId,
+            gameId2CivNames: new Map<string, string[]>(),
+          };
         }
-
-        // password is required for chatting
-        if (!password) return status('Unauthorized');
-
-        const dbAuth = await db.Auth.findById(userId, { hash: 1 });
-        if (!dbAuth) return status('Unauthorized');
-        if (dbAuth) {
-          const verified = await Bun.password.verify(password, dbAuth.hash);
-          if (!verified) return status('Unauthorized');
-        }
-
-        return {
-          userId,
-          gameId2CivNames: new Map<string, string[]>(),
-        };
-      })
+      )
       .ws('/chat', {
         open: () =>
           ({
