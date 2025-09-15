@@ -45,6 +45,6 @@ export const authRoute = (app: Elysia) =>
             await dbAuth.save();
             return 'Successfully updated password';
           },
-          { body: type('6 <= string <= 1024') }
+          { body: type('6 <= string <= 512') }
         )
   );

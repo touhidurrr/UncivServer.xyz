@@ -37,16 +37,15 @@ export const MAX_FILE_SIZE = Math.min(MAX_CONTENT_LENGTH, bytes.parse('2mb')!);
 // auth
 export const NUMERIC_REGEX = /^\d+$/;
 export const GAME_ID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}(_Preview)?$/;
-export const GAME_ID_SCHEMA = type.pipe(
-  type('string == 36 | string == 44'),
-  val => ({
-    uuid: val.slice(0, 36).toLowerCase(),
-    preview: val.endsWith('_Preview'),
-  }),
-  type({ uuid: 'string.uuid', preview: 'boolean' })
+export const GAME_ID_SCHEMA = type('string == 36 |> string.uuid |> string.lower').or(
+  type('string == 44').pipe(
+    val => [val.slice(0, 36).toLowerCase(), val.slice(36)],
+    type(['string.uuid', "'_Preview'"]),
+    val => val.join('')
+  )
 );
 export const UUID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
-export const UUID_SCHEMA = type('string.lower |> string.uuid');
+export const UUID_SCHEMA = type('string.uuid |> string.lower');
 export const BEARER_TOKEN_SCHEMA = z
   .stringFormat('BearerToken', /^bearer\s+/i)
   .transform(val => val.replace(/^bearer\s+/i, '').trimEnd());

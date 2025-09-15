@@ -1,6 +1,5 @@
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import { randInt } from 'randomcryp';
-import { z } from 'zod';
 import cache from './cache';
 
 const SYNC_TOKEN = process.env.SYNC_TOKEN;
@@ -27,7 +26,7 @@ const initWs = (baseURL: string) => {
   });
 
   ws.addEventListener('message', ({ data }) => {
-    const msg = JSON.parse(data.toString('utf8')) as z.infer<typeof SYNC_RESPONSE_SCHEMA>;
+    const msg = JSON.parse(data.toString('utf8')) as typeof SYNC_RESPONSE_SCHEMA.infer;
     switch (msg.type) {
       case 'SyncData':
         cache.set(msg.data.gameId, msg.data.content);

@@ -3,13 +3,8 @@
   "editor.quickSuggestions": {
     "strings": "on"
   },
-  "typescript.preferences.autoImportSpecifierExcludeRegexes": [
-    "^(node:)?os$"
-  ],
+  "typescript.preferences.autoImportSpecifierExcludeRegexes": ["^(node:)?os$"],
 
   // cSpell
-  "cSpell.words": [
-    "arktype",
-    "eleventy"
-  ]
+  "cSpell.words": ["arktype", "eleventy"]
 }

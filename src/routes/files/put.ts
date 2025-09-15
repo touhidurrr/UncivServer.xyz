@@ -5,15 +5,15 @@ import { isDiscordTokenValid, sendNewTurnNotification } from '@services/discord'
 import { gameDataSecurityModifier } from '@services/gameDataSecurity';
 import { db } from '@services/mongodb';
 import { pack } from '@services/uncivJSON';
+import { type } from 'arktype';
 import type { Elysia } from 'elysia';
-import { z } from 'zod';
 import { UncivGame } from '../../models/uncivGame';
 
 export const putFile = (app: Elysia) =>
   app.guard(
     {
       headers: UNCIV_BASIC_AUTH_HEADER_SCHEMA,
-      body: z.string().min(MIN_FILE_SIZE).max(MAX_FILE_SIZE),
+      body: type(`${MIN_FILE_SIZE}<= string <= ${MAX_FILE_SIZE}`),
     },
     app =>
       app
@@ -93,7 +93,7 @@ export const putFile = (app: Elysia) =>
                   JSON.stringify({
                     type: 'SyncData',
                     data: { gameId, content: body },
-                  } as z.infer<typeof SYNC_RESPONSE_SCHEMA>),
+                  } as typeof SYNC_RESPONSE_SCHEMA.infer),
                   true
                 );
               } catch (err) {

@@ -1,4 +1,5 @@
 import {
+  IS_DEVELOPMENT,
   MAX_CHAT_MESSAGE_LENGTH,
   NO_CACHE_CONTROL,
   UNCIV_BASIC_AUTH_HEADER_SCHEMA,
@@ -68,10 +69,10 @@ export const chatWebSocket = (app: Elysia) =>
       .derive(async ({ set, status, headers }) => {
         set.headers['cache-control'] = NO_CACHE_CONTROL;
 
-        // !temporary fix
+        //! temporary fix
         let [userId, password] = headers.authorization;
         if (!Array.isArray(headers.authorization)) {
-          // console.log(headers);
+          if (IS_DEVELOPMENT) console.log(headers);
 
           const result = UNCIV_BASIC_AUTH_HEADER_SCHEMA(headers);
           if (result instanceof type.errors) {

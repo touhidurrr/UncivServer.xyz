@@ -4,7 +4,6 @@ import db from '@services/mongodb';
 import axios from 'axios';
 import { afterAll, describe, expect, test } from 'bun:test';
 import { parse as parseCacheControl } from 'cache-control-parser';
-import { z } from 'zod';
 
 import '@index';
 
@@ -52,7 +51,7 @@ describe('Token', () => {
         const ws = getSyncWSClient('');
         ws.addEventListener('open', () => Bun.sleep(1000).then(() => res('Done')));
         ws.addEventListener('message', ({ data }) => {
-          const msg = JSON.parse(data.toString('utf8')) as z.infer<typeof SYNC_RESPONSE_SCHEMA>;
+          const msg = JSON.parse(data.toString('utf8')) as typeof SYNC_RESPONSE_SCHEMA.infer;
           if (msg.type === 'AuthError') {
             rej('AuthError');
             ws.close();
@@ -72,7 +71,7 @@ describe('Token', () => {
         const ws = getSyncWSClient('Bearer ');
         ws.addEventListener('open', () => Bun.sleep(1000).then(() => res('Done')));
         ws.addEventListener('message', ({ data }) => {
-          const msg = JSON.parse(data.toString('utf8')) as z.infer<typeof SYNC_RESPONSE_SCHEMA>;
+          const msg = JSON.parse(data.toString('utf8')) as typeof SYNC_RESPONSE_SCHEMA.infer;
           if (msg.type === 'AuthError') {
             rej('AuthError');
             ws.close();
@@ -92,7 +91,7 @@ describe('Token', () => {
         const ws = getSyncWSClient('Bearer Mismatch');
         ws.addEventListener('open', () => Bun.sleep(1000).then(() => res('Done')));
         ws.addEventListener('message', ({ data }) => {
-          const msg = JSON.parse(data.toString('utf8')) as z.infer<typeof SYNC_RESPONSE_SCHEMA>;
+          const msg = JSON.parse(data.toString('utf8')) as typeof SYNC_RESPONSE_SCHEMA.infer;
           if (msg.type === 'AuthError') {
             rej('AuthError');
             ws.close();
@@ -112,7 +111,7 @@ describe('Token', () => {
         const ws = getSyncWSClient(SYNC_TOKEN);
         ws.addEventListener('open', () => Bun.sleep(1000).then(() => res('Done')));
         ws.addEventListener('message', ({ data }) => {
-          const msg = JSON.parse(data.toString('utf8')) as z.infer<typeof SYNC_RESPONSE_SCHEMA>;
+          const msg = JSON.parse(data.toString('utf8')) as typeof SYNC_RESPONSE_SCHEMA.infer;
           if (msg.type === 'AuthError') {
             rej('AuthError');
             ws.close();
@@ -161,7 +160,7 @@ test('Uploaded files are relayed properly', async () => {
     });
 
     ws.addEventListener('message', ({ data }) => {
-      const msg = JSON.parse(data.toString('utf8')) as z.infer<typeof SYNC_RESPONSE_SCHEMA>;
+      const msg = JSON.parse(data.toString('utf8')) as typeof SYNC_RESPONSE_SCHEMA.infer;
 
       if (msg.type === 'SyncData') {
         switch (msg.data.gameId) {

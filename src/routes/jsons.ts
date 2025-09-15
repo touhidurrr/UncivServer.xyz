@@ -1,4 +1,4 @@
-import { GAME_ID_REGEX } from '@constants';
+import { GAME_ID_SCHEMA } from '@constants';
 import cache from '@services/cache';
 import { db } from '@services/mongodb';
 import { unpackJSON } from '@services/uncivJSON';
@@ -32,5 +32,5 @@ export const jsonsRoute = (app: Elysia) =>
       await cache.set(gameId, dbGame.text);
       return unpackJSON(dbGame.text);
     },
-    { params: type({ gameId: type('string.lower').pipe(type(GAME_ID_REGEX)) }) }
+    { params: type({ gameId: GAME_ID_SCHEMA }) }
   );

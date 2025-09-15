@@ -1,21 +1,20 @@
-import { BEARER_TOKEN_SCHEMA, GAME_ID_REGEX, NO_CACHE_CONTROL } from '@constants';
+import { BEARER_TOKEN_SCHEMA, GAME_ID_SCHEMA, NO_CACHE_CONTROL } from '@constants';
 import { isValidSyncToken } from '@lib';
+import { type } from 'arktype';
 import type { Elysia } from 'elysia';
 import z from 'zod';
 
-const SYNC_GAME_DATA_SCHEMA = z.object({
-  type: z.literal('SyncData'),
-  data: z.object({
-    gameId: z.stringFormat('UncivGameFileName', GAME_ID_REGEX),
-    content: z.string(),
-  }),
+const SYNC_GAME_DATA_SCHEMA = type({
+  type: "'SyncData'",
+  data: {
+    gameId: GAME_ID_SCHEMA,
+    content: 'string',
+  },
 });
 
-const SYNC_ERROR_SCHEMA = z.object({
-  type: z.literal('AuthError'),
-});
+const SYNC_ERROR_SCHEMA = type({ type: "'AuthError'" });
 
-export const SYNC_RESPONSE_SCHEMA = z.union([SYNC_GAME_DATA_SCHEMA, SYNC_ERROR_SCHEMA]);
+export const SYNC_RESPONSE_SCHEMA = SYNC_GAME_DATA_SCHEMA.or(SYNC_ERROR_SCHEMA);
 
 export const syncRoute = (app: Elysia) =>
   app.ws('/sync', {
