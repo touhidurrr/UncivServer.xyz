@@ -1,7 +1,3 @@
 {
-  "recommendations": [
-    "dbaeumer.vscode-eslint",
-    "oven.bun-vscode",
-    "arktypeio.arkdark"
-  ]
+  "recommendations": ["dbaeumer.vscode-eslint", "oven.bun-vscode", "arktypeio.arkdark"]
 }
