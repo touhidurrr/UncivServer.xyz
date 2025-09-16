@@ -1,5 +1,4 @@
 import {
-  IS_DEVELOPMENT,
   MAX_CHAT_MESSAGE_LENGTH,
   NO_CACHE_CONTROL,
   UNCIV_BASIC_AUTH_HEADER_SCHEMA,
@@ -13,7 +12,6 @@ import type {
 } from '@localTypes/chat';
 import db from '@services/mongodb';
 import { unpack } from '@services/uncivJSON';
-import { type } from 'arktype';
 import type { Elysia } from 'elysia';
 import type { ElysiaWS } from 'elysia/ws';
 import { commands } from './commands';
