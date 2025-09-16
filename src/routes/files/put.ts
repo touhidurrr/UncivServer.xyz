@@ -138,7 +138,7 @@ export const putFile = (app: Elysia) =>
               // repack game data if there are modifications or notifications
               if (hasModifications || hasNotifications) {
                 //@ts-expect-error it works but shows error
-                ctx.body = pack(ctx.game);
+                ctx.body = pack(ctx.game.data);
               }
             },
           }

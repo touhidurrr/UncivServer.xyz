@@ -1,3 +1,4 @@
+import { UUID_SCHEMA } from '@constants';
 import * as notificationsData from '@data/notifications';
 import type { Civilization, Notification, UncivJSON } from '@localTypes/unciv';
 import { unpack } from '@services/uncivJSON';
@@ -14,13 +15,13 @@ const SPN_PROBABILITY = 0.2;
 
 const UncivGameSchema = type({
   '+': 'ignore',
-  gameId: "string.uuid",
+  gameId: UUID_SCHEMA,
   currentPlayer: 'string',
   civilizations: type({
     '+': 'ignore',
     civName: 'string',
     'playerType?': "'Human' | 'AI'",
-    'playerId?': "string.uuid",
+    'playerId?': UUID_SCHEMA,
   }).array(),
   gameParameters: {
     '+': 'ignore',
@@ -28,12 +29,12 @@ const UncivGameSchema = type({
       '+': 'ignore',
       'chosenCiv?': 'string',
       'playerType?': "'Human' | 'AI'",
-      'playerId?': "string.uuid",
+      'playerId?': UUID_SCHEMA,
     }).array(),
   },
   'turns?': 'number.integer',
   'difficulty?': 'string',
-  'currentTurnStartTime?': 'number.integer',
+  'currentTurnStartTime?': 'number.epoch',
   'version?': {
     number: 'number',
     createdWith: {
