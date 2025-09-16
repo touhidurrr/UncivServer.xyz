@@ -13,7 +13,7 @@ const api = axios.create({
   validateStatus: null,
   auth: {
     username: TEST_GAME_ID,
-    password: process.env.SYNC_TOKEN!,
+    password: process.env.SYNC_TOKEN ?? '',
   },
 });
 

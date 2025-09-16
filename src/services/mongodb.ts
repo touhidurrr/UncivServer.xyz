@@ -1,7 +1,11 @@
 import { GAME_ID_REGEX, INITIAL_MU, INITIAL_SIGMA, NUMERIC_REGEX, UUID_REGEX } from '@constants';
 import mongoose, { Schema } from 'mongoose';
 
-await mongoose.connect(process.env.MONGO_URL!, {
+if (!process.env.MONGO_URL) {
+  throw new Error('MONGO_URL environment variable not set');
+}
+
+await mongoose.connect(process.env.MONGO_URL, {
   dbName: 'unciv',
   appName: 'UncivServer.xyz',
   retryWrites: true,

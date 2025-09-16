@@ -14,7 +14,9 @@ export const IS_DEVELOPMENT = !IS_PRODUCTION;
 // server
 export const DEFAULT_PORT = '1557';
 export const DEFAULT_HOST = '::';
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 export const MIN_CONTENT_LENGTH = bytes.parse('6b')!;
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 export const MAX_CONTENT_LENGTH = bytes.parse('2mb')!;
 
 // redis
@@ -28,10 +30,13 @@ export const CACHE_TTL_MILLISECONDS = CACHE_TTL_SECONDS * 1000;
 export const CACHE_TTL_CHECK_INTERVAL_SECONDS = 60;
 export const CACHE_TTL_CHECK_INTERVAL_MILLISECONDS = CACHE_TTL_CHECK_INTERVAL_SECONDS * 1000;
 export const FILES_CACHE_MAX_ITEMS = 10_000;
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 export const FILES_CACHE_MAX_SIZE = bytes.parse('150mb')!;
 
 // files
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 export const MIN_FILE_SIZE = Math.max(MIN_CONTENT_LENGTH, bytes.parse('10b')!);
+// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 export const MAX_FILE_SIZE = Math.min(MAX_CONTENT_LENGTH, bytes.parse('2mb')!);
 
 // auth

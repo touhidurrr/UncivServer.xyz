@@ -7,7 +7,7 @@ const pathStart = /(?<=\/\/[^/]+)\/[^/]*/;
 export const statsRoute = (app: Elysia) =>
   app
     .onRequest(({ request: { method, url } }) => {
-      let key = `${method} ${pathStart.exec(url)![0]}`;
+      let key = `${method} ${pathStart.exec(url)?.[0]}`;
       if (key.endsWith('/files')) {
         if (url.endsWith('_Preview')) key += ' (preview)';
         else key += ' (full)';
