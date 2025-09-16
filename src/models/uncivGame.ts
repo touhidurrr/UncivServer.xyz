@@ -77,16 +77,16 @@ export class UncivGame {
 
   getTurns = () => this.data.turns ?? 0;
 
-  isVersionAtLeast({ number, createdWithNumber }: { number?: number; createdWithNumber?: number }) {
-    if (!this.data.version) return true;
-    if (typeof number === 'number' && this.data.version.number < number) return false;
-    if (
-      typeof createdWithNumber === 'number' &&
-      this.data.version.createdWith.number < createdWithNumber
-    )
-      return false;
-    return true;
-  }
+  isVersionAtLeast = ({
+    number = Number.NEGATIVE_INFINITY,
+    createdWithNumber = Number.NEGATIVE_INFINITY,
+  }: {
+    number?: number;
+    createdWithNumber?: number;
+  }) =>
+    this.data.version &&
+    this.data.version.number >= number &&
+    this.data.version.createdWith.number >= createdWithNumber;
 
   getHumanCivNames = () =>
     this.data.civilizations

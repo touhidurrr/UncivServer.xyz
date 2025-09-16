@@ -115,30 +115,29 @@ export const putFile = (app: Elysia) =>
             // used for notifications, security provider and discord notifications
             // in case an injection is possible, we need to repack the body to update it
             transform: ctx => {
-              // run security modifier on game data
               //@ts-expect-error it works but shows error
-              const hasModifications = gameDataSecurityModifier(ctx.game);
+              const game: UncivGame = ctx.game;
+
+              // run security modifier on game data
+              const hasModifications = gameDataSecurityModifier(game);
 
               // notifications provider
               let hasNotifications = false;
               if (
                 !ctx.params.gameId.endsWith('_Preview') &&
-                //@ts-expect-error it works but shows error
-                ctx.game.isVersionAtLeast({ number: 4, createdWithNumber: 1075 }) &&
+                game.isVersionAtLeast({ number: 4, createdWithNumber: 1075 }) &&
                 // 52.5% chance of a notification being shown per turn
                 // weighted average of a poll in Unciv the discord server
                 // decreased to 10% at least for this year because yair thinks it's too much
                 percentage(10)
               ) {
                 hasNotifications = true;
-                //@ts-expect-error it works but shows error
-                ctx.game.addRandomNotificationToCurrentCiv();
+                game.addRandomNotificationToCurrentCiv();
               }
 
               // repack game data if there are modifications or notifications
               if (hasModifications || hasNotifications) {
-                //@ts-expect-error it works but shows error
-                ctx.body = pack(ctx.game.data);
+                ctx.body = pack(game.data);
               }
             },
           }
