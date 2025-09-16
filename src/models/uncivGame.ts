@@ -13,16 +13,8 @@ const DEFAULT_SPN_ICON = notificationsData.icons.promotion[0]!;
 const SPN_PROBABILITY = 0.2;
 
 const UncivGameSchema = type({
-  'turns?': 'number',
   gameId: UUID_SCHEMA,
   currentPlayer: 'string',
-  'version?': {
-    number: 'number',
-    createdWith: {
-      text: 'string',
-      number: 'number',
-    },
-  },
   civilizations: type({
     civName: 'string',
     'playerType?': "'Human'",
@@ -34,6 +26,16 @@ const UncivGameSchema = type({
       'playerType?': "'Human'",
       'playerId?': UUID_SCHEMA,
     }).array(),
+  },
+  'turns?': 'number.integer',
+  'difficulty?': 'string',
+  'currentTurnStartTime?': 'number.epoch',
+  'version?': {
+    number: 'number',
+    createdWith: {
+      text: 'string',
+      number: 'number',
+    },
   },
 });
 
