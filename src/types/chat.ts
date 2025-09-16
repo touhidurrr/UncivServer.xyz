@@ -39,5 +39,5 @@ export type WSChatResponseError = {
 export type ChatCommand = {
   name: string;
   description: string;
-  run: (info: { ws: ElysiaWS; name: string; input: string; chat: WSChatMessageRelay }) => any;
+  run: (info: { ws: ElysiaWS; name: string; input: string; chat: WSChatMessageRelay }) => unknown;
 };

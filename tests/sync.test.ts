@@ -18,7 +18,7 @@ if (!SYNC_TOKEN) {
 }
 
 const getSyncWSClient = (token: string) =>
-  //@ts-ignore: perMessageDeflate pull request is pending
+  //@ts-expect-error: perMessageDeflate pull request is pending
   new WebSocket(`${getAppBaseURL()}/sync`, {
     headers: { Authorization: `Bearer ${token}` },
     perMessageDeflate: true,

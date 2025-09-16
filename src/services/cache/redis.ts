@@ -1,4 +1,5 @@
 import { REDIS_DEFAULT_URL } from '@constants';
+import type { CacheService } from '@models/cache';
 import { RedisClient } from 'bun';
 
 const REDIS_URL = process.env.REDISCLOUD_URL || process.env.REDIS_URL || REDIS_DEFAULT_URL;

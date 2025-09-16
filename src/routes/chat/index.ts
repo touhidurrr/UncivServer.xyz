@@ -16,10 +16,11 @@ import type { Elysia } from 'elysia';
 import type { ElysiaWS } from 'elysia/ws';
 import { commands } from './commands';
 
-function publishChat(ws: ElysiaWS, chat: WSChatMessageRelay) {
-  const civNames = (
-    ws as any as { data: { gameId2CivNames: Map<string, string[]> } }
-  ).data.gameId2CivNames.get(chat.gameId);
+function publishChat(
+  ws: ElysiaWS<{ gameId2CivNames: Map<string, string[]> }>,
+  chat: WSChatMessageRelay
+) {
+  const civNames = ws.data.gameId2CivNames.get(chat.gameId);
   if (!civNames || !civNames.includes(chat.civName)) {
     chat.message = `Unauthorized Civ: ${chat.civName}`;
     chat.civName = 'Server';
@@ -99,7 +100,7 @@ export const chatWebSocket = (app: Elysia) =>
             message: [
               'Welcome to UncivServer.xyz!',
               'Type /help to get help regarding server commands.',
-              'The chat is realtime, unmoderated and the data is not stored.',
+              'The chat is realtime, un-moderated and the data is not stored.',
               'For now, players can only see your messages if they are online.',
               'Proceed at your own discretion!',
             ].join(' '),
@@ -113,17 +114,18 @@ export const chatWebSocket = (app: Elysia) =>
           }
 
           switch (message.type) {
-            case 'chat':
+            case 'chat': {
               if (ws.isSubscribed(message.gameId)) {
                 if (message.message.length > MAX_CHAT_MESSAGE_LENGTH) {
                   message.civName = 'Server';
                   message.message = `Message too long. Maximum allowed characters: ${MAX_CHAT_MESSAGE_LENGTH}.`;
                   return ws.send(message);
                 }
-                await publishChat(ws as any, message);
+                await publishChat(ws, message);
               }
               break;
-            case 'join':
+            }
+            case 'join': {
               const { userId, gameId2CivNames } = ws.data;
               const games = await db.UncivGame.find(
                 { players: userId, _id: { $in: message.gameIds.map(id => `${id}_Preview`) } },
@@ -143,22 +145,24 @@ export const chatWebSocket = (app: Elysia) =>
                 });
               });
 
-              ws.send({
+              return ws.send({
                 type: 'joinSuccess',
                 gameIds: acceptedGameIds,
               } satisfies WSChatResponseJoinSuccess);
-              break;
-            case 'leave':
+            }
+            case 'leave': {
               message.gameIds.forEach(gameId => {
                 ws.unsubscribe(gameId);
                 ws.data.gameId2CivNames.delete(gameId);
               });
               break;
-            default:
+            }
+            default: {
               return ws.send({
                 type: 'error',
-                message: `Unknown message type: ${(message as { type: any }).type}`,
+                message: `Unknown message type: ${message?.['type']}`,
               } satisfies WSChatResponseError);
+            }
           }
         },
       })

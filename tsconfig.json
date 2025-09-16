@@ -25,6 +25,7 @@
       "@lib/*": ["./src/lib/*"],
       "@data/*": ["./src/data/*"],
       "@routes/*": ["./src/routes/*"],
+      "@models/*": ["./src/models/*"],
       "@localTypes/*": ["./src/types/*"],
       "@services/*": ["./src/services/*"]
     },
@@ -40,6 +41,7 @@
     // Best practices
     "strict": true,
     "skipLibCheck": true,
+    "noImplicitAny": true,
     "noFallthroughCasesInSwitch": true,
 
     // Some stricter flags

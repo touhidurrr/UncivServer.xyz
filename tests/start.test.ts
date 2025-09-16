@@ -15,7 +15,6 @@ describe('App Start Test', () => {
     stdout: Bun.stdout,
     env: {
       ...process.env,
-      HOST: process.env.HOST,
       PORT: port.toString(),
       NODE_ENV: 'production',
     },
@@ -38,7 +37,9 @@ describe('App Start Test', () => {
             break;
           }
           await Bun.sleep(START_TEST_FETCH_RETRY_INTERVAL);
-        } catch {}
+        } catch {
+          /* empty */
+        }
       }
     },
     START_TEST_TIMEOUT

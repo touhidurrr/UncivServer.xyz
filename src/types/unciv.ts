@@ -25,12 +25,6 @@ export type MapGenerationType =
 
 export type MapShape = 'Hexagonal' | 'Flat Earth Hexagonal' | 'Rectangular';
 
-export interface Player {
-  chosenCiv?: string;
-  playerId: string;
-  playerType: string;
-}
-
 export interface UncivJSON {
   barbarians: Barbarians;
   checksum: string;
@@ -44,7 +38,7 @@ export interface UncivJSON {
   lastUnitId: number;
   tileMap: TileMap;
   turns: number;
-  version: Version;
+  version?: Version;
 }
 
 export interface Barbarians {
@@ -359,8 +353,8 @@ export interface GameParameters {
 
 export interface Player {
   chosenCiv?: string;
-  playerId: string;
-  playerType: string;
+  playerId?: string;
+  playerType?: string;
 }
 
 export interface TileMap {
@@ -449,9 +443,9 @@ export interface ImprovementQueue {
 }
 
 export interface Version {
-  createdWith: {
-    number: number;
-    text: string;
-  };
   number: number;
+  createdWith: {
+    text: string;
+    number: number;
+  };
 }

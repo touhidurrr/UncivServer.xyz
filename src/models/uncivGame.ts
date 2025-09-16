@@ -1,6 +1,8 @@
+import { UUID_SCHEMA } from '@constants';
 import * as notificationsData from '@data/notifications';
 import type { Civilization, Notification, UncivJSON } from '@localTypes/unciv';
 import { unpack } from '@services/uncivJSON';
+import { type } from 'arktype';
 import { choice, probability } from 'randomcryp';
 
 const DEFAULT_NOTIFICATION = 'Welcome to UncivServer.xyz!';
@@ -9,6 +11,31 @@ const DEFAULT_SPN_ICON = notificationsData.icons.promotion[0]!;
 
 // Self promotion notification probability
 const SPN_PROBABILITY = 0.2;
+
+const UncivGameSchema = type({
+  'turns?': 'number',
+  gameId: UUID_SCHEMA,
+  currentPlayer: 'string',
+  'version?': {
+    number: 'number',
+    createdWith: {
+      text: 'string',
+      number: 'number',
+    },
+  },
+  civilizations: type({
+    civName: 'string',
+    'playerType?': "'Human'",
+    'playerId?': UUID_SCHEMA,
+  }).array(),
+  gameParameters: {
+    players: type({
+      'chosenCiv?': 'string',
+      'playerType?': "'Human'",
+      'playerId?': UUID_SCHEMA,
+    }).array(),
+  },
+});
 
 export class UncivGame {
   data: UncivJSON;
@@ -19,7 +46,13 @@ export class UncivGame {
   players: string[];
 
   constructor(json: string) {
-    this.data = unpack(json);
+    const parsedGame = UncivGameSchema(unpack(json));
+
+    if (parsedGame instanceof type.errors) {
+      throw new Error('Invalid Game Data!');
+    }
+
+    this.data = parsedGame as UncivJSON;
     this.gameId = this.data.gameId;
     this.previewId = `${this.data.gameId}_Preview`;
     this.currentPlayer = this.data.currentPlayer;
@@ -28,22 +61,17 @@ export class UncivGame {
     this.players = new Set(
       [
         ...this.data.civilizations.map(c => c.playerId),
-        ...this.data.gameParameters?.players?.map(p => p.playerId),
+        ...this.data.gameParameters.players.map(p => p.playerId),
       ].filter(id => typeof id === 'string')
     )
       .values()
       .toArray();
-
-    if (
-      [this.data, this.gameId, this.currentPlayer, this.data.civilizations].some(p => !Boolean(p))
-    ) {
-      throw new Error('Invalid Game Data!');
-    }
   }
 
   getTurns = () => this.data.turns ?? 0;
 
   isVersionAtLeast({ number, createdWithNumber }: { number?: number; createdWithNumber?: number }) {
+    if (!this.data.version) return true;
     if (typeof number === 'number' && this.data.version.number < number) return false;
     if (
       typeof createdWithNumber === 'number' &&
@@ -60,7 +88,7 @@ export class UncivGame {
 
   forEachCivilizations = (
     callbackfn: (value: Civilization, index: number, array: Civilization[]) => void,
-    thisArg?: any
+    thisArg?: unknown
   ) => this.data.civilizations.forEach(callbackfn, thisArg);
 
   getNextPlayerCivilization = (): Civilization | undefined => {
@@ -101,6 +129,8 @@ export class UncivGame {
   };
 
   generateRandomNotification = (): Notification => {
+    if (!this.data.version) throw new Error('Unknown Game Version');
+
     let text = DEFAULT_NOTIFICATION;
     const icons = [DEFAULT_NOTIFICATION_ICON];
     const actions: Notification['actions'] = [];
@@ -129,7 +159,7 @@ export class UncivGame {
   };
 
   addRandomNotificationToCurrentCiv() {
-    if (this.currentCiv) {
+    if (this.currentCiv && this.data.version) {
       const newNotification = this.generateRandomNotification();
       if (this.currentCiv.notifications) this.currentCiv.notifications.push(newNotification);
       else this.currentCiv.notifications = [newNotification];

@@ -1,4 +1,5 @@
 import { CACHE_TTL_CHECK_INTERVAL_SECONDS, CACHE_TTL_SECONDS } from '@constants';
+import type { CacheService } from '@models/cache';
 import { format } from 'bytes';
 import NodeCache from 'node-cache';
 

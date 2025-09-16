@@ -8,6 +8,7 @@ import { pack } from '@services/uncivJSON';
 import { type } from 'arktype';
 import type { Elysia } from 'elysia';
 import { UncivGame } from '../../models/uncivGame';
+import { percentage } from 'randomcryp';
 
 export const putFile = (app: Elysia) =>
   app.guard(
@@ -23,11 +24,12 @@ export const putFile = (app: Elysia) =>
           async ({ body, params: { gameId }, status, game, headers }) => {
             const [userId, password] = headers.authorization;
 
-            let [dbAuth, dbGame] = await Promise.all([
+            const results = await Promise.all([
               db.Auth.findById(userId, { hash: 1 }),
               db.UncivGame.findById(game.previewId, { players: 1 }),
             ]);
 
+            let dbGame = results[1];
             if (dbGame === null) {
               dbGame = await db.UncivGame.create({
                 _id: game.previewId,
@@ -53,6 +55,7 @@ export const putFile = (app: Elysia) =>
 
             if (!playersInGame) return status('Unauthorized');
 
+            const dbAuth = results[0];
             if (dbAuth) {
               const verified = await Bun.password.verify(password, dbAuth.hash);
               if (!verified) return status('Unauthorized');
@@ -118,17 +121,19 @@ export const putFile = (app: Elysia) =>
 
               // notifications provider
               let hasNotifications = false;
-              // if (
-              //   !ctx.params.gameId.endsWith('_Preview') &&
-              //   ctx.game.isVersionAtLeast({ number: 4, createdWithNumber: 1075 }) &&
-              //   // 52.5% chance of a notification being shown per turn
-              //   // weighted average of a poll in Unciv the discord server
-              //   // decreased to 10% at least for this year because yair thinks it's too much
-              //   percentage(10)
-              // ) {
-              //   hasNotifications = true;
-              //   ctx.game.addRandomNotificationToCurrentCiv();
-              // }
+              if (
+                !ctx.params.gameId.endsWith('_Preview') &&
+                //@ts-expect-error it works but shows error
+                ctx.game.isVersionAtLeast({ number: 4, createdWithNumber: 1075 }) &&
+                // 52.5% chance of a notification being shown per turn
+                // weighted average of a poll in Unciv the discord server
+                // decreased to 10% at least for this year because yair thinks it's too much
+                percentage(10)
+              ) {
+                hasNotifications = true;
+                //@ts-expect-error it works but shows error
+                ctx.game.addRandomNotificationToCurrentCiv();
+              }
 
               // repack game data if there are modifications or notifications
               if (hasModifications || hasNotifications) {
