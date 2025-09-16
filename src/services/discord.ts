@@ -1,13 +1,13 @@
 import { SUPPORT_EMBED } from '@constants';
 import { REST } from '@discordjs/rest';
 import { getRandomColor } from '@lib/getRandomColor';
+import type { UncivGame } from '@models/uncivGame';
 import {
   Routes,
   type RESTPostAPIChannelMessageJSONBody,
   type RESTPostAPIChannelMessageResult,
   type RESTPostAPICurrentUserCreateDMChannelResult,
 } from 'discord-api-types/rest/v10';
-import type { UncivGame } from '../models/uncivGame';
 import { db } from './mongodb';
 
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;

@@ -1,13 +1,12 @@
 import { MAX_FILE_SIZE, MIN_FILE_SIZE, UNCIV_BASIC_AUTH_HEADER_SCHEMA } from '@constants';
+import { UncivGame } from '@models/uncivGame';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import cache from '@services/cache';
 import { isDiscordTokenValid, sendNewTurnNotification } from '@services/discord';
 import { gameDataSecurityModifier } from '@services/gameDataSecurity';
 import { db } from '@services/mongodb';
-import { pack } from '@services/uncivJSON';
 import { type } from 'arktype';
 import type { Elysia } from 'elysia';
-import { UncivGame } from '../../models/uncivGame';
 import { percentage } from 'randomcryp';
 
 export const putFile = (app: Elysia) =>
@@ -35,7 +34,7 @@ export const putFile = (app: Elysia) =>
                 _id: game.previewId,
                 turns: !game.getTurns(),
                 players: game.players,
-                text: pack(game.getPreview()),
+                text: game.packedPreview(),
               }).catch(() => db.UncivGame.findById(game.previewId, { players: 1 }));
 
               if (dbGame == null) return status(500, 'Failed to save game!');
@@ -137,7 +136,7 @@ export const putFile = (app: Elysia) =>
 
               // repack game data if there are modifications or notifications
               if (hasModifications || hasNotifications) {
-                ctx.body = pack(game.data);
+                ctx.body = game.packed();
               }
             },
           }

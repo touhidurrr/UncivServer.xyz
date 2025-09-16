@@ -1,7 +1,7 @@
 import { UUID_SCHEMA } from '@constants';
 import * as notificationsData from '@data/notifications';
 import type { Civilization, Notification, UncivJSON } from '@localTypes/unciv';
-import { unpack } from '@services/uncivJSON';
+import { pack, unpack } from '@services/uncivJSON';
 import { type } from 'arktype';
 import { choice, probability } from 'randomcryp';
 
@@ -175,4 +175,16 @@ export class UncivGame {
       else this.currentCiv.notifications = [newNotification];
     }
   }
+
+  /**
+   * Get game data packed into an Unciv game data string
+   * @returns Unciv game data string
+   */
+  packed = () => pack(this.data);
+
+  /**
+   * Get game preview packed into an Unciv game data string
+   * @returns Unciv game data string
+   */
+  packedPreview = () => pack(this.getPreview());
 }
