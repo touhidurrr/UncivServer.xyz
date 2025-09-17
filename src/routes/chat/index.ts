@@ -145,10 +145,10 @@ export const chatWebSocket = (app: Elysia) =>
                 });
               });
 
-              return ws.send({
+              return {
                 type: 'joinSuccess',
                 gameIds: acceptedGameIds,
-              } satisfies WSChatResponseJoinSuccess);
+              } satisfies WSChatResponseJoinSuccess;
             }
             case 'leave': {
               message.gameIds.forEach(gameId => {
@@ -158,10 +158,10 @@ export const chatWebSocket = (app: Elysia) =>
               break;
             }
             default: {
-              return ws.send({
+              return {
                 type: 'error',
                 message: `Unknown message type: ${message?.['type']}`,
-              } satisfies WSChatResponseError);
+              } satisfies WSChatResponseError;
             }
           }
         },
