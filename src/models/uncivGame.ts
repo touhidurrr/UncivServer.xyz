@@ -180,11 +180,11 @@ export class UncivGame {
    * Get game data packed into an Unciv game data string
    * @returns Unciv game data string
    */
-  packed = () => pack(this.data);
+  asText = () => pack(this.data);
 
   /**
    * Get game preview packed into an Unciv game data string
    * @returns Unciv game data string
    */
-  packedPreview = () => pack(this.getPreview());
+  asPreviewText = () => pack(this.getPreview());
 }

@@ -1,5 +1,5 @@
 import { MAX_FILE_SIZE, TEST_GAME_ID } from '@constants';
-import { getAppBaseURL, getRandomSave } from '@lib';
+import { getAppBaseURL, getRandomBase64String, getRandomSave } from '@lib';
 import cache from '@services/cache';
 import db from '@services/mongodb';
 import axios from 'axios';
@@ -7,6 +7,7 @@ import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
 import { sep } from 'node:path';
 
 import '@index';
+import { pack } from '@services/uncivJSON';
 
 const api = axios.create({
   baseURL: getAppBaseURL(),
@@ -60,6 +61,20 @@ describe('PUT /files', () => {
     const payload = 'test';
     const { status } = await api.put(`/files/${gameId}`, payload);
     expect(status).toBe(400);
+  });
+
+  test('Fail on Random Base64 Body', async () => {
+    const gameId = TEST_GAME_ID;
+    const payload = getRandomBase64String('100kb');
+    const { status } = await api.put(`/files/${gameId}`, payload);
+    expect(status).toBe(500);
+  });
+
+  test('Fail on Random Invalid Game Data', async () => {
+    const gameId = TEST_GAME_ID;
+    const payload = pack({ data: getRandomBase64String('100kb') });
+    const { status } = await api.put(`/files/${gameId}`, payload);
+    expect(status).toBe(500);
   });
 
   test('Fail on files larger than MAX_FILE_SIZE', async () => {

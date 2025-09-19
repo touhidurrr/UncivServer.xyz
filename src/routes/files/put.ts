@@ -34,7 +34,7 @@ export const putFile = (app: Elysia) =>
                 _id: game.previewId,
                 turns: !game.getTurns(),
                 players: game.players,
-                text: game.packedPreview(),
+                text: game.asPreviewText(),
               }).catch(() => db.UncivGame.findById(game.previewId, { players: 1 }));
 
               if (dbGame == null) return status(500, 'Failed to save game!');
@@ -66,7 +66,6 @@ export const putFile = (app: Elysia) =>
             return 'Done!';
           },
           {
-            //@ts-expect-error it works but shows error
             afterResponse: async ({ body, server, params: { gameId }, game }) => {
               const isPreview = gameId.endsWith('_Preview');
               const [, name] = await Promise.allSettled([
@@ -114,29 +113,26 @@ export const putFile = (app: Elysia) =>
             // used for notifications, security provider and discord notifications
             // in case an injection is possible, we need to repack the body to update it
             transform: ctx => {
-              //@ts-expect-error it works but shows error
-              const game: UncivGame = ctx.game;
-
               // run security modifier on game data
-              const hasModifications = gameDataSecurityModifier(game);
+              const hasModifications = gameDataSecurityModifier(ctx.game);
 
               // notifications provider
               let hasNotifications = false;
               if (
                 !ctx.params.gameId.endsWith('_Preview') &&
-                game.isVersionAtLeast({ number: 4, createdWithNumber: 1075 }) &&
+                ctx.game.isVersionAtLeast({ number: 4, createdWithNumber: 1075 }) &&
                 // 52.5% chance of a notification being shown per turn
                 // weighted average of a poll in Unciv the discord server
                 // decreased to 10% at least for this year because yair thinks it's too much
                 percentage(10)
               ) {
                 hasNotifications = true;
-                game.addRandomNotificationToCurrentCiv();
+                ctx.game.addRandomNotificationToCurrentCiv();
               }
 
               // repack game data if there are modifications or notifications
               if (hasModifications || hasNotifications) {
-                ctx.body = game.packed();
+                ctx.body = ctx.game.asText();
               }
             },
           }
