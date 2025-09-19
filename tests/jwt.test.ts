@@ -78,7 +78,7 @@ test('400 on invalid tokens', () =>
 
 test('401 on none type token', () => {
   const [, payload] = jwtToken.split('.');
-  const noneTypeHeader = Buffer.from(`{"alg":"none"}`).toBase64();
+  const noneTypeHeader = Buffer.from(`{"alg":"none"}`).toBase64({ alphabet: 'base64url' });
   const noneTypeToken = `${noneTypeHeader}.${payload}.`;
 
   return postAPI.post(`/jwt/verify`, noneTypeToken).then(({ status, data }) => {
