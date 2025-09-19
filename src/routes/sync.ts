@@ -2,7 +2,6 @@ import { BEARER_TOKEN_SCHEMA, GAME_ID_SCHEMA, NO_CACHE_CONTROL } from '@constant
 import { isValidSyncToken } from '@lib';
 import { type } from 'arktype';
 import type { Elysia } from 'elysia';
-import z from 'zod';
 
 const SYNC_GAME_DATA_SCHEMA = type({
   type: "'SyncData'",
@@ -18,7 +17,7 @@ export const SYNC_RESPONSE_SCHEMA = SYNC_GAME_DATA_SCHEMA.or(SYNC_ERROR_SCHEMA);
 
 export const syncRoute = (app: Elysia) =>
   app.ws('/sync', {
-    headers: z.object({ authorization: BEARER_TOKEN_SCHEMA }),
+    headers: type({ authorization: BEARER_TOKEN_SCHEMA }),
     response: SYNC_RESPONSE_SCHEMA,
     beforeHandle: ({ set }) => {
       set.headers['cache-control'] = NO_CACHE_CONTROL;

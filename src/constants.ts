@@ -2,7 +2,6 @@ import { type } from 'arktype';
 import bytes from 'bytes';
 import { stringify as stringifyCacheControl } from 'cache-control-parser';
 import type { APIEmbed } from 'discord-api-types/v10';
-import { z } from 'zod';
 
 // isAlive
 export const IS_ALIVE = { authVersion: 1, chatVersion: 1 };
@@ -51,10 +50,9 @@ export const GAME_ID_SCHEMA = type('string == 36 |> string.uuid |> string.lower'
 );
 export const UUID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
 export const UUID_SCHEMA = type('string.uuid |> string.lower');
-export const BEARER_TOKEN_SCHEMA = z
-  .stringFormat('BearerToken', /^bearer\s+/i)
-  .transform(val => val.replace(/^bearer\s+/i, '').trimEnd());
-export const BEARER_JWT_SCHEMA = BEARER_TOKEN_SCHEMA.pipe(z.jwt({ alg: 'HS512' }));
+export const BEARER_TOKEN_SCHEMA = type(/^bearer\s+/i).pipe(val =>
+  val.replace(/^bearer\s+/i, '').trimEnd()
+);
 export const UNCIV_BASIC_AUTH_HEADER_SCHEMA = type({
   authorization: type
     .pipe(

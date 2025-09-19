@@ -2,8 +2,8 @@ import { BEARER_TOKEN_SCHEMA } from '@constants';
 import { jwt } from '@elysiajs/jwt';
 import { isValidSyncToken } from '@lib';
 import db from '@services/mongodb';
+import { type } from 'arktype';
 import { Elysia } from 'elysia';
-import { z } from 'zod';
 
 export const jwtPlugin = new Elysia({ name: 'jwt', prefix: 'jwt' })
   .use(
@@ -33,7 +33,7 @@ export const jwtPlugin = new Elysia({ name: 'jwt', prefix: 'jwt' })
 
       return value;
     },
-    { headers: z.object({ authorization: BEARER_TOKEN_SCHEMA }) }
+    { headers: type({ authorization: BEARER_TOKEN_SCHEMA }) }
   )
   .post(
     'verify',
@@ -42,10 +42,5 @@ export const jwtPlugin = new Elysia({ name: 'jwt', prefix: 'jwt' })
       if (!verified) return status('Unauthorized');
       return 'OK';
     },
-    {
-      body: z
-        .string()
-        .transform(val => val.trim())
-        .pipe(z.jwt({ alg: 'HS512' })),
-    }
+    { body: type('string.trim') }
   );

@@ -1,16 +1,15 @@
-import { BEARER_JWT_SCHEMA, UUID_SCHEMA } from '@constants';
+import { BEARER_TOKEN_SCHEMA, UUID_SCHEMA } from '@constants';
 import db from '@services/mongodb';
 import { calculateRating } from '@services/rating';
 import { type } from 'arktype';
 import { Elysia } from 'elysia';
 import type { AnyBulkWriteOperation } from 'mongoose';
-import { z } from 'zod';
 import { jwtPlugin } from './jwt';
 
 export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugin).guard(
   {
     cookie: type({ 'auth?': type.string }),
-    headers: z.object({ authorization: BEARER_JWT_SCHEMA.optional() }),
+    headers: type({ 'authorization?': BEARER_TOKEN_SCHEMA }),
     beforeHandle: async ({ status, jwt, headers: { authorization }, cookie: { auth } }) => {
       const token = auth.value ?? authorization;
       if (!token) return status(400, 'You must provide one of bearer token or auth cookie!');
@@ -105,10 +104,13 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
               return games;
             },
             {
-              query: z.object({
-                playing: z.stringbool().readonly().default(false),
-                limit: z.coerce.number().min(1).max(25).default(25),
-              }),
+              query: type({
+                'playing?': "'y' | 'n' | 'true' | 'false'",
+                'limit?': 'string.integer.parse |> 1 <= number <= 25',
+              }).pipe(({ playing, limit }) => ({
+                limit: limit ?? 25,
+                playing: playing === 'y' || playing === 'true',
+              })),
             }
           )
       )
