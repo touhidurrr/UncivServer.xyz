@@ -41,7 +41,8 @@ export const MAX_FILE_SIZE = Math.min(MAX_CONTENT_LENGTH, bytes.parse('2mb')!);
 // auth
 export const NUMERIC_REGEX = /^\d+$/;
 export const GAME_ID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}(_Preview)?$/;
-export const GAME_ID_SCHEMA = type('string == 36 |> string.uuid |> string.lower').or(
+export const GAME_ID_SCHEMA = type.or(
+  type('string == 36 & string.uuid |> string.lower'),
   type('string == 44').pipe(
     val => [val.slice(0, 36).toLowerCase(), val.slice(36)],
     type(['string.uuid', "'_Preview'"]),
