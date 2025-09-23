@@ -77,6 +77,9 @@ export const UNCIV_BASIC_AUTH_HEADER_SCHEMA = type({
       return [userId, password || ''] as const;
     }),
 });
+export const STRING_BOOL_SCHEMA = type("'y' | 'n' | 'true' | 'false'")
+  .pipe(s => s === 'true' || s === 'y')
+  .default('false');
 
 // test
 export const START_TEST_TIMEOUT = 30_000;

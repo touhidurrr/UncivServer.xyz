@@ -1,4 +1,4 @@
-import { BEARER_TOKEN_SCHEMA, UUID_SCHEMA } from '@constants';
+import { BEARER_TOKEN_SCHEMA, STRING_BOOL_SCHEMA, UUID_SCHEMA } from '@constants';
 import db from '@services/mongodb';
 import { calculateRating } from '@services/rating';
 import { type } from 'arktype';
@@ -105,12 +105,9 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
             },
             {
               query: type({
-                'playing?': "'y' | 'n' | 'true' | 'false'",
-                'limit?': 'string.integer.parse |> 1 <= number <= 25',
-              }).pipe(({ playing, limit }) => ({
-                limit: limit ?? 25,
-                playing: playing === 'y' || playing === 'true',
-              })),
+                playing: STRING_BOOL_SCHEMA,
+                limit: "string.integer.parse |> 1 <= number <= 25 = '25'",
+              }),
             }
           )
       )
