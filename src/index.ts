@@ -19,6 +19,7 @@ import { jsonsRoute } from '@routes/jsons';
 import { jwtPlugin } from '@routes/jwt';
 import { statsRoute } from '@routes/stats';
 import { syncRoute } from '@routes/sync';
+import { webhooksPlugin } from '@routes/webhooks';
 import { Elysia } from 'elysia';
 
 // start sync service
@@ -60,6 +61,7 @@ export const app = new Elysia({
   .use(jsonsRoute)
   .use(apiPlugin)
   .use(infoRoute)
+  .use(webhooksPlugin)
   .get('/isalive', ({ set }) => {
     set.headers['cache-control'] = NO_CACHE_CONTROL;
     return IS_ALIVE;

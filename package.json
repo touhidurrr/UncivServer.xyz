@@ -1,6 +1,6 @@
 {
   "name": "uncivserver.xyz",
-  "version": "4.41.5",
+  "version": "4.42.0",
   "description": "An Open Source, Free to Play, Unciv Multiplayer Server written in Javascript",
   "author": "Md. Touhidur Rahman",
   "license": "BSD-3-Clause",
@@ -41,7 +41,7 @@
     "date-fns": "^4.1.0",
     "discord-api-types": "^0.38.26",
     "elysia": "^1.4.7",
-    "lru-cache": "^11.2.1",
+    "lru-cache": "^11.2.2",
     "mongoose": "^8.18.2",
     "node-cache": "^5.1.2",
     "openskill": "^4.1.0",

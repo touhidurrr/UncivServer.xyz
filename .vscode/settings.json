@@ -6,5 +6,5 @@
   "typescript.preferences.autoImportSpecifierExcludeRegexes": ["^(node:)?os$"],
 
   // cSpell
-  "cSpell.words": ["arktype", "eleventy"]
+  "cSpell.words": ["arktype", "buymeacoffee", "eleventy"]
 }
