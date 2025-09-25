@@ -1,6 +1,6 @@
 import { HMAC } from '@models/hmac';
 import { type } from 'arktype';
-import { Elysia } from 'elysia';
+import type { Elysia } from 'elysia';
 
 export const patreonRoute = (app: Elysia) => {
   const { PATREON_WEBHOOK_SECRET } = process.env;
@@ -11,8 +11,7 @@ export const patreonRoute = (app: Elysia) => {
   return app.post(
     'patreon',
     async ({ body: data, status, headers: { 'x-patreon-signature': signature } }) => {
-      const verified = hmac.verify(signature, data);
-      if (!verified) return status(401);
+      if (!hmac.verify(signature, data)) return status(401);
 
       const event = JSON.parse(data);
       Bun.write('.webhook.yaml', Bun.YAML.stringify(event, null, 2));

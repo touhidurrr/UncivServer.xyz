@@ -16,7 +16,6 @@ export class HMAC {
   verify(signature: string, data: Bun.BlobOrStringOrBuffer) {
     const hasher = new Bun.CryptoHasher(this.algorithm, this.key);
     const hash = hasher.update(data).digest(this.digest);
-    console.log({ hash, signature });
     return hash === signature;
   }
 }

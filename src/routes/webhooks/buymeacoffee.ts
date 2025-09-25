@@ -1,6 +1,7 @@
+import type { BMCWebhookEvent } from '@localTypes/buymeacoffee';
 import { HMAC } from '@models/hmac';
 import { type } from 'arktype';
-import { Elysia } from 'elysia';
+import type { Elysia } from 'elysia';
 
 export const bmcRoute = (app: Elysia) => {
   const { BUYMEACOFFEE_WEBHOOK_SECRET } = process.env;
@@ -11,11 +12,14 @@ export const bmcRoute = (app: Elysia) => {
   return app.post(
     'buymeacoffee',
     async ({ body: data, status, headers: { 'x-signature-sha256': signature } }) => {
-      const verified = hmac.verify(signature, data);
-      if (!verified) return status(401);
+      if (!hmac.verify(signature, data)) return status(401);
 
-      const event = JSON.parse(data);
-      Bun.write('.webhook.yaml', Bun.YAML.stringify(event, null, 2));
+      const event = JSON.parse(data) as BMCWebhookEvent;
+      if (!event.live_mode) {
+        console.dir(event, { depth: null });
+        Bun.write('.webhook.yaml', Bun.YAML.stringify(event, null, 2));
+        return status(200);
+      }
     },
     {
       parse: 'text',
