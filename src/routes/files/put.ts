@@ -23,21 +23,19 @@ export const putFile = (app: Elysia) =>
           async ({ body, params: { gameId }, status, game, headers }) => {
             const [userId, password] = headers.authorization;
 
-            const results = await Promise.all([
+            const [dbAuth, dbGame] = await Promise.all([
               db.Auth.findById(userId, { hash: 1 }),
               db.UncivGame.findById(game.previewId, { players: 1 }),
             ]);
 
-            let dbGame = results[1];
-            if (dbGame === null) {
-              dbGame = await db.UncivGame.create({
-                _id: game.previewId,
-                turns: !game.getTurns(),
-                players: game.players,
-                text: game.asPreviewText(),
-              }).catch(() => db.UncivGame.findById(game.previewId, { players: 1 }));
+            if (dbAuth) {
+              const verified = await Bun.password.verify(password, dbAuth.hash);
+              if (!verified) return status('Unauthorized');
+            }
 
-              if (dbGame == null) return status(500, 'Failed to save game!');
+            if (dbGame === null) {
+              await cache.set(gameId, body);
+              return 'Done!';
             }
 
             // if a players list doesn't exist, regenerate it
@@ -53,12 +51,6 @@ export const putFile = (app: Elysia) =>
               );
 
             if (!playersInGame) return status('Unauthorized');
-
-            const dbAuth = results[0];
-            if (dbAuth) {
-              const verified = await Bun.password.verify(password, dbAuth.hash);
-              if (!verified) return status('Unauthorized');
-            }
 
             // for performance reasons, just store the file in cache and return ok
             // try to do everything else asynchronously in afterResponse

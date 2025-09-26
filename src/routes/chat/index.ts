@@ -92,8 +92,9 @@ export const chatWebSocket = (app: Elysia) =>
         }
       )
       .ws('/chat', {
-        open: () =>
-          ({
+        open: ws => {
+          ws.subscribe('chat');
+          return {
             type: 'chat',
             gameId: '',
             civName: 'Server',
@@ -104,7 +105,8 @@ export const chatWebSocket = (app: Elysia) =>
               'For now, players can only see your messages if they are online.',
               'Proceed at your own discretion!',
             ].join(' '),
-          }) satisfies WSChatResponseRelay,
+          } satisfies WSChatResponseRelay;
+        },
         message: async (ws, message: WSChatMessage) => {
           if (typeof message !== 'object' || !message.type) {
             return ws.send({
