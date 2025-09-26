@@ -40,17 +40,17 @@ export const MAX_FILE_SIZE = Math.min(MAX_CONTENT_LENGTH, bytes.parse('2mb')!);
 
 // auth
 export const NUMERIC_REGEX = /^\d+$/;
+export const UUID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
+export const UUID_SCHEMA = type(UUID_REGEX).pipe(val => val.toLowerCase());
 export const GAME_ID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}(_Preview)?$/;
 export const GAME_ID_SCHEMA = type.or(
-  type('string == 36 & string.uuid |> string.lower'),
-  type('string == 44').pipe(
+  type.string.exactlyLength(36).pipe(UUID_SCHEMA),
+  type.string.exactlyLength(44).pipe(
     val => [val.slice(0, 36).toLowerCase(), val.slice(36)],
-    type(['string.uuid', "'_Preview'"]),
+    type([UUID_SCHEMA, "'_Preview'"]),
     val => val.join('')
   )
 );
-export const UUID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
-export const UUID_SCHEMA = type('string.uuid |> string.lower');
 export const BEARER_TOKEN_SCHEMA = type(/^bearer\s+/i).pipe(val =>
   val.replace(/^bearer\s+/i, '').trimEnd()
 );
@@ -68,13 +68,13 @@ export const UNCIV_BASIC_AUTH_HEADER_SCHEMA = type({
         return ctx.error('valid basic auth header');
       }
 
-      const userId = val.slice(0, sepIdx).toLowerCase();
-      if (!UUID_REGEX.test(userId)) {
+      const userId = UUID_SCHEMA(val.slice(0, sepIdx));
+      if (userId instanceof type.errors) {
         return ctx.error('valid UUID');
       }
 
       const password = val.slice(sepIdx + 1);
-      return [userId, password || ''] as const;
+      return [userId, password] as const;
     }),
 });
 export const STRING_BOOL_SCHEMA = type("'' | 'y' | 'n' | 'true' | 'false'")
