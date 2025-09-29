@@ -50,7 +50,7 @@
   "devDependencies": {
     "@11ty/eleventy": "^3.1.2",
     "@eslint/js": "^9.36.0",
-    "@types/bun": "^1.2.22",
+    "@types/bun": "^1.2.23",
     "@types/bytes": "^3.1.5",
     "axios": "^1.12.2",
     "eslint": "^9.36.0",
