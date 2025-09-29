@@ -40,7 +40,7 @@
     "cache-control-parser": "^2.0.6",
     "date-fns": "^4.1.0",
     "discord-api-types": "^0.38.26",
-    "elysia": "^1.4.7",
+    "elysia": "^1.4.8",
     "lru-cache": "^11.2.2",
     "mongoose": "^8.18.2",
     "node-cache": "^5.1.2",
