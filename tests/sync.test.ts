@@ -2,7 +2,7 @@ import { getAppBaseURL, getRandomSave } from '@lib';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import db from '@services/mongodb';
 import axios from 'axios';
-import { afterAll, describe, expect, test } from 'bun:test';
+import { describe, expect, test } from 'bun:test';
 import { parse as parseCacheControl } from 'cache-control-parser';
 
 import '@index';
@@ -131,59 +131,59 @@ test('Uploaded files are relayed properly', async () => {
   const userId = Bun.randomUUIDv7();
   const payload = getRandomSave('1kb', { gameId, userId });
 
-  afterAll(() =>
-    db.UncivGame.deleteMany({
-      _id: { $in: [gameId, `${gameId}_Preview`] },
-    })
-  );
+  try {
+    const putFile = (isPreview: boolean = false) =>
+      api
+        .put(`/files/${gameId + (isPreview ? '_Preview' : '')}`, payload, {
+          auth: {
+            username: userId,
+            password: '',
+          },
+        })
+        .then(({ status }) => expect(status).toBe(200));
 
-  const putFile = (isPreview: boolean = false) =>
-    api
-      .put(`/files/${gameId + (isPreview ? '_Preview' : '')}`, payload, {
-        auth: {
-          username: userId,
-          password: '',
-        },
-      })
-      .then(({ status }) => expect(status).toBe(200));
+    let receivedData = false;
+    let receivedPreview = false;
 
-  let receivedData = false;
-  let receivedPreview = false;
+    const promise = new Promise((resolve, reject) => {
+      const ws = getSyncWSClient(SYNC_TOKEN);
 
-  const promise = new Promise((resolve, reject) => {
-    const ws = getSyncWSClient(SYNC_TOKEN);
+      ws.addEventListener('open', () => {
+        putFile();
+        putFile(true);
+        Bun.sleep(5_000).then(() => reject('Timeout'));
+      });
 
-    ws.addEventListener('open', () => {
-      putFile();
-      putFile(true);
-      Bun.sleep(5_000).then(() => reject('Timeout'));
-    });
+      ws.addEventListener('message', ({ data }) => {
+        const msg = JSON.parse(data.toString('utf8')) as typeof SYNC_RESPONSE_SCHEMA.infer;
 
-    ws.addEventListener('message', ({ data }) => {
-      const msg = JSON.parse(data.toString('utf8')) as typeof SYNC_RESPONSE_SCHEMA.infer;
+        if (msg.type === 'SyncData') {
+          switch (msg.data.gameId) {
+            case gameId:
+              receivedData = true;
+              break;
+            case `${gameId}_Preview`:
+              receivedPreview = true;
+              break;
+            default:
+              return;
+          }
 
-      if (msg.type === 'SyncData') {
-        switch (msg.data.gameId) {
-          case gameId:
-            receivedData = true;
-            break;
-          case `${gameId}_Preview`:
-            receivedPreview = true;
-            break;
-          default:
-            return;
+          expect(msg.data.content).toBe(payload);
+          if (receivedData && receivedPreview) resolve('Done!');
         }
+      });
 
-        expect(msg.data.content).toBe(payload);
-        if (receivedData && receivedPreview) resolve('Done!');
-      }
+      ws.addEventListener('close', () => reject('Connection Closed'));
+      ws.addEventListener('error', reject);
     });
 
-    ws.addEventListener('close', () => reject('Connection Closed'));
-    ws.addEventListener('error', reject);
-  });
-
-  await expect(promise).resolves.toBeTruthy();
-  expect(receivedData).toBeTrue();
-  expect(receivedPreview).toBeTrue();
+    await expect(promise).resolves.toBeTruthy();
+    expect(receivedData).toBeTrue();
+    expect(receivedPreview).toBeTrue();
+  } finally {
+    await db.UncivGame.deleteMany({
+      _id: { $in: [gameId, `${gameId}_Preview`] },
+    });
+  }
 });
