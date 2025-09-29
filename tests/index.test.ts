@@ -18,14 +18,15 @@ const api = axios.create({
   },
 });
 
-test('GET /isalive', () =>
+test.concurrent('GET /isalive', () =>
   api.get('/isalive').then(({ status, data }) => {
     expect(status).toBe(200);
     expect(data).toBeObject();
     expect(data).toStrictEqual({ authVersion: 1, chatVersion: 1 });
-  }));
+  })
+);
 
-describe('GET /files', () => {
+describe.concurrent('GET /files', () => {
   test('Validation Error on Bad ID', async () => {
     const gameId = 'bad-id';
     const { status, data } = await api.get(`/files/${gameId}`);
@@ -44,7 +45,7 @@ describe('GET /files', () => {
   });
 });
 
-describe('PUT /files', () => {
+describe.concurrent('PUT /files', () => {
   beforeAll(async () => {
     const testIds = [];
     for (const c of '0123456789abcde') {
@@ -106,13 +107,13 @@ describe('PUT /files', () => {
       expect(data).toBe('Done!');
     });
 
-    test('Cache Hit', async () => {
+    test.serial('Cache Hit', async () => {
       const cachedFile = await cache.get(TEST_GAME_ID);
       expect(cachedFile).toBeString();
       expect(cachedFile).toBe(payload);
     });
 
-    test('Can be found in GET /files', async () => {
+    test.serial('Can be found in GET /files', async () => {
       const gameId = TEST_GAME_ID;
       const { status, data } = await api.get(`/files/${gameId}`);
       expect(status).toBe(200);
@@ -122,7 +123,7 @@ describe('PUT /files', () => {
   });
 });
 
-test('All static assets can be accessed', async () => {
+test.concurrent('All static assets can be accessed', async () => {
   // make a list of paths
   const paths: string[] = [];
   const filenames = new Bun.Glob('public/**').scan({ onlyFiles: true });
@@ -143,7 +144,7 @@ test('All static assets can be accessed', async () => {
   );
 });
 
-describe('Auth', () => {
+describe.concurrent('Auth', () => {
   const username = Bun.randomUUIDv7();
   const password = '0'.repeat(6);
 
@@ -161,7 +162,7 @@ describe('Auth', () => {
     expect(Number(headers['content-length'])).toBe(0);
   });
 
-  test('Initial PUT /auth', async () => {
+  test.serial('Initial PUT /auth', async () => {
     const { status, data } = await api.put('/auth', password, {
       auth: { username, password: '' },
     });
@@ -204,7 +205,7 @@ describe('Auth', () => {
     expect(status).toBe(200);
   });
 
-  test('PUT /auth with correct password', async () => {
+  test.serial('PUT /auth with correct password', async () => {
     const { status, data } = await api.put('/auth', password + '1', {
       auth: { username, password },
     });
@@ -227,7 +228,7 @@ describe('Auth', () => {
   });
 });
 
-describe('GET /jsons', () => {
+describe.concurrent('GET /jsons', () => {
   const gameId = Bun.randomUUIDv7();
   const payload = getRandomSave('100kb', { gameId });
 

@@ -24,7 +24,7 @@ const getSyncWSClient = (token: string) =>
     perMessageDeflate: true,
   });
 
-test('Cache Control', async () => {
+test.concurrent('Cache Control', async () => {
   const { headers } = await api.get('/sync', {
     headers: {
       connection: 'upgrade',
@@ -33,9 +33,8 @@ test('Cache Control', async () => {
     },
   });
 
-  expect.hasAssertions();
   const ccHeaders = headers['cache-control'];
-  if (typeof ccHeaders !== 'string') return;
+  if (typeof ccHeaders !== 'string') return expect().fail();
 
   expect(ccHeaders).toBeString();
   const cacheControl = parseCacheControl(ccHeaders);
@@ -44,7 +43,7 @@ test('Cache Control', async () => {
   expect(cacheControl['no-cache']).toBeTrue();
 });
 
-describe('Token', () => {
+describe.concurrent('Token', () => {
   test('Rejects No Token', async () => {
     const promise = new Promise((res, rej) => {
       try {
@@ -126,7 +125,7 @@ describe('Token', () => {
   });
 });
 
-test('Uploaded files are relayed properly', async () => {
+test.concurrent('Uploaded files are relayed properly', async () => {
   const gameId = Bun.randomUUIDv7();
   const userId = Bun.randomUUIDv7();
   const payload = getRandomSave('1kb', { gameId, userId });

@@ -14,7 +14,7 @@ const syncToken = process.env.SYNC_TOKEN ?? '';
 
 await Bun.sleep(3_000);
 
-test('Validation error on no SYNC_TOKEN', () =>
+test.concurrent('Validation error on no SYNC_TOKEN', () =>
   api
     .get(`/jwt/${name}`, {
       headers: { Authorization: `Bearer ` },
@@ -26,9 +26,10 @@ test('Validation error on no SYNC_TOKEN', () =>
         on: 'headers',
         property: 'authorization',
       });
-    }));
+    })
+);
 
-test('JWT unobtainable on incorrect SYNC_TOKEN', () =>
+test.concurrent('JWT unobtainable on incorrect SYNC_TOKEN', () =>
   api
     .get(`/jwt/${name}`, {
       headers: { Authorization: `Bearer SomeToken` },
@@ -36,7 +37,8 @@ test('JWT unobtainable on incorrect SYNC_TOKEN', () =>
     .then(({ status, data }) => {
       expect(status).toBe(401);
       expect(data).toBe('Unauthorized');
-    }));
+    })
+);
 
 let jwtToken = '';
 
@@ -60,7 +62,7 @@ test('200 on valid token', () =>
     jwtToken = data;
   }));
 
-test('Validation error on no token', () =>
+test.concurrent('Validation error on no token', () =>
   postAPI.post(`/jwt/verify`, '').then(({ status, data }) => {
     expect(status).toBe(422);
     expect(data).toMatchObject({
@@ -68,15 +70,17 @@ test('Validation error on no token', () =>
       on: 'body',
       property: 'root',
     });
-  }));
+  })
+);
 
-test('400 on invalid tokens', () =>
+test.concurrent('400 on invalid tokens', () =>
   postAPI.post(`/jwt/verify`, 'abcd').then(({ status, data }) => {
     expect(status).toBe(400);
     expect(data).toBe('Bad Request');
-  }));
+  })
+);
 
-test('401 on none type token', () => {
+test.concurrent('401 on none type token', () => {
   const [, payload] = jwtToken.split('.');
   const noneTypeHeader = Buffer.from(`{"alg":"none"}`).toBase64({ alphabet: 'base64url' });
   const noneTypeToken = `${noneTypeHeader}.${payload}.`;

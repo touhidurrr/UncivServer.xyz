@@ -4,7 +4,7 @@ import { isAllowedURL } from '@services/gameDataSecurity';
 import { pack, unpack } from '@services/uncivJSON';
 import { describe, expect, test } from 'bun:test';
 
-describe('uncivGame', () => {
+describe.concurrent('uncivGame', () => {
   test('Pack and Unpack', () => {
     const object = { hello: 'world' };
 
@@ -17,7 +17,7 @@ describe('uncivGame', () => {
   });
 });
 
-describe('gameDataSecurity', () => {
+describe.concurrent('gameDataSecurity', () => {
   test(isAllowedURL.name, () => {
     // all promotion URLs should be valid
     promotions.forEach(({ url }) => {
