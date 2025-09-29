@@ -1,3 +1,4 @@
+export { broadcastToChat } from './broadcastToChat';
 export { getAppBaseURL } from './getAppBaseURL';
 export { getRandomBase64String } from './getRandomBase64String';
 export { getRandomColor } from './getRandomColor';

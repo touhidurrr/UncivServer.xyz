@@ -5,7 +5,7 @@ import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
 import type { Elysia } from 'elysia';
 
 export const infoRoute = (app: Elysia) =>
-  app.get('/info', ({ set }) => {
+  app.get('/info', ({ set, server }) => {
     const uptime = process.uptime();
     const { rss, heapUsed, heapTotal, external, arrayBuffers } = process.memoryUsage();
     set.headers['cache-control'] = MINIMAL_CACHE_CONTROL;
@@ -25,5 +25,6 @@ export const infoRoute = (app: Elysia) =>
       uptime: formatDistanceToNow(new Date(Date.now() - uptime * 1000), {
         includeSeconds: true,
       }),
+      chatClients: server?.subscriberCount('chat'),
     };
   });
