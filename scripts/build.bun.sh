@@ -1,2 +1,2 @@
 bun install --production --frozen-lockfile
-bunx eleventy
+bunx @11ty/eleventy
