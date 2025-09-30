@@ -1,2 +1,2 @@
-bun install --frozen-lockfile
+bun install --production --frozen-lockfile
 bunx eleventy
