@@ -1,4 +1,5 @@
 import { MINIMAL_CACHE_CONTROL } from '@constants';
+import { queuedBroadcastMessages } from '@lib/broadcastToChat';
 import { dependencies, version } from '@package.json';
 import { format } from 'bytes';
 import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
@@ -26,5 +27,6 @@ export const infoRoute = (app: Elysia) =>
         includeSeconds: true,
       }),
       chatClients: server?.subscriberCount('chat'),
+      queuedBroadcastMessages,
     };
   });
