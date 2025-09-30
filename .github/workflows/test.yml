@@ -25,6 +25,9 @@ jobs:
       - name: Run Build Script
         run: bun run build
 
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile
+
       - name: Lint TypeScript
         run: bun lint
 
