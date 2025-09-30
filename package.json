@@ -25,7 +25,7 @@
   "scripts": {
     "dev": "bun --watch src/index.ts",
     "start": "bun src/index.ts",
-    "lint": "eslint .",
+    "lint": "bunx eslint .",
     "format": "prettier --write '**/?*.*'",
     "wc": "find src tests -type f -exec wc {} +",
     "build": "bun scripts/build.bun.sh"
