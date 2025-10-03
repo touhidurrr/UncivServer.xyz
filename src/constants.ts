@@ -41,12 +41,12 @@ export const MAX_FILE_SIZE = Math.min(MAX_CONTENT_LENGTH, bytes.parse('2mb')!);
 // auth
 export const NUMERIC_REGEX = /^\d+$/;
 export const UUID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
-export const UUID_SCHEMA = type(UUID_REGEX).pipe(val => val.toLowerCase());
+export const UUID_SCHEMA = type('string.lower').pipe(type(UUID_REGEX));
 export const GAME_ID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}(_Preview)?$/;
 export const GAME_ID_SCHEMA = type.or(
   type.string.exactlyLength(36).pipe(UUID_SCHEMA),
   type.string.exactlyLength(44).pipe(
-    val => [val.slice(0, 36).toLowerCase(), val.slice(36)],
+    val => [val.slice(0, 36), val.slice(36)],
     type([UUID_SCHEMA, "'_Preview'"]),
     val => val.join('')
   )
