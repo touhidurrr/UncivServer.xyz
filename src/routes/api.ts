@@ -119,7 +119,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
           if (!profile) return status(404);
           return profile._id;
         },
-        { params: type({ _id: UUID_SCHEMA.array().atMostLength(128) }) }
+        { params: type({ _id: UUID_SCHEMA }) }
       )
 
       .post(
