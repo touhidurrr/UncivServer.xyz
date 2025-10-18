@@ -18,7 +18,7 @@ class RedisCacheService implements CacheService {
     return redis.get(key);
   }
 
-  async set(key: string, value: string): Promise<void> {
+  async set(key: string, value: string): Promise<undefined> {
     await redis.set(key, value);
   }
 

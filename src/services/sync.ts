@@ -11,10 +11,8 @@ const MAX_RECONNECTION_ATTEMPTS = 100;
 
 // initialize a websocket connection with a sync server
 const initWs = (baseURL: string) => {
-  //@ts-expect-error: perMessageDeflate pull request is pending
   const ws = new WebSocket(`${baseURL}/sync`, {
     headers: { Authorization: `Bearer ${SYNC_TOKEN}` },
-    perMessageDeflate: true,
   });
 
   let authOk = true;
