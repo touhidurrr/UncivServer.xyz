@@ -3,14 +3,14 @@ import bytes from 'bytes';
 import { stringify as stringifyCacheControl } from 'cache-control-parser';
 import type { APIEmbed } from 'discord-api-types/v10';
 
-// isAlive
+// IsAlive
 export const IS_ALIVE = { authVersion: 1, chatVersion: 1 };
 
-// utils
+// Utils
 export const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 export const IS_DEVELOPMENT = !IS_PRODUCTION;
 
-// server
+// Server
 export const DEFAULT_PORT = '1557';
 export const DEFAULT_HOST = '::';
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -18,10 +18,10 @@ export const MIN_CONTENT_LENGTH = bytes.parse('6b')!;
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 export const MAX_CONTENT_LENGTH = bytes.parse('2mb')!;
 
-// redis
+// Redis
 export const REDIS_DEFAULT_URL = '0.0.0.0:6379';
 
-// cache
+// Cache
 export const CACHE_MAX_ITEMS = 10_000;
 export const CACHE_MAX_SIZE = bytes.parse('150mb');
 export const CACHE_TTL_SECONDS = 30 * 60;
@@ -32,13 +32,13 @@ export const FILES_CACHE_MAX_ITEMS = 10_000;
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 export const FILES_CACHE_MAX_SIZE = bytes.parse('150mb')!;
 
-// files
+// Files
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 export const MIN_FILE_SIZE = Math.max(MIN_CONTENT_LENGTH, bytes.parse('10b')!);
 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 export const MAX_FILE_SIZE = Math.min(MAX_CONTENT_LENGTH, bytes.parse('2mb')!);
 
-// auth
+// Auth
 export const NUMERIC_REGEX = /^\d+$/;
 export const UUID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
 export const UUID_SCHEMA = type('string.lower').pipe(type(UUID_REGEX));
@@ -81,13 +81,13 @@ export const STRING_BOOL_SCHEMA = type("'' | 'y' | 'n' | 'true' | 'false'")
   .pipe(s => s === 'y' || s === 'true')
   .default('');
 
-// test
+// Test
 export const START_TEST_TIMEOUT = 30_000;
 export const START_TEST_FETCH_TIMEOUT = 1_000;
 export const START_TEST_FETCH_RETRY_INTERVAL = 500;
 export const TEST_GAME_ID = '00000000-0000-0000-0000-000000000000';
 
-// support
+// Support
 export const SUPPORT_CHANNEL_NAME = 'Buy Me A Coffee';
 export const SUPPORT_URL = 'https://buymeacoffee.com/touhidurrr';
 export const SUPPORT_MESSAGE = `Enjoying UncivServer.xyz? Consider supporting the project at https://uncivserver.xyz/support !`;
@@ -99,10 +99,10 @@ export const SUPPORT_EMBED: Readonly<APIEmbed> = Object.freeze({
   color: 0xffdd00,
 });
 
-// misc
+// Misc
 export const DISCORD_INVITE = 'https://discord.gg/cdDhexB6qh';
 
-// cache control
+// Cache control
 export const MINIMAL_CACHE_CONTROL = stringifyCacheControl({
   public: true,
   immutable: true,
@@ -115,10 +115,10 @@ export const NO_CACHE_CONTROL = stringifyCacheControl({
   'no-cache': true,
 });
 
-// chat
+// Chat
 export const MAX_CHAT_MESSAGE_LENGTH = 1024;
 
-// rating system
+// Rating System
 export const INITIAL_MU = 1000;
 export const INITIAL_SIGMA = 235;
 export const DISPLAY_Z = 1.65;
