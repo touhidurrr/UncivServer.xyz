@@ -1,4 +1,8 @@
-# UncivGames Democracy Bot Terms of Service
+---
+layout: docs.njk
+nav: Terms of Service
+title: UncivGames Democracy Bot Terms of Service
+---
 
 ## Definitions
 
@@ -8,9 +12,9 @@
 
 ## Agreement
 
-By using **UncivGames Democracy Bot**, you agree to these [Terms of Service](/bot/terms-of-service)
-and our [Privacy Policy](/bot/privacy-policy). Your continued use of the bot constitutes acceptance
-of any updates to these terms.
+By using **UncivGames Democracy Bot**, you agree to these
+[Terms of Service](/docs/bot/terms-of-service) and our [Privacy Policy](/docs/bot/privacy-policy).
+Your continued use of the bot constitutes acceptance of any updates to these terms.
 
 ## Change of Policies
 

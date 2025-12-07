@@ -9,3 +9,10 @@ arrowParens: 'avoid'
 trailingComma: 'es5'
 bracketSpacing: true
 quoteProps: 'as-needed'
+plugins:
+  - prettier-plugin-toml
+  - prettier-plugin-jinja-template
+overrides:
+  - files: '*.njk'
+    options:
+      parser: 'jinja-template'

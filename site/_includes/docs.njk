@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ title }} | UncivGames Docs</title>
+    <script src="/public/_includes/docs.ts" defer></script>
+    <link rel="stylesheet" href="/public/_includes/docs.css" />
+    <link rel="icon" type="image/png" href="/public/assets/logo.png" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <header class="doc-header">
+      <div class="header-left">
+        <button id="sidebar-toggle" aria-label="Toggle Navigation">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
+        </button>
+
+        <a href="/" class="brand">
+          <img src="/public/_assets/logo.png" alt="UncivGames Logo" class="brand-logo" />
+          <span>UncivGames Docs</span>
+        </a>
+      </div>
+    </header>
+
+    <div class="doc-container" id="doc-container">
+      <nav class="doc-sidebar" id="doc-sidebar">
+        <p class="sidebar-title">Bot Documentation</p>
+        <ul>
+          {% for item in collections.all %}
+            {% if item.data.layout == 'docs.njk' and '/docs/bot/' in item.url %}
+              <li>
+                <a href="{{ item.url }}" class="{% if item.url == page.url %}active{% endif %}">
+                  {{ item.data.nav or item.data.title }}
+                </a>
+              </li>
+            {% endif %}
+          {% endfor %}
+        </ul>
+      </nav>
+
+      <main class="doc-main-content">
+        <article>
+          <h1>{{ title }}</h1>
+          {{ content | safe }}
+        </article>
+      </main>
+    </div>
+
+    <footer class="doc-footer">
+      <p>
+        &copy; 2022 - <span id="current-year"></span>
+        <a href="https://github.com/touhidurrr">Md. Touhidur Rahman</a>. All rights reserved.
+      </p>
+    </footer>
+  </body>
+</html>

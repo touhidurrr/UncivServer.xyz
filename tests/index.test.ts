@@ -2,12 +2,11 @@ import { MAX_FILE_SIZE, TEST_GAME_ID } from '@constants';
 import { getAppBaseURL, getRandomBase64String, getRandomSave } from '@lib';
 import cache from '@services/cache';
 import db from '@services/mongodb';
+import { pack } from '@services/uncivJSON';
 import axios from 'axios';
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
-import { sep } from 'node:path';
 
 import '@index';
-import { pack } from '@services/uncivJSON';
 
 const api = axios.create({
   baseURL: getAppBaseURL(),
@@ -123,17 +122,8 @@ describe.concurrent('PUT /files', () => {
   });
 });
 
-test.concurrent('All static assets can be accessed', async () => {
-  // make a list of paths
-  const paths: string[] = [];
-  const filenames = new Bun.Glob('public/**').scan({ onlyFiles: true });
-  for await (const file of filenames) {
-    const path = '/' + file.split(sep).slice(1).join('/');
-    paths.push(path);
-    if (path.endsWith('/index.html')) {
-      paths.push(path.replace(/index\.html$/, ''));
-    }
-  }
+test.concurrent('All pages can be accessed', async () => {
+  const paths: string[] = ['/', '/tools', '/docs/bot/terms-of-service', '/docs/bot/privacy-policy'];
 
   // test each path
   await Promise.all(

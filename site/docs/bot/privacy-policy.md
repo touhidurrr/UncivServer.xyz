@@ -1,4 +1,8 @@
-# **UncivGames Democracy Bot Privacy Policy**
+---
+layout: docs.njk
+nav: Privacy Policy
+title: UncivGames Democracy Bot Privacy Policy
+---
 
 ## Introduction
 

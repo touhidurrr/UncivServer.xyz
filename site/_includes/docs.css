@@ -1,0 +1,249 @@
+/* --- Variables --- */
+:root {
+  --primary-color: #3b82f6; /* Bright Blue */
+  --primary-hover: #2563eb;
+  --bg-color: #f8fafc; /* Light grey-blue bg */
+  --surface-color: #ffffff; /* White cards */
+  --text-main: #0f172a; /* Dark Navy */
+  --text-muted: #64748b; /* Slate Grey */
+  --border-color: #e2e8f0;
+
+  --header-height: 64px;
+  --sidebar-width: 280px;
+  --max-content-width: 1000px; /* Wider reading area */
+}
+
+/* --- Reset --- */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  line-height: 1.6;
+}
+
+a {
+  color: var(--primary-color);
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* --- Header --- */
+.doc-header {
+  height: var(--header-height);
+  background-color: #1e293b; /* Dark Slate */
+  color: white;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Toggle Button */
+#sidebar-toggle {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+}
+
+#sidebar-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Brand/Logo Area */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: white;
+  font-weight: 600;
+  font-size: 1.125rem;
+}
+
+.brand-logo {
+  height: 32px;
+  width: auto;
+}
+
+.brand:hover {
+  text-decoration: none;
+}
+
+/* --- Layout Container --- */
+.doc-container {
+  display: flex;
+  min-height: calc(100vh - var(--header-height));
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+/* --- Sidebar --- */
+.doc-sidebar {
+  width: var(--sidebar-width);
+  background-color: var(--surface-color);
+  border-right: 1px solid var(--border-color);
+  flex-shrink: 0;
+  padding: 2rem 1rem;
+  overflow-y: auto;
+
+  /* Sticky positioning */
+  position: sticky;
+  top: var(--header-height);
+  height: calc(100vh - var(--header-height));
+
+  /* Transition for collapsing */
+  transition:
+    width 0.3s ease,
+    padding 0.3s ease,
+    transform 0.3s ease;
+}
+
+.sidebar-title {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  margin-bottom: 1rem;
+  padding-left: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.doc-sidebar ul {
+  list-style: none;
+}
+.doc-sidebar li {
+  margin-bottom: 2px;
+}
+
+.doc-sidebar a {
+  display: block;
+  padding: 0.5rem 0.75rem;
+  color: var(--text-muted);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.doc-sidebar a:hover {
+  background-color: #f1f5f9;
+  color: var(--text-main);
+  text-decoration: none;
+}
+
+.doc-sidebar a.active {
+  background-color: #eff6ff;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* --- Collapsed State Logic --- */
+.doc-container.sidebar-collapsed .doc-sidebar {
+  width: 0;
+  padding: 0;
+  overflow: hidden;
+  border-right: none;
+}
+
+/* --- Main Content --- */
+.doc-main-content {
+  flex-grow: 1;
+  padding: 3rem 2rem;
+  background-color: var(--surface-color);
+  transition: padding 0.3s ease;
+}
+
+.doc-main-content article {
+  max-width: var(--max-content-width); /* Increased width */
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Typography */
+.doc-main-content h1 {
+  font-size: 2.25rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.doc-main-content h2 {
+  font-size: 1.75rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--text-main);
+}
+
+.doc-main-content p {
+  margin-bottom: 1.25rem;
+  color: #334155;
+  font-size: 1.05rem;
+}
+
+.doc-main-content ul,
+.doc-main-content ol {
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+}
+
+/* --- Footer --- */
+.doc-footer {
+  text-align: center;
+  padding: 2rem;
+  background-color: var(--bg-color);
+  color: var(--text-muted);
+  border-top: 1px solid var(--border-color);
+  font-size: 0.875rem;
+}
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 768px) {
+  .doc-container {
+    flex-direction: column;
+  }
+
+  .doc-sidebar {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+    top: 0;
+  }
+
+  /* Reuse collapsed class to hide sidebar completely on mobile if toggled */
+  .doc-container.sidebar-collapsed .doc-sidebar {
+    height: 0;
+    padding: 0;
+  }
+
+  .doc-main-content {
+    padding: 2rem 1rem;
+  }
+
+  .brand span {
+    display: none; /* Hide text on small screens if needed */
+  }
+}
