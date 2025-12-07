@@ -1,5 +1,4 @@
-<!doctype html>
-<html lang="en">
+<html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,51 +6,10 @@
 
     <title>Toolbox</title>
 
-    <script src="./index.ts" type="module" defer></script>
     <link rel="stylesheet" href="./index.css" />
-
-    <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap"
-      rel="stylesheet"
-    />
+    <script type="module" src="./index.tsx" defer></script>
   </head>
   <body>
-    <div class="container">
-      <h1>Toolbox</h1>
-
-      <div class="card">
-        <h2>User ID / Password Validator</h2>
-        <form id="validate-form">
-          <label for="userId">User ID:</label>
-          <input type="text" id="userId" required placeholder="Enter your User ID" />
-          <label for="password">Password:</label>
-          <input type="password" id="password" placeholder="Enter your password" />
-          <button type="submit">Validate</button>
-        </form>
-        <p id="validate-status" class="status"></p>
-        <p id="validate-result" class="result"></p>
-      </div>
-
-      <div class="card">
-        <h2>Password Changer</h2>
-        <form id="change-password-form">
-          <label for="changeUserId">User ID:</label>
-          <input type="text" id="changeUserId" required placeholder="Enter User ID" />
-          <label for="oldPassword">Old Password:</label>
-          <input
-            type="password"
-            id="oldPassword"
-            placeholder="Enter old password (leave empty for no previous password)"
-          />
-          <label for="newPassword">New Password:</label>
-          <input type="password" id="newPassword" required placeholder="Enter a new password" />
-          <label for="confirmPassword">Confirm Password:</label>
-          <input type="password" id="confirmPassword" required placeholder="Confirm new password" />
-          <button type="submit">Change Password</button>
-        </form>
-        <p id="change-status" class="status"></p>
-        <p id="change-result" class="result"></p>
-      </div>
-    </div>
+    <div id="root"></div>
   </body>
 </html>

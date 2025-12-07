@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import { FaTools, FaGithub, FaPatreon } from 'react-icons/fa';
+import { FaGithub, FaPatreon, FaTools } from 'react-icons/fa';
 
 const Home = () => {
   return (
