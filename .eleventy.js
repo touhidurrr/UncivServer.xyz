@@ -5,7 +5,7 @@ export const config = {
   },
 };
 
-const passthroughCopyPaths = ['assets', '**/*.ts', '**/*.txt', '**/*.css'];
+const passthroughCopyPaths = ['assets', '**/*.(ts|tsx)', '**/*.txt', '**/*.css'];
 
 /** @param {import("@11ty/eleventy/UserConfig").default} eleventyConfig */
 export default function (eleventyConfig) {

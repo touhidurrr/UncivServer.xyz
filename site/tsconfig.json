@@ -1,7 +1,0 @@
-{
-  "compilerOptions": {
-    "lib": ["DOM", "ESNext"],
-    "target": "ES2018",
-    "moduleResolution": "bundler"
-  }
-}

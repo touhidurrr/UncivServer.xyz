@@ -1,9 +1,9 @@
 {
   // include paths
-  "include": ["src", "tests"],
+  "include": ["src", "tests", "site"],
 
   "compilerOptions": {
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "DOM"],
     "target": "ESNext",
     "module": "ESNext",
     "esModuleInterop": true,
@@ -11,8 +11,6 @@
 
     // elysia jsx
     "jsx": "react",
-    "jsxFactory": "Html.createElement",
-    "jsxFragmentFactory": "Html.Fragment",
 
     // paths
     "paths": {
