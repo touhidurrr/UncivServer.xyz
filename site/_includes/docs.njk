@@ -1,14 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/png" href="/public/assets/logo.png" />
-
-    <title>{{ title }} | UncivGames Docs</title>
-
-    <link rel="stylesheet" href="/public/_includes/docs.css" />
-    <script src="/public/_includes/docs.ts" type="module" defer></script>
+    {% set title = nav ~ " | UncivGames Democracy Bot Docs" %}
+    {% set css = "/public/_includes/docs.css" %}
+    {% set script = "/public/_includes/docs.ts" %}
+    {% include "head.njk" %}
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,6 +13,7 @@
       rel="stylesheet"
     />
   </head>
+
   <body>
     <header class="doc-header">
       <div class="header-left">
@@ -60,7 +57,7 @@
 
       <main class="doc-main-content">
         <article>
-          <h1>{{ title }}</h1>
+          <h1>{{ heading }}</h1>
           {{ content | safe }}
         </article>
       </main>

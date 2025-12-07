@@ -6,5 +6,14 @@
   "typescript.preferences.autoImportSpecifierExcludeRegexes": ["^(node:)?os$"],
 
   // cSpell
-  "cSpell.words": ["arktype", "buymeacoffee", "eleventy"]
+  "cSpell.words": ["arktype", "buymeacoffee", "eleventy"],
+
+  // misc
+  "[nunjucks]": {
+    "editor.defaultFormatter": "prettier.prettier-vscode"
+  },
+
+  "[jinja-html]": {
+    "editor.defaultFormatter": "prettier.prettier-vscode"
+  }
 }
