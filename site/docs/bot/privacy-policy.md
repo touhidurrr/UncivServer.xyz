@@ -2,6 +2,7 @@
 layout: docs.njk
 nav: Privacy Policy
 heading: UncivGames Democracy Bot Privacy Policy
+description: The Privacy policy for UncivGames Democracy Bot
 ---
 
 ## Introduction
