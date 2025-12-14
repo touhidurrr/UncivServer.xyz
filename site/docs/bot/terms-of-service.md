@@ -2,6 +2,7 @@
 layout: docs.njk
 nav: Terms of Service
 heading: UncivGames Democracy Bot Terms of Service
+description: The Terms of Service for UncivGames Democracy Bot
 ---
 
 ## Definitions

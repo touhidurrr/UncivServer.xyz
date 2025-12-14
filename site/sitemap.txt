@@ -1,9 +1,9 @@
-https://uncivserver.xyz/
+https://uncivserver.xyz
 https://uncivserver.xyz/robots.txt
-https://uncivserver.xyz/_assets/logo.png
 
 https://uncivserver.xyz/info
 https://uncivserver.xyz/stats
+https://uncivserver.xyz/tools
 
-https://uncivserver.xyz/bot/terms-of-service
-https://uncivserver.xyz/bot/privacy-policy
+https://uncivserver.xyz/docs/bot/terms-of-service
+https://uncivserver.xyz/docs/bot/privacy-policy

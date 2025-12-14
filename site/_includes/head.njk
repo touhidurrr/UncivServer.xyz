@@ -2,15 +2,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <link rel="icon" type="image/png" href="/public/assets/logo.png" />
 
-<title>{{ title }}</title>
+{% if title %}<title>{{ title }}</title>{% endif %}
+{% if description %}<meta name="description" content="{{ description }}" />{% endif %}
 
-{% if css %}
-  <link rel="stylesheet" href="{{ css }}" />
-{% endif %}
+{% if css %}<link rel="stylesheet" href="{{ css }}" />{% endif %}
 
-{% if script %}
-  <script type="module" src="{{ script }}" defer></script>
-{% endif %}
+{% if script %}<script type="module" src="{{ script }}" defer></script>{% endif %}
 
 <script
   defer

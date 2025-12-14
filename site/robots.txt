@@ -1,2 +1,2 @@
-Allow: *
+User-agent: *
 Sitemap: https://uncivserver.xyz/sitemap.txt
