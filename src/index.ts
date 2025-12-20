@@ -27,6 +27,7 @@ import './services/sync';
 
 const port = process.env.PORT ?? DEFAULT_PORT;
 const hostname = process.env.HOST ?? DEFAULT_HOST;
+const unix = process.env.UNIX_SOCKET_PATH;
 
 // loggers for debugging in development
 const devPlugin = (app: Elysia) => {
@@ -37,7 +38,9 @@ const devPlugin = (app: Elysia) => {
 };
 
 export const app = new Elysia({
-  serve: { maxRequestBodySize: 1.1 * MAX_CONTENT_LENGTH },
+  serve: {
+    maxRequestBodySize: 1.1 * MAX_CONTENT_LENGTH,
+  },
   websocket: {
     perMessageDeflate: true,
     publishToSelf: true,
@@ -69,6 +72,6 @@ export const app = new Elysia({
   .all('/support', ctx => ctx.redirect(SUPPORT_URL, 303))
   .all('/discord', ctx => ctx.redirect(DISCORD_INVITE, 303))
   .use(staticPlugin({ prefix: '/', alwaysStatic: true }))
-  .listen({ port, hostname });
-
-console.log(`Server started at ${app.server?.url}`);
+  .listen(unix ? { unix } : { port, hostname }, server =>
+    console.log(`Server started at ${server.url}`)
+  );
