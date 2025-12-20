@@ -21,6 +21,7 @@ import { statsRoute } from '@routes/stats';
 import { syncRoute } from '@routes/sync';
 import { webhooksPlugin } from '@routes/webhooks';
 import { Elysia } from 'elysia';
+import { chmodSync, existsSync, unlinkSync } from 'node:fs';
 
 // start sync service
 import './services/sync';
@@ -36,6 +37,10 @@ const devPlugin = (app: Elysia) => {
     console.error(error);
   });
 };
+
+if (unix && existsSync(unix)) {
+  unlinkSync(unix);
+}
 
 export const app = new Elysia({
   serve: {
@@ -72,6 +77,7 @@ export const app = new Elysia({
   .all('/support', ctx => ctx.redirect(SUPPORT_URL, 303))
   .all('/discord', ctx => ctx.redirect(DISCORD_INVITE, 303))
   .use(staticPlugin({ prefix: '/', alwaysStatic: true }))
-  .listen(unix ? { unix } : { port, hostname }, server =>
-    console.log(`Server started at ${server.url}`)
-  );
+  .listen(unix ? { unix } : { port, hostname }, server => {
+    if (unix) chmodSync(unix, 0o666);
+    console.log(`Server started at ${server.url}`);
+  });
