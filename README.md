@@ -22,7 +22,9 @@ directory and make a file named `.env`.
 git clone https://github.com/touhidurrr/UncivServer.xyz.git
 cd UncivServer.xyz
 
-# If running via docker, should be `echo "MONGO_URL=mongodb://localhost" > .env`
+# By default UncivServer.xyz assumes you are using a locally hosted MongoDB server
+# on default host and port. If not, do: `echo "MONGO_URL=mongodb://localhost" > .env`
+# You can also get a free MongoDB Cloud Server on https://www.mongodb.com/cloud/atlas/register
 echo "MONGO_URL=<Your MongoDB URL>" > .env
 
 # Required for sync tests to pass
