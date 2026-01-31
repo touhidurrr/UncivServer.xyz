@@ -1,0 +1,5 @@
+.*
+test*
+eslint*
+bun.lock*
+Procfile

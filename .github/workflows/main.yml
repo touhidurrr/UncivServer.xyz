@@ -44,7 +44,7 @@ jobs:
           MONGO_URL=mongodb://localhost:27017/unciv \
           bun test
 
-  deploy:
+  publish:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     needs: test
