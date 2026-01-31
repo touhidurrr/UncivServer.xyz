@@ -1,0 +1,78 @@
+name: Run Tests & Build & Publish to Docker Hub
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    defaults:
+      run:
+        shell: bash
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Run Build Script
+        run: bun run build
+
+      - name: Install Dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Lint TypeScript
+        run: bun lint
+
+      - name: Start MongoDB
+        uses: supercharge/mongodb-github-action@1.12.0
+        with:
+          mongodb-db: unciv
+
+      - name: Run tests
+        run: |
+          JWT_KEY=$(openssl rand -base64 64) \
+          SYNC_TOKEN=$(openssl rand -base64 32) \
+          DISCORD_TOKEN=$(openssl rand -base64 32) \
+          MONGO_URL=mongodb://localhost:27017/unciv \
+          bun test
+
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: test
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          platforms: linux/amd64,linux/arm64
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Get Project Version
+        run: |
+          VERSION=$(cat package.json | jq -r .version)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: touhidurrr/uncivserver:latest,touhidurrr/uncivserver:${{ env.VERSION }}
