@@ -1,4 +1,4 @@
-FROM dhi.io/bun
+FROM dhi.io/bun:1
 WORKDIR /usr/touhidurrr/app
 
 COPY . .
