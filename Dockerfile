@@ -1,4 +1,4 @@
-FROM oven/bun:slim
+FROM dhi.io/bun
 WORKDIR /usr/touhidurrr/app
 
 COPY . .
