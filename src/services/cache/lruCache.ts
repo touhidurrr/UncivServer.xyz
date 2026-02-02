@@ -29,10 +29,14 @@ const lruCache = new LRUCache<string, string>({
 
 setInterval(
   () => {
+    const { size, maxSize, calculatedSize } = lruCache;
     console.info('[Cache] Stats:', {
-      size: lruCache.size,
-      maxSize: format(lruCache.maxSize),
-      calculatedSize: format(lruCache.calculatedSize),
+      items: size,
+      size: format(calculatedSize),
+      limits: {
+        items: +MAX_CACHE_ITEMS,
+        size: format(maxSize),
+      },
     });
   },
   1000 * 60 * 5
