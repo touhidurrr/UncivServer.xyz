@@ -5,7 +5,7 @@ import { LRUCache } from 'lru-cache';
 
 const { 
   MAX_CACHE_SIZE,
-  MAX_CACHE_ITEMS = FILES_CACHE_MAX_SIZE
+  MAX_CACHE_ITEMS = FILES_CACHE_MAX_ITEMS
 } = process.env;
 
 let maxCacheSize = FILES_CACHE_MAX_SIZE;
