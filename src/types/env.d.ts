@@ -11,6 +11,7 @@ declare namespace NodeJS {
     SYNC_SERVERS?: string;
     DISCORD_TOKEN?: string;
     MAX_CACHE_SIZE?: string;
+    MAX_CACHE_ITEMS?: string;
     UNIX_SOCKET_PATH?: string;
     PATREON_WEBHOOK_SECRET?: string;
     BUYMEACOFFEE_WEBHOOK_SECRET?: string;
