@@ -3,19 +3,24 @@ import type { CacheService } from '@models/cache';
 import { format, parse } from 'bytes';
 import { LRUCache } from 'lru-cache';
 
+const { 
+  MAX_CACHE_SIZE,
+  MAX_CACHE_ITEMS = FILES_CACHE_MAX_SIZE
+} = process.env;
+
 let maxCacheSize = FILES_CACHE_MAX_SIZE;
 
-if (process.env.MAX_CACHE_SIZE) {
-  console.info('[Cache] MAX_CACHE_SIZE:', process.env.MAX_CACHE_SIZE);
-  const parsedMaxCacheSize = parse(process.env.MAX_CACHE_SIZE);
+if (MAX_CACHE_SIZE) {
+  console.info('[Cache] MAX_CACHE_SIZE:', MAX_CACHE_SIZE);
+  const parsedMaxCacheSize = parse(MAX_CACHE_SIZE);
   if (parsedMaxCacheSize === null) {
-    throw new Error(`Invalid MAX_CACHE_SIZE: ${process.env.MAX_CACHE_SIZE}`);
+    throw new Error(`Invalid MAX_CACHE_SIZE: ${MAX_CACHE_SIZE}`);
   }
   maxCacheSize = parsedMaxCacheSize;
 }
 
 const lruCache = new LRUCache<string, string>({
-  max: FILES_CACHE_MAX_ITEMS,
+  max: +MAX_CACHE_ITEMS,
   maxSize: maxCacheSize,
   // according to stackoverflow, any character is stored as utf-16
   // utf-16 is 2 bytes per character
