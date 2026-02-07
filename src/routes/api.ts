@@ -142,9 +142,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
             idToProfile.set(p._id, p);
           }
 
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           const ratings = calculateRating(ids.map(id => idToProfile.get(id)!.rating!));
-
           const bulkUpdateOps: Array<AnyBulkWriteOperation<(typeof profiles)[0]>> = [];
 
           ids.forEach((_id, i) => {

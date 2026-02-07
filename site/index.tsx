@@ -53,7 +53,6 @@ const Home = () => {
           <iframe
             src="https://canary.discord.com/widget?id=866650187211210762&theme=dark"
             className="discord-frame"
-            allowTransparency={true}
             sandbox="allow-popups allow-popups-to-escape-sandbox allow-same-origin allow-scripts"
             title="Discord Widget"
           />

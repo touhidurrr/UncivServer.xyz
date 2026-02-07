@@ -7,7 +7,6 @@ import { choice, probability } from 'randomcryp';
 
 const DEFAULT_NOTIFICATION = 'Welcome to UncivServer.xyz!';
 const DEFAULT_NOTIFICATION_ICON = 'NotificationIcons/RobotArm';
-// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 const DEFAULT_SPN_ICON = notificationsData.icons.promotion[0]!;
 
 // Self promotion notification probability
@@ -145,7 +144,6 @@ export class UncivGame {
     if (this.data.turns) {
       // Self promotion notifications
       if (probability(SPN_PROBABILITY)) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const { message, url, icon } = choice(notificationsData.promotions)!;
         text = message;
         icons[0] = icon || DEFAULT_SPN_ICON;
@@ -153,9 +151,7 @@ export class UncivGame {
           actions[0] = { LinkAction: { url } };
         }
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         text = choice(notificationsData.messages)!;
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         icons[0] = choice(notificationsData.icons.classic)!;
       }
     }

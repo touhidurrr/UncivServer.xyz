@@ -21,10 +21,11 @@ export const getRandomSave = (
     }
     size = parsedSize;
   }
-  let save = '';
-  let mid = 0;
+
+  let mid;
   let low = 0;
   let high = size * 2;
+  let save = '';
 
   let i = 0;
   while (low <= high && i < 20) {
