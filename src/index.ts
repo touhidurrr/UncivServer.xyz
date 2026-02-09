@@ -84,3 +84,7 @@ export const app = new Elysia({
     if (unix) chmod(unix, 0o666);
     console.log(`Server started at ${server.url}`);
   });
+
+// periodically run gc
+setInterval(Bun.gc, 100_000);
+
