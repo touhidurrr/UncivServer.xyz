@@ -1,17 +1,20 @@
 FROM dhi.io/bun:1-dev AS build
-WORKDIR /usr/touhidurrr/app
+WORKDIR /build
 
-# Copy files and build
 COPY . .
+
 RUN bun run build
 
-# Remove unnecessary files in the build stage
-RUN rm -rf scripts bun.lock site .eleventy.js
+ENV BUN_OPTIONS="--minify --sourcemap --no-compile-autoload-dotenv"
+RUN bun build --compile src/index.ts --outfile uncivserver
 
-FROM dhi.io/bun:1
+FROM dhi.io/debian-base:trixie
 WORKDIR /usr/touhidurrr/app
 
-COPY --from=build /usr/touhidurrr/app .
+COPY LICENSE .
+COPY bunfig.toml .
+COPY --from=build /build/public public
+COPY --from=build --chmod=+x /build/uncivserver .
 
 EXPOSE 1557
-CMD ["bun", "src"]
+CMD ["./uncivserver"]
