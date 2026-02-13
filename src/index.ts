@@ -87,4 +87,3 @@ export const app = new Elysia({
 
 // periodically run gc
 setInterval(Bun.gc, 100_000);
-

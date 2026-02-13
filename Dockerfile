@@ -5,7 +5,8 @@ COPY . .
 
 RUN bun run build
 
-ENV BUN_OPTIONS="--minify --sourcemap --no-compile-autoload-dotenv"
+ENV NODE_ENV=production
+ENV BUN_OPTIONS="--bytecode --minify --sourcemap --format=esm"
 RUN bun build --compile src/index.ts --outfile uncivserver
 
 FROM dhi.io/debian-base:trixie
