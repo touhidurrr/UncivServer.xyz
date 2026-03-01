@@ -39,7 +39,7 @@
     "bytes": "^3.1.2",
     "cache-control-parser": "^2.2.0",
     "date-fns": "^4.1.0",
-    "discord-api-types": "^0.38.38",
+    "discord-api-types": "^0.38.40",
     "elysia": "^1.4.25",
     "lru-cache": "^11.2.6",
     "mongoose": "^9.2.1",
