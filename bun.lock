@@ -19,7 +19,7 @@
         "mongoose": "^9.2.1",
         "node-cache": "^5.1.2",
         "openskill": "^4.1.0",
-        "randomcryp": "^2.1.3",
+        "randomcryp": "^2.2.0",
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
         "react-icons": "^5.5.0",
@@ -735,7 +735,7 @@
 
     "ramda": ["ramda@0.30.1", "", {}, "sha512-tEF5I22zJnuclswcZMc8bDIrwRHRzf+NqVEmqg50ShAZMP7MWeR/RGDthfM/p+BlqvF2fXAzpn8i+SJcYD3alw=="],
 
-    "randomcryp": ["randomcryp@2.1.3", "", {}, "sha512-uhr85/lIKmEsLyCsQeBhzKLSfd7At84t4F/Ttay0IUQQxiaUEwPnnk+MPgJcxdmQJRfh4yqicQU/uG7xZ9+ENA=="],
+    "randomcryp": ["randomcryp@2.2.0", "", {}, "sha512-G/Hii2LTs+faHVlE2j6sJ8LEiRoOg8tHrZLyquPJsIg1AcxGuc/zCIJDKwoRK4zTh74VfSj3bFZQRCu9aUoyjA=="],
 
     "range-parser": ["range-parser@1.2.1", "", {}, "sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg=="],
 
