@@ -59,7 +59,7 @@
     "axios": "^1.13.5",
     "eslint": "^10.0.0",
     "eslint-plugin-react": "^7.37.5",
-    "globals": "^17.3.0",
+    "globals": "^17.4.0",
     "jiti": "^2.6.1",
     "prettier": "^3.8.1",
     "prettier-plugin-jinja-template": "^2.1.0",
