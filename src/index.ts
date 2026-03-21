@@ -62,7 +62,6 @@ export const app = new Elysia({
       if (+contentLen > MAX_CONTENT_LENGTH) return status(413);
     }
   })
-  .use(staticPlugin({ prefix: '/', alwaysStatic: true }))
   .use(devPlugin)
   .use(statsRoute)
   .use(jwtPlugin)
@@ -80,10 +79,8 @@ export const app = new Elysia({
   })
   .all('/support', ctx => ctx.redirect(SUPPORT_URL, 303))
   .all('/discord', ctx => ctx.redirect(DISCORD_INVITE, 303))
+  .use(await staticPlugin({ prefix: '/', alwaysStatic: true }))
   .listen(unix ? { unix } : { port, hostname }, server => {
     if (unix) chmod(unix, 0o666);
     console.log(`Server started at ${server.url}`);
   });
-
-// periodically run gc
-setInterval(Bun.gc, 100_000);
