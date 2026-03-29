@@ -2,20 +2,22 @@ import { BEARER_TOKEN_SCHEMA } from '@constants';
 import { jwt } from '@elysiajs/jwt';
 import { isValidSyncToken } from '@lib';
 import { Variable } from '@models/Variable';
+import { connectDB } from '@services/mongodb';
 import { type } from 'arktype';
 import { Elysia } from 'elysia';
 
 export const jwtPlugin = new Elysia({ name: 'jwt', prefix: 'jwt' })
-  .use(
-    Variable.findById('jwt-key', { value: 1, _id: 0 }).then(v =>
-      jwt({
-        name: 'jwt',
-        exp: '1h',
-        alg: 'HS512',
-        secret: `${v?.value ?? process.env.JWT_KEY}`,
-      })
-    )
-  )
+  .use(async () => {
+    await connectDB();
+    const result = await Variable.findById('jwt-key', { value: 1, _id: 0 });
+    const secret = result?.value ?? process.env.JWT_KEY;
+    return jwt({
+      secret,
+      exp: '1h',
+      name: 'jwt',
+      alg: 'HS512',
+    });
+  })
   .get(
     ':name',
     async ({ jwt, status, params: { name }, cookie: { auth }, headers: { authorization } }) => {
@@ -23,7 +25,7 @@ export const jwtPlugin = new Elysia({ name: 'jwt', prefix: 'jwt' })
         return status('Unauthorized');
       }
 
-      const value = await jwt.sign({ name });
+      const value = await jwt?.sign({ name });
 
       auth.set({
         value,
@@ -38,7 +40,7 @@ export const jwtPlugin = new Elysia({ name: 'jwt', prefix: 'jwt' })
   .post(
     'verify',
     async ({ status, jwt, body: token }) => {
-      const verified = await jwt.verify(token);
+      const verified = await jwt?.verify(token);
       if (!verified) return status('Unauthorized');
       return 'OK';
     },

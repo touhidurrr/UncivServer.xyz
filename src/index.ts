@@ -24,19 +24,25 @@ import { connectDB } from '@services/mongodb';
 import { Elysia } from 'elysia';
 import { chmod } from 'node:fs/promises';
 
+// connect to database and clean up unix socket if exists
+await Promise.all([
+  connectDB(),
+  async () => {
+    if (unix) {
+      const file = Bun.file(unix);
+      if (await file.exists()) {
+        await file.unlink();
+      }
+    }
+  },
+]);
+
 // start sync service
 import '@services/sync';
 
 const port = process.env.PORT ?? DEFAULT_PORT;
 const hostname = process.env.HOST ?? DEFAULT_HOST;
 const unix = process.env.UNIX_SOCKET_PATH;
-
-if (unix) {
-  const file = Bun.file(unix);
-  if (await file.exists()) {
-    await file.unlink();
-  }
-}
 
 export const app = new Elysia({
   serve: {
@@ -47,14 +53,12 @@ export const app = new Elysia({
     publishToSelf: true,
   },
 })
-  .use(async app => {
-    await connectDB();
-    if (IS_DEVELOPMENT) {
-      // attach logger in development mode
-      return app
-        .onRequest(({ request: { method, url } }) => console.info(`${method} ${url}`))
-        .onError(({ error }) => console.error(error));
-    } else return app;
+  .use(app => {
+    if (!IS_DEVELOPMENT) return app;
+    // attach logger in development mode
+    return app
+      .onRequest(({ request: { method, url } }) => console.info(`${method} ${url}`))
+      .onError(({ error }) => console.error(error));
   })
   .onRequest(({ status, request: { body, headers } }) => {
     if (body === null) return;
