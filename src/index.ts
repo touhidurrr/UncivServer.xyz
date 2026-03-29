@@ -25,6 +25,7 @@ import { chmod } from 'node:fs/promises';
 
 // start sync service
 import '@services/sync';
+import { connectDB } from '@services/mongodb';
 
 const port = process.env.PORT ?? DEFAULT_PORT;
 const hostname = process.env.HOST ?? DEFAULT_HOST;
@@ -46,11 +47,14 @@ export const app = new Elysia({
     publishToSelf: true,
   },
 })
-  .use(app => {
-    if (!IS_DEVELOPMENT) return app;
-    return app
-      .onRequest(({ request: { method, url } }) => console.info(`${method} ${url}`))
-      .onError(({ error }) => console.error(error));
+  .use(async app => {
+    await connectDB();
+    if (IS_DEVELOPMENT) {
+      // attach logger in development mode
+      return app
+        .onRequest(({ request: { method, url } }) => console.info(`${method} ${url}`))
+        .onError(({ error }) => console.error(error));
+    } else return app;
   })
   .onRequest(({ status, request: { body, headers } }) => {
     if (body === null) return;
