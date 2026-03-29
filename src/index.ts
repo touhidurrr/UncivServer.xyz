@@ -20,12 +20,12 @@ import { jwtPlugin } from '@routes/jwt';
 import { statsRoute } from '@routes/stats';
 import { syncRoute } from '@routes/sync';
 import { webhooksPlugin } from '@routes/webhooks';
+import { connectDB } from '@services/mongodb';
 import { Elysia } from 'elysia';
 import { chmod } from 'node:fs/promises';
 
 // start sync service
 import '@services/sync';
-import { connectDB } from '@services/mongodb';
 
 const port = process.env.PORT ?? DEFAULT_PORT;
 const hostname = process.env.HOST ?? DEFAULT_HOST;
