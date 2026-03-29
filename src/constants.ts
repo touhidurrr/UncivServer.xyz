@@ -94,8 +94,7 @@ export const SUPPORT_EMBED_MESSAGE = `Enjoying **UncivServer.xyz**? **[${SUPPORT
 export const SUPPORT_EMBED: Readonly<APIEmbed> = {
   author: {
     name: 'Buy touhidurrr a Coffee!',
-    icon_url:
-      'https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExanozM2hzZmUwaDV6Mm9uN3htY3ZwdDVtcWJiaTd1dzh4dGFxenp6aSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/TDQOtnWgsBx99cNoyH/giphy.gif',
+    icon_url: 'https://media.giphy.com/media/TDQOtnWgsBx99cNoyH/giphy.gif',
   },
   title: 'Support the Project',
   description: SUPPORT_EMBED_MESSAGE,
