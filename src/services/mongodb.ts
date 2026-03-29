@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const { MONGO_URL = 'mongodb://localhost' } = process.env;
 
 export const connectDB = async () => {
-  if (mongoose.connection.readyState === 1) return;
+  if (mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2) return;
   try {
     await mongoose.connect(MONGO_URL, {
       dbName: 'unciv',

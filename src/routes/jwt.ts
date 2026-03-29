@@ -7,17 +7,19 @@ import { type } from 'arktype';
 import { Elysia } from 'elysia';
 
 export const jwtPlugin = new Elysia({ name: 'jwt', prefix: 'jwt' })
-  .use(async () => {
-    await connectDB();
-    const result = await Variable.findById('jwt-key', { value: 1, _id: 0 });
-    const secret = result?.value ?? process.env.JWT_KEY;
-    return jwt({
-      secret,
-      exp: '1h',
-      name: 'jwt',
-      alg: 'HS512',
-    });
-  })
+  .use(
+    connectDB()
+      .then(() => Variable.findById('jwt-key', { value: 1, _id: 0 }))
+      .then(result => {
+        const secret = result?.value ?? process.env.JWT_KEY;
+        return jwt({
+          secret,
+          exp: '1h',
+          name: 'jwt',
+          alg: 'HS512',
+        });
+      })
+  )
   .get(
     ':name',
     async ({ jwt, status, params: { name }, cookie: { auth }, headers: { authorization } }) => {
@@ -25,7 +27,7 @@ export const jwtPlugin = new Elysia({ name: 'jwt', prefix: 'jwt' })
         return status('Unauthorized');
       }
 
-      const value = await jwt?.sign({ name });
+      const value = await jwt.sign({ name });
 
       auth.set({
         value,
@@ -40,7 +42,7 @@ export const jwtPlugin = new Elysia({ name: 'jwt', prefix: 'jwt' })
   .post(
     'verify',
     async ({ status, jwt, body: token }) => {
-      const verified = await jwt?.verify(token);
+      const verified = await jwt.verify(token);
       if (!verified) return status('Unauthorized');
       return 'OK';
     },
