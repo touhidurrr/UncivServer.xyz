@@ -1,7 +1,7 @@
+import type { UncivSave } from '@classes/uncivSave';
 import { SUPPORT_EMBED } from '@constants';
 import { REST } from '@discordjs/rest';
 import { getRandomColor } from '@lib/getRandomColor';
-import type { UncivGame } from '@models/uncivGame';
 import {
   Routes,
   type RESTPostAPIChannelMessageJSONBody,
@@ -45,7 +45,7 @@ const getDMChannel = async (discordId: string) => {
   return res.id;
 };
 
-export const sendNewTurnNotification = async (game: UncivGame, name?: string | null) => {
+export const sendNewTurnNotification = async (game: UncivSave, name?: string | null) => {
   const { currentPlayer, currentCiv, gameId } = game;
 
   // Check if the Player exists in DB

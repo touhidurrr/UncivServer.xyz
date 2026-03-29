@@ -23,7 +23,7 @@
       "@lib/*": ["./src/lib/*"],
       "@data/*": ["./src/data/*"],
       "@routes/*": ["./src/routes/*"],
-      "@models/*": ["./src/models/*"],
+      "@classes/*": ["./src/classes/*"],
       "@localTypes/*": ["./src/types/*"],
       "@services/*": ["./src/services/*"]
     },

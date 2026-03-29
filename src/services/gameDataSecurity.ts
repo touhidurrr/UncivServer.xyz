@@ -1,6 +1,6 @@
 import { DISCORD_INVITE, SUPPORT_URL } from '@constants';
 import { promotions } from '@data/notifications';
-import type { UncivGame } from '@models/uncivGame';
+import type { UncivSave } from '@classes/uncivSave';
 import { URL } from 'node:url';
 
 const allowedUrlSet = new Set([DISCORD_INVITE, SUPPORT_URL, ...promotions.map(p => p.url)]);
@@ -24,7 +24,7 @@ export const isAllowedURL = (candidateURL: string): boolean => {
 
 // run security checks and returns true if game data is modified
 // game data should be modified in place
-export const gameDataSecurityModifier = (game: UncivGame): boolean => {
+export const gameDataSecurityModifier = (game: UncivSave): boolean => {
   let hasModifications = false;
 
   // LinkAction security

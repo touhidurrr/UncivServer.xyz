@@ -24,7 +24,7 @@ import { Elysia } from 'elysia';
 import { chmod } from 'node:fs/promises';
 
 // start sync service
-import './services/sync';
+import '@services/sync';
 
 const port = process.env.PORT ?? DEFAULT_PORT;
 const hostname = process.env.HOST ?? DEFAULT_HOST;

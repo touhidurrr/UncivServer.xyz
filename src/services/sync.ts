@@ -12,6 +12,7 @@ const MAX_RECONNECTION_ATTEMPTS = 100;
 // initialize a websocket connection with a sync server
 const initWs = (baseURL: string) => {
   const ws = new WebSocket(`${baseURL}/sync`, {
+    //@ts-expect-error https://bun.com/docs/runtime/http/websockets#connect-to-a-websocket-server
     headers: { Authorization: `Bearer ${SYNC_TOKEN}` },
   });
 

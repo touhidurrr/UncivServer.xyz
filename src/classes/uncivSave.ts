@@ -43,7 +43,7 @@ const UncivGameSchema = type({
   },
 });
 
-export class UncivGame {
+export class UncivSave {
   data: UncivJSON;
   gameId: string;
   previewId: string;

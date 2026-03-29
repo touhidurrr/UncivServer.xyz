@@ -1,5 +1,5 @@
+import type { CacheService } from '@classes/cache';
 import { FILES_CACHE_MAX_ITEMS, FILES_CACHE_MAX_SIZE } from '@constants';
-import type { CacheService } from '@models/cache';
 import { format, parse } from 'bytes';
 import { LRUCache } from 'lru-cache';
 

@@ -1,5 +1,5 @@
 import { MAX_FILE_SIZE, MIN_FILE_SIZE, UNCIV_BASIC_AUTH_HEADER_SCHEMA } from '@constants';
-import { UncivGame } from '@models/uncivGame';
+import { UncivSave } from '@classes/uncivSave';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import cache from '@services/cache';
 import { isDiscordTokenValid, sendNewTurnNotification } from '@services/discord';
@@ -17,7 +17,7 @@ export const putFile = (app: Elysia) =>
     },
     app =>
       app
-        .derive(({ body }) => ({ game: new UncivGame(body) }))
+        .derive(({ body }) => ({ game: new UncivSave(body) }))
         .put(
           ':gameId',
           async ({ body, params: { gameId }, status, game, headers }) => {

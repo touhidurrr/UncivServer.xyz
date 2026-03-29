@@ -1,6 +1,6 @@
+import { HMAC } from '@classes/hmac';
 import { broadcastToChat } from '@lib';
 import type { BMCWebhookEvent } from '@localTypes/buymeacoffee';
-import { HMAC } from '@models/hmac';
 import { type } from 'arktype';
 import type { Elysia } from 'elysia';
 
