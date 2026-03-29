@@ -28,7 +28,7 @@ jobs:
       - name: Install Dependencies
         run: bun install --frozen-lockfile
 
-      - name: Lint TypeScript
+      - name: Lint
         run: bun lint
 
       - name: Start MongoDB
