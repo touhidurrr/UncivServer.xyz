@@ -1,4 +1,4 @@
-import { HMAC } from '@classes/hmac';
+import { HMAC } from '@classes/HMAC';
 import { broadcastToChat } from '@lib';
 import type { BMCWebhookEvent } from '@localTypes/buymeacoffee';
 import { type } from 'arktype';

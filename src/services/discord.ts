@@ -1,14 +1,14 @@
-import type { UncivSave } from '@classes/uncivSave';
+import type { UncivSave } from '@classes/UncivSave';
 import { SUPPORT_EMBED } from '@constants';
 import { REST } from '@discordjs/rest';
 import { getRandomColor } from '@lib/getRandomColor';
+import { PlayerProfile } from '@models/PlayerProfile';
 import {
   Routes,
   type RESTPostAPIChannelMessageJSONBody,
   type RESTPostAPIChannelMessageResult,
   type RESTPostAPICurrentUserCreateDMChannelResult,
 } from 'discord-api-types/rest/v10';
-import { db } from './mongodb';
 
 const DISCORD_TOKEN = process.env.DISCORD_TOKEN;
 
@@ -51,7 +51,7 @@ export const sendNewTurnNotification = async (game: UncivSave, name?: string | n
   // Check if the Player exists in DB
   const playerId = currentCiv?.playerId;
   if (!playerId) return;
-  const playerProfile = await db.PlayerProfile.findOne(
+  const playerProfile = await PlayerProfile.findOne(
     { uncivUserIds: playerId },
     { notifications: 1, dmChannel: 1 }
   );

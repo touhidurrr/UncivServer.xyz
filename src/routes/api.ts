@@ -1,9 +1,11 @@
 import { BEARER_TOKEN_SCHEMA, STRING_BOOL_SCHEMA, UUID_SCHEMA } from '@constants';
-import db from '@services/mongodb';
+import { PlayerProfile } from '@models/PlayerProfile';
+import { UncivGame } from '@models/UncivGame';
 import { calculateRating } from '@services/rating';
 import { type } from 'arktype';
 import { Elysia } from 'elysia';
 import type { AnyBulkWriteOperation } from 'mongoose';
+import mongoose from 'mongoose';
 import { jwtPlugin } from './jwt';
 
 export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugin).guard(
@@ -22,7 +24,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
       .guard({ params: type({ gameId: UUID_SCHEMA }) }, app =>
         app
           .get('games/:gameId/name', async ({ status, params: { gameId } }) => {
-            const game = await db.UncivGame.findById(`${gameId}_Preview`, { _id: 0, name: 1 });
+            const game = await UncivGame.findById(`${gameId}_Preview`, { _id: 0, name: 1 });
             if (!game || !game.name) return status('Not Found');
             return game.name;
           })
@@ -30,7 +32,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
             'games/:gameId/name',
             async ({ status, params: { gameId }, body: { name } }) => {
               if (name.length === 0) return status('Bad Request');
-              const { matchedCount } = await db.UncivGame.updateOne(
+              const { matchedCount } = await UncivGame.updateOne(
                 { _id: `${gameId}_Preview` },
                 { $set: { name } }
               );
@@ -39,7 +41,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
             { body: type({ name: 'string <= 100' }) }
           )
           .delete('games/:gameId/name', async ({ status, params: { gameId } }) => {
-            const { matchedCount } = await db.UncivGame.updateOne(
+            const { matchedCount } = await UncivGame.updateOne(
               { _id: `${gameId}_Preview` },
               { $unset: { name: '' } }
             );
@@ -50,36 +52,36 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
       .guard({ params: type({ _id: 'string.digits > 0' }) }, app =>
         app
           .get('profiles/:_id', ({ params: { _id } }) =>
-            db.PlayerProfile.findById(_id)
-              .then(p => p || db.PlayerProfile.create({ _id }))
+            PlayerProfile.findById(_id)
+              .then(p => p || PlayerProfile.create({ _id }))
               .then(p => p.toObject())
           )
 
           .post(
             'profiles/:_id/notifications',
             ({ params: { _id }, body: { status } }) =>
-              db.PlayerProfile.updateOne({ _id }, { $set: { notifications: status } }),
+              PlayerProfile.updateOne({ _id }, { $set: { notifications: status } }),
             { body: type({ status: "'enabled' | 'disabled'" }) }
           )
 
           .post(
             'profiles/:_id/uncivUserIds',
             ({ params: { _id }, body: { userId } }) =>
-              db.PlayerProfile.updateOne({ _id }, { $addToSet: { uncivUserIds: userId } }),
+              PlayerProfile.updateOne({ _id }, { $addToSet: { uncivUserIds: userId } }),
             { body: type({ userId: UUID_SCHEMA }) }
           )
 
           .delete(
             'profiles/:_id/uncivUserIds',
             ({ params: { _id }, body: { userId } }) =>
-              db.PlayerProfile.updateOne({ _id }, { $pull: { uncivUserIds: userId } }),
+              PlayerProfile.updateOne({ _id }, { $pull: { uncivUserIds: userId } }),
             { body: type({ userId: UUID_SCHEMA }) }
           )
 
           .get(
             'profiles/:_id/games',
             async ({ status, params: { _id }, query: { playing, limit } }) => {
-              const profile = await db.PlayerProfile.findById(_id, { uncivUserIds: 1 });
+              const profile = await PlayerProfile.findById(_id, { uncivUserIds: 1 });
               if (!profile) return status(404);
               if (profile.uncivUserIds.length < 1) return status(204);
 
@@ -88,7 +90,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
                   ? { playerId: profile.uncivUserIds }
                   : { players: { $in: profile.uncivUserIds } };
 
-              const games = await db.UncivGame.find(
+              const games = await UncivGame.find(
                 filter,
                 { createdAt: 1, updatedAt: 1, currentPlayer: 1, name: 1, turns: 1 },
                 {
@@ -115,7 +117,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
       .get(
         'users/:_id/profileId',
         async ({ status, params: { _id } }) => {
-          const profile = await db.PlayerProfile.findOne({ uncivUserIds: _id }, { _id: 1 });
+          const profile = await PlayerProfile.findOne({ uncivUserIds: _id }, { _id: 1 });
           if (!profile) return status(404);
           return profile._id;
         },
@@ -125,7 +127,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
       .post(
         'profiles/rating',
         async ({ body: { ids } }) => {
-          const profiles = await db.PlayerProfile.find({ _id: { $in: ids } }, { rating: 1 });
+          const profiles = await PlayerProfile.find({ _id: { $in: ids } }, { rating: 1 });
 
           if (profiles.length < ids.length) {
             const idSet = new Set(ids);
@@ -133,7 +135,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
             const diffSet = idSet.difference(profileIdSet);
 
             const newDocs = Array.from(diffSet).map(_id => ({ _id }));
-            const newProfiles = await db.PlayerProfile.create(newDocs);
+            const newProfiles = await PlayerProfile.create(newDocs);
             profiles.push(...newProfiles);
           }
 
@@ -179,7 +181,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
             });
           });
 
-          await db.PlayerProfile.bulkWrite(bulkUpdateOps);
+          await PlayerProfile.bulkWrite(bulkUpdateOps);
 
           return ratings.map(r => r.cur);
         },
@@ -189,10 +191,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
       .post(
         'filterUnregisteredUserIds',
         async ({ body: { userIds } }) => {
-          const profiles = await db.PlayerProfile.find(
-            { uncivUserIds: userIds },
-            { uncivUserIds: 1 }
-          );
+          const profiles = await PlayerProfile.find({ uncivUserIds: userIds }, { uncivUserIds: 1 });
           return [...new Set(profiles.flatMap(p => p.uncivUserIds)).intersection(new Set(userIds))];
         },
         {
@@ -200,5 +199,5 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
         }
       )
 
-      .get('stats', () => db.stats())
+      .get('stats', () => mongoose.connection.db?.stats())
 );

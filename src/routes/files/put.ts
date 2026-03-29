@@ -1,10 +1,11 @@
+import { UncivSave } from '@classes/UncivSave';
 import { MAX_FILE_SIZE, MIN_FILE_SIZE, UNCIV_BASIC_AUTH_HEADER_SCHEMA } from '@constants';
-import { UncivSave } from '@classes/uncivSave';
+import { Auth } from '@models/Auth';
+import { UncivGame } from '@models/UncivGame';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import cache from '@services/cache';
 import { isDiscordTokenValid, sendNewTurnNotification } from '@services/discord';
 import { gameDataSecurityModifier } from '@services/gameDataSecurity';
-import { db } from '@services/mongodb';
 import { type } from 'arktype';
 import type { Elysia } from 'elysia';
 import { percentage } from 'randomcryp';
@@ -24,8 +25,8 @@ export const putFile = (app: Elysia) =>
             const [userId, password] = headers.authorization;
 
             const [dbAuth, dbGame] = await Promise.all([
-              db.Auth.findById(userId, { hash: 1 }),
-              db.UncivGame.findById(game.previewId, { players: 1 }),
+              Auth.findById(userId, { hash: 1 }),
+              UncivGame.findById(game.previewId, { players: 1 }),
             ]);
 
             if (dbAuth) {
@@ -61,8 +62,8 @@ export const putFile = (app: Elysia) =>
             afterResponse: async ({ body, server, params: { gameId }, game }) => {
               const isPreview = gameId.endsWith('_Preview');
               const [, name] = await Promise.allSettled([
-                db.UncivGame.updateOne({ _id: gameId }, { $set: { text: body } }, { upsert: true }),
-                db.UncivGame.findByIdAndUpdate(
+                UncivGame.updateOne({ _id: gameId }, { $set: { text: body } }, { upsert: true }),
+                UncivGame.findByIdAndUpdate(
                   game.previewId,
                   {
                     $set: {

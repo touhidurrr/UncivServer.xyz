@@ -1,4 +1,4 @@
-import type { CacheService } from '@classes/cache';
+import type { CacheService } from '@classes/CacheService';
 import { REDIS_DEFAULT_URL } from '@constants';
 import { RedisClient } from 'bun';
 

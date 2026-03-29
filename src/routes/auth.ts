@@ -1,5 +1,5 @@
 import { NO_CACHE_CONTROL, UNCIV_BASIC_AUTH_HEADER_SCHEMA } from '@constants';
-import db from '@services/mongodb';
+import { Auth } from '@models/Auth';
 import { type } from 'arktype';
 import type { Elysia } from 'elysia';
 
@@ -15,7 +15,7 @@ export const authRoute = (app: Elysia) =>
 
           const [userId, password] = headers.authorization;
 
-          const dbAuth = await db.Auth.findById(userId, { hash: 1 });
+          const dbAuth = await Auth.findById(userId, { hash: 1 });
           if (dbAuth === null) return status(204);
 
           const verified = await Bun.password.verify(password, dbAuth.hash);
@@ -31,10 +31,10 @@ export const authRoute = (app: Elysia) =>
 
             const [userId, password] = headers.authorization;
 
-            const dbAuth = await db.Auth.findById(userId, { hash: 1 });
+            const dbAuth = await Auth.findById(userId, { hash: 1 });
             if (dbAuth === null) {
               const hash = await Bun.password.hash(newPassword);
-              await db.Auth.create({ _id: userId, hash });
+              await Auth.create({ _id: userId, hash });
               return 'Successfully assigned a new password';
             }
 

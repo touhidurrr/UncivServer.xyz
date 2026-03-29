@@ -30,14 +30,6 @@ const port = process.env.PORT ?? DEFAULT_PORT;
 const hostname = process.env.HOST ?? DEFAULT_HOST;
 const unix = process.env.UNIX_SOCKET_PATH;
 
-// loggers for debugging in development
-const devPlugin = (app: Elysia) => {
-  if (!IS_DEVELOPMENT) return app;
-  return app.onError(({ error }) => {
-    console.error(error);
-  });
-};
-
 if (unix) {
   const file = Bun.file(unix);
   if (await file.exists()) {
@@ -54,15 +46,18 @@ export const app = new Elysia({
     publishToSelf: true,
   },
 })
-  .onRequest(({ request, status }) => {
-    if (IS_DEVELOPMENT) console.info(`${request.method} ${request.url}`);
-    if (request.body !== null) {
-      const contentLen = Number(request.headers.get('content-length'));
-      if (!contentLen || contentLen < MIN_CONTENT_LENGTH) return status(400);
-      if (+contentLen > MAX_CONTENT_LENGTH) return status(413);
-    }
+  .use(app => {
+    if (!IS_DEVELOPMENT) return app;
+    return app
+      .onRequest(({ request: { method, url } }) => console.info(`${method} ${url}`))
+      .onError(({ error }) => console.error(error));
   })
-  .use(devPlugin)
+  .onRequest(({ status, request: { body, headers } }) => {
+    if (body === null) return;
+    const contentLen = Number(headers.get('content-length'));
+    if (!contentLen || contentLen < MIN_CONTENT_LENGTH) return status(400);
+    if (+contentLen > MAX_CONTENT_LENGTH) return status(413);
+  })
   .use(statsRoute)
   .use(jwtPlugin)
   .use(filesPlugin)

@@ -1,6 +1,6 @@
+import type { UncivSave } from '@classes/UncivSave';
 import { DISCORD_INVITE, SUPPORT_URL } from '@constants';
 import { promotions } from '@data/notifications';
-import type { UncivSave } from '@classes/uncivSave';
 import { URL } from 'node:url';
 
 const allowedUrlSet = new Set([DISCORD_INVITE, SUPPORT_URL, ...promotions.map(p => p.url)]);

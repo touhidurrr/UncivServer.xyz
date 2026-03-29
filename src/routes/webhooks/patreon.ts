@@ -1,4 +1,4 @@
-import { HMAC } from '@classes/hmac';
+import { HMAC } from '@classes/HMAC';
 import { type } from 'arktype';
 import type { Elysia } from 'elysia';
 

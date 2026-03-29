@@ -1,4 +1,4 @@
-import type { CacheService } from '@classes/cache';
+import type { CacheService } from '@classes/CacheService';
 import { CACHE_TTL_CHECK_INTERVAL_SECONDS, CACHE_TTL_SECONDS } from '@constants';
 import { format } from 'bytes';
 import NodeCache from 'node-cache';

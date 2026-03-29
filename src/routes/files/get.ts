@@ -1,13 +1,13 @@
 import { MINIMAL_CACHE_CONTROL, NO_CACHE_CONTROL } from '@constants';
+import { UncivGame } from '@models/UncivGame';
 import cache from '@services/cache';
-import { db } from '@services/mongodb';
 import type { Elysia } from 'elysia';
 
 export const getFile = (app: Elysia) =>
   app.get(
     ':gameId',
     async ({ status, params: { gameId } }) => {
-      const game = await db.UncivGame.findById(gameId, { _id: 0, text: 1 });
+      const game = await UncivGame.findById(gameId, { _id: 0, text: 1 });
 
       if (!game || !game.text) return status(404);
 

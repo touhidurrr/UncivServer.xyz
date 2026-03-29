@@ -1,7 +1,8 @@
 import { MAX_FILE_SIZE, TEST_GAME_ID } from '@constants';
 import { getAppBaseURL, getRandomBase64String, getRandomSave } from '@lib';
+import { Auth } from '@models/Auth';
+import { UncivGame } from '@models/UncivGame';
 import cache from '@services/cache';
-import db from '@services/mongodb';
 import { pack } from '@services/uncivJSON';
 import axios from 'axios';
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
@@ -52,7 +53,7 @@ describe.concurrent('PUT /files', () => {
       testIds.push(id);
       testIds.push(`${id}_Preview`);
     }
-    const result = await db.UncivGame.deleteMany({ _id: { $in: testIds } });
+    const result = await UncivGame.deleteMany({ _id: { $in: testIds } });
     console.log('PUT /files beforeAll Result:', result);
   });
 
@@ -139,7 +140,7 @@ describe.concurrent('Auth', () => {
   const password = '0'.repeat(6);
 
   afterAll(async () => {
-    const result = await db.Auth.deleteOne({ _id: username });
+    const result = await Auth.deleteOne({ _id: username });
     console.log('Auth afterAll Result:', result);
   });
 
@@ -227,7 +228,7 @@ describe.concurrent('GET /jsons', () => {
     Promise.all([
       cache.del(gameId),
       cache.del(`${gameId}_Preview`),
-      db.UncivGame.deleteMany({ _id: { $in: [gameId, `${gameId}_Preview`] } }),
+      UncivGame.deleteMany({ _id: { $in: [gameId, `${gameId}_Preview`] } }),
     ])
   );
 

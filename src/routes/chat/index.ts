@@ -10,7 +10,8 @@ import type {
   WSChatResponseJoinSuccess,
   WSChatResponseRelay,
 } from '@localTypes/chat';
-import db from '@services/mongodb';
+import { Auth } from '@models/Auth';
+import { UncivGame } from '@models/UncivGame';
 import { unpack } from '@services/uncivJSON';
 import type { Elysia } from 'elysia';
 import type { ElysiaWS } from 'elysia/ws';
@@ -78,7 +79,7 @@ export const chatWebSocket = (app: Elysia) =>
           // password is required for chatting
           if (!password) return status('Unauthorized');
 
-          const dbAuth = await db.Auth.findById(userId, { hash: 1 });
+          const dbAuth = await Auth.findById(userId, { hash: 1 });
           if (!dbAuth) return status('Unauthorized');
           if (dbAuth) {
             const verified = await Bun.password.verify(password, dbAuth.hash);
@@ -129,7 +130,7 @@ export const chatWebSocket = (app: Elysia) =>
             }
             case 'join': {
               const { userId, gameId2CivNames } = ws.data;
-              const games = await db.UncivGame.find(
+              const games = await UncivGame.find(
                 { players: userId, _id: { $in: message.gameIds.map(id => `${id}_Preview`) } },
                 { text: 1 }
               ).then(games => games.map(g => unpack(g.text)));

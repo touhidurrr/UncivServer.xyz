@@ -1,11 +1,11 @@
 import { getAppBaseURL, getRandomSave } from '@lib';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
-import db from '@services/mongodb';
 import axios from 'axios';
 import { describe, expect, test } from 'bun:test';
 import { parse as parseCacheControl } from 'cache-control-parser';
 
 import '@index';
+import { UncivGame } from '@models/UncivGame';
 
 const api = axios.create({
   baseURL: getAppBaseURL(),
@@ -181,7 +181,7 @@ test.concurrent('Uploaded files are relayed properly', async () => {
     expect(receivedData).toBeTrue();
     expect(receivedPreview).toBeTrue();
   } finally {
-    await db.UncivGame.deleteMany({
+    await UncivGame.deleteMany({
       _id: { $in: [gameId, `${gameId}_Preview`] },
     });
   }

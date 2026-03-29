@@ -7,7 +7,7 @@ export let queuedBroadcastMessages = 0;
 let lastBroadcast = 0;
 let nextAvailableSlot = 0;
 
-export const broadcastToChat = (server: Bun.Server | null, message: string) => {
+export const broadcastToChat = (server: Bun.Server<unknown> | null, message: string) => {
   const now = Date.now();
   const earliestSendTime = Math.max(lastBroadcast + MIN_BROADCAST_INTERVAL, now);
   const delay = Math.max(0, nextAvailableSlot - now);

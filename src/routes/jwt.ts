@@ -1,13 +1,13 @@
 import { BEARER_TOKEN_SCHEMA } from '@constants';
 import { jwt } from '@elysiajs/jwt';
 import { isValidSyncToken } from '@lib';
-import db from '@services/mongodb';
+import { Variable } from '@models/Variable';
 import { type } from 'arktype';
 import { Elysia } from 'elysia';
 
 export const jwtPlugin = new Elysia({ name: 'jwt', prefix: 'jwt' })
   .use(
-    db.Variable.findById('jwt-key', { value: 1, _id: 0 }).then(v =>
+    Variable.findById('jwt-key', { value: 1, _id: 0 }).then(v =>
       jwt({
         name: 'jwt',
         exp: '1h',
