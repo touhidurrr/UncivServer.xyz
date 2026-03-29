@@ -89,13 +89,17 @@ export const TEST_GAME_ID = '00000000-0000-0000-0000-000000000000';
 export const SUPPORT_CHANNEL_NAME = 'Buy Me A Coffee';
 export const SUPPORT_URL = 'https://buymeacoffee.com/touhidurrr';
 export const SUPPORT_MESSAGE = `Enjoying UncivServer.xyz? Consider supporting the project at https://uncivserver.xyz/support !`;
-export const SUPPORT_EMBED_MESSAGE = `Enjoying **UncivServer.xyz**? Consider supporting the project at [${SUPPORT_CHANNEL_NAME}](${SUPPORT_URL})!`;
+export const SUPPORT_EMBED_MESSAGE = `Enjoying **UncivServer.xyz**? **[${SUPPORT_CHANNEL_NAME}](${SUPPORT_URL})**!`;
 
-export const SUPPORT_EMBED: Readonly<APIEmbed> = Object.freeze({
+export const SUPPORT_EMBED: Readonly<APIEmbed> = {
+  author: {
+    name: 'Buy touhidurrr a Coffee!',
+    icon_url: 'https://i.imgur.com/tPsHJEE.png',
+  },
   title: 'Support the Project',
   description: SUPPORT_EMBED_MESSAGE,
   color: 0xffdd00,
-});
+};
 
 // Misc
 export const DISCORD_INVITE = 'https://discord.gg/cdDhexB6qh';
