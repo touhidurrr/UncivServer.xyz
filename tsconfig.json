@@ -3,13 +3,12 @@
   "include": ["src", "tests", "site"],
 
   "compilerOptions": {
+    "types": ["bun", "bytes", "react-dom"],
+
     "lib": ["ESNext", "DOM"],
     "target": "ESNext",
-    "module": "ESNext",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
+    "module": "Preserve",
 
-    // elysia jsx
     "jsx": "react",
 
     // paths
@@ -38,10 +37,10 @@
     "noEmit": true,
 
     // Best practices
-    "strict": true,
     "skipLibCheck": true,
     "noImplicitAny": true,
     "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true,
 
     // Some stricter flags
     "noUnusedLocals": true,
