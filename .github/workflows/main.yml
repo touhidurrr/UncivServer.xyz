@@ -1,6 +1,8 @@
 name: Run Tests & Build & Publish to Docker Hub
 
-on: [push, pull_request, workflow_dispatch]
+on:
+  push:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -11,7 +13,7 @@ jobs:
       run:
         shell: bash
 
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
 
     steps:
       - name: Checkout
@@ -44,7 +46,7 @@ jobs:
           bun test
 
   publish:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     needs: test
 
@@ -81,4 +83,6 @@ jobs:
           context: .
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: touhidurrr/uncivserver:latest,touhidurrr/uncivserver:${{ env.VERSION }}
+          tags: |
+            touhidurrr/uncivserver:latest
+            touhidurrr/uncivserver:${{ env.VERSION }}
