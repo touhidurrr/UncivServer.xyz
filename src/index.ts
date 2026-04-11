@@ -24,6 +24,10 @@ import { connectDB } from '@services/mongodb';
 import { Elysia } from 'elysia';
 import { chmod } from 'node:fs/promises';
 
+const port = process.env.PORT ?? DEFAULT_PORT;
+const hostname = process.env.HOST ?? DEFAULT_HOST;
+const unix = process.env.UNIX_SOCKET_PATH;
+
 // connect to database and clean up unix socket if exists
 await Promise.all([
   connectDB(),
@@ -39,10 +43,6 @@ await Promise.all([
 
 // start sync service
 import '@services/sync';
-
-const port = process.env.PORT ?? DEFAULT_PORT;
-const hostname = process.env.HOST ?? DEFAULT_HOST;
-const unix = process.env.UNIX_SOCKET_PATH;
 
 export const app = new Elysia({
   serve: {
