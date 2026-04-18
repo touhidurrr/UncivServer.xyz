@@ -33,18 +33,18 @@
   "dependencies": {
     "@discordjs/rest": "^2.6.1",
     "@elysiajs/jwt": "^1.4.1",
-    "@elysiajs/static": "^1.4.7",
+    "@elysiajs/static": "^1.4.9",
     "@mongodb-js/zstd": "^7.0.0",
     "arktype": "^2.2.0",
     "bytes": "^3.1.2",
     "cache-control-parser": "^2.2.0",
     "date-fns": "^4.1.0",
-    "discord-api-types": "^0.38.44",
+    "discord-api-types": "^0.38.46",
     "elysia": "^1.4.28",
-    "lru-cache": "^11.3.3",
+    "lru-cache": "^11.3.5",
     "mongoose": "^9.4.1",
     "openskill": "^4.1.1",
-    "randomcryp": "^2.2.0",
+    "randomcryp": "^2.3.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-icons": "^5.6.0"
@@ -58,13 +58,13 @@
     "axios": "^1.15.0",
     "eslint": "^10.2.0",
     "eslint-plugin-react": "^7.37.5",
-    "globals": "^17.4.0",
+    "globals": "^17.5.0",
     "jiti": "^2.6.1",
-    "prettier": "^3.8.2",
+    "prettier": "^3.8.3",
     "prettier-plugin-jinja-template": "^2.1.0",
     "prettier-plugin-toml": "^2.0.6",
     "typescript": "^6.0.2",
-    "typescript-eslint": "^8.58.1"
+    "typescript-eslint": "^8.58.2"
   },
   "trustedDependencies": [
     "@mongodb-js/zstd"
