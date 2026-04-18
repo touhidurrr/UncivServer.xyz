@@ -23,12 +23,10 @@ export const REDIS_DEFAULT_URL = '0.0.0.0:6379';
 export const DEFAULT_FILES_CACHE_MAX_ITEMS = 5_000;
 export const DEFAULT_FILES_CACHE_MAX_SIZE = bytes.parse('100mb')!;
 export const DEFAULT_PASSWORDS_CACHE_MAX_ITEMS = 1_000;
-export const DEFAULT_PASSWORDS_CACHE_MAX_SIZE = bytes.parse('1mb')!;
+export const DEFAULT_PASSWORDS_CACHE_MAX_SIZE = bytes.parse('2mb')!;
 
 // Files
-
 export const MIN_FILE_SIZE = Math.max(MIN_CONTENT_LENGTH, bytes.parse('10b')!);
-
 export const MAX_FILE_SIZE = Math.min(MAX_CONTENT_LENGTH, bytes.parse('2mb')!);
 
 // Auth
