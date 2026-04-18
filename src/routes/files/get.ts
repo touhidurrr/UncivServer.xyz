@@ -1,6 +1,6 @@
+import filesCache from '@cache/filesCache';
 import { MINIMAL_CACHE_CONTROL, NO_CACHE_CONTROL } from '@constants';
 import { UncivGame } from '@models/UncivGame';
-import cache from '@services/cache';
 import type { Elysia } from 'elysia';
 
 export const getFile = (app: Elysia) =>
@@ -11,7 +11,7 @@ export const getFile = (app: Elysia) =>
 
       if (!game || !game.text) return status(404);
 
-      await cache.set(gameId, game.text);
+      filesCache.set(gameId, game.text);
       return game.text;
     },
     {
@@ -19,8 +19,8 @@ export const getFile = (app: Elysia) =>
         set.headers['cache-control'] = gameId.endsWith('_Preview')
           ? MINIMAL_CACHE_CONTROL
           : NO_CACHE_CONTROL;
-        const cachedResponse = await cache.get(gameId);
-        if (cachedResponse) return cachedResponse;
+        const cachedGame = filesCache.get(gameId);
+        if (cachedGame) return cachedGame;
       },
     }
   );

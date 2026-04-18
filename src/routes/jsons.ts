@@ -1,6 +1,6 @@
+import filesCache from '@cache/filesCache';
 import { GAME_ID_SCHEMA } from '@constants';
 import { UncivGame } from '@models/UncivGame';
-import cache from '@services/cache';
 import { unpackJSON } from '@services/uncivJSON';
 import { type } from 'arktype';
 import { stringify } from 'cache-control-parser';
@@ -20,8 +20,8 @@ export const jsonsRoute = (app: Elysia) =>
       set.headers['cache-control'] = CACHE_CONTROL;
       set.headers['content-type'] = 'application/json';
 
-      const gameData = await cache.get(gameId);
-      if (gameData) return unpackJSON(gameData);
+      const cachedGame = filesCache.get(gameId);
+      if (cachedGame) return unpackJSON(cachedGame);
 
       const dbGame = await UncivGame.findById(gameId, { _id: 0, text: 1 });
       if (!dbGame) {
@@ -29,7 +29,7 @@ export const jsonsRoute = (app: Elysia) =>
         return status(404);
       }
 
-      await cache.set(gameId, dbGame.text);
+      filesCache.set(gameId, dbGame.text);
       return unpackJSON(dbGame.text);
     },
     { params: type({ gameId: GAME_ID_SCHEMA }) }

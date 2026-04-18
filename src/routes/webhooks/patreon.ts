@@ -6,7 +6,7 @@ export const patreonRoute = (app: Elysia) => {
   const { PATREON_WEBHOOK_SECRET } = process.env;
   if (!PATREON_WEBHOOK_SECRET) return app;
 
-  const hmac = new HMAC(PATREON_WEBHOOK_SECRET, 'md5', 'hex');
+  const hmac = new HMAC('md5', 'hex', PATREON_WEBHOOK_SECRET);
 
   return app.post(
     'patreon',

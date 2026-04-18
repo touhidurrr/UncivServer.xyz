@@ -8,7 +8,7 @@ export const bmcRoute = (app: Elysia) => {
   const { BUYMEACOFFEE_WEBHOOK_SECRET } = process.env;
   if (!BUYMEACOFFEE_WEBHOOK_SECRET) return app;
 
-  const hmac = new HMAC(BUYMEACOFFEE_WEBHOOK_SECRET, 'sha256', 'hex');
+  const hmac = new HMAC('sha256', 'hex', BUYMEACOFFEE_WEBHOOK_SECRET);
 
   return app.post(
     'buymeacoffee',

@@ -1,6 +1,6 @@
+import filesCache from '@cache/filesCache';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import { randInt } from 'randomcryp';
-import cache from './cache';
 
 const SYNC_TOKEN = process.env.SYNC_TOKEN;
 const SYNC_SERVERS = process.env.SYNC_SERVERS ?? '';
@@ -28,7 +28,7 @@ const initWs = (baseURL: string) => {
     const msg = JSON.parse(data.toString('utf8')) as typeof SYNC_RESPONSE_SCHEMA.infer;
     switch (msg.type) {
       case 'SyncData':
-        cache.set(msg.data.gameId, msg.data.content);
+        filesCache.set(msg.data.gameId, msg.data.content);
         break;
       case 'AuthError':
         authOk = false;

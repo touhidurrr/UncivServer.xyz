@@ -1,8 +1,9 @@
+import filesCache from '@cache/filesCache';
+import passwordsCache from '@cache/passwordsCache';
 import { MAX_FILE_SIZE, TEST_GAME_ID } from '@constants';
 import { getAppBaseURL, getRandomBase64String, getRandomSave } from '@lib';
 import { Auth } from '@models/Auth';
 import { UncivGame } from '@models/UncivGame';
-import cache from '@services/cache';
 import { pack } from '@services/uncivJSON';
 import axios from 'axios';
 import { afterAll, beforeAll, describe, expect, test } from 'bun:test';
@@ -108,7 +109,7 @@ describe.concurrent('PUT /files', () => {
     });
 
     test.serial('Cache Hit', async () => {
-      const cachedFile = await cache.get(TEST_GAME_ID);
+      const cachedFile = filesCache.get(TEST_GAME_ID);
       expect(cachedFile).toBeString();
       expect(cachedFile).toBe(payload);
     });
@@ -151,6 +152,7 @@ describe.concurrent('Auth', () => {
     expect(status).toBe(204);
     expect(data).toBe('');
     expect(Number(headers['content-length'])).toBe(0);
+    expect(passwordsCache.has(username)).toBe(false);
   });
 
   test.serial('Initial PUT /auth', async () => {
@@ -159,6 +161,7 @@ describe.concurrent('Auth', () => {
     });
     expect(status).toBe(200);
     expect(data).toBe('Successfully assigned a new password');
+    expect(passwordsCache.verify(username, password)).toBe(true);
   });
 
   test('PUT /auth with no password', async () => {
@@ -197,11 +200,14 @@ describe.concurrent('Auth', () => {
   });
 
   test.serial('PUT /auth with correct password', async () => {
-    const { status, data } = await api.put('/auth', password + '1', {
+    const newPassword = password + '1';
+    const { status, data } = await api.put('/auth', newPassword, {
       auth: { username, password },
     });
     expect(status).toBe(200);
     expect(data).toBe('Successfully updated password');
+    expect(passwordsCache.verify(username, password)).toBe(false);
+    expect(passwordsCache.verify(username, newPassword)).toBe(true);
   });
 
   test('GET /auth with incorrect password after update', async () => {
@@ -224,13 +230,11 @@ describe.concurrent('GET /jsons', () => {
   const payload = getRandomSave('100kb', { gameId });
 
   beforeAll(() => api.put(`/files/${gameId}`, payload));
-  afterAll(() =>
-    Promise.all([
-      cache.del(gameId),
-      cache.del(`${gameId}_Preview`),
-      UncivGame.deleteMany({ _id: { $in: [gameId, `${gameId}_Preview`] } }),
-    ])
-  );
+  afterAll(() => {
+    filesCache.delete(gameId);
+    filesCache.delete(`${gameId}_Preview`);
+    return UncivGame.deleteMany({ _id: { $in: [gameId, `${gameId}_Preview`] } });
+  });
 
   test('404 Not Found on Nonexistent ID', async () => {
     const { status, data, headers } = await api.get(`/jsons/${Bun.randomUUIDv7()}`);

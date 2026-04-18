@@ -25,7 +25,8 @@
       "@models/*": ["./src/models/*"],
       "@classes/*": ["./src/classes/*"],
       "@localTypes/*": ["./src/types/*"],
-      "@services/*": ["./src/services/*"]
+      "@services/*": ["./src/services/*"],
+      "@cache/*": ["./src/services/cache/*"]
     },
 
     /* bun recommended settings */

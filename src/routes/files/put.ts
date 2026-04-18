@@ -1,9 +1,10 @@
+import filesCache from '@cache/filesCache';
+import passwordsCache from '@cache/passwordsCache';
 import { UncivSave } from '@classes/UncivSave';
 import { MAX_FILE_SIZE, MIN_FILE_SIZE, UNCIV_BASIC_AUTH_HEADER_SCHEMA } from '@constants';
 import { Auth } from '@models/Auth';
 import { UncivGame } from '@models/UncivGame';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
-import cache from '@services/cache';
 import { isDiscordTokenValid, sendNewTurnNotification } from '@services/discord';
 import { gameDataSecurityModifier } from '@services/gameDataSecurity';
 import { type } from 'arktype';
@@ -25,17 +26,22 @@ export const putFile = (app: Elysia) =>
             const [userId, password] = headers.authorization;
 
             const [dbAuth, dbGame] = await Promise.all([
-              Auth.findById(userId, { hash: 1 }),
+              Auth.findById(userId, { hash: 1 }).lean(),
               UncivGame.findById(game.previewId, { players: 1 }),
             ]);
 
             if (dbAuth) {
-              const verified = await Bun.password.verify(password, dbAuth.hash);
-              if (!verified) return status('Unauthorized');
+              if (!passwordsCache.has(userId)) {
+                const verified = await Bun.password.verify(password, dbAuth.hash);
+                if (!verified) return status('Unauthorized');
+                passwordsCache.set(userId, password);
+              } else {
+                if (!passwordsCache.verify(userId, password)) return status('Unauthorized');
+              }
             }
 
             if (dbGame === null) {
-              await cache.set(gameId, body);
+              filesCache.set(gameId, body);
               return 'Done!';
             }
 
@@ -55,7 +61,7 @@ export const putFile = (app: Elysia) =>
 
             // for performance reasons, just store the file in cache and return ok
             // try to do everything else asynchronously in afterResponse
-            await cache.set(gameId, body);
+            filesCache.set(gameId, body);
             return 'Done!';
           },
           {
@@ -77,7 +83,9 @@ export const putFile = (app: Elysia) =>
                     projection: { _id: 0, name: 1 },
                     upsert: true,
                   }
-                ).then(game => game?.name),
+                )
+                  .lean()
+                  .then(game => game?.name),
               ]);
 
               try {

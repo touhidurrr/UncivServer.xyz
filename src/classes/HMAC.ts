@@ -1,21 +1,21 @@
 export class HMAC {
-  key: string | NodeJS.TypedArray;
-  digest: Bun.DigestEncoding;
-  algorithm: Bun.SupportedCryptoAlgorithms;
+  #digest: Bun.DigestEncoding;
+  #hasher: Bun.CryptoHasher;
 
   constructor(
-    key: string | NodeJS.TypedArray,
     algorithm: Bun.SupportedCryptoAlgorithms,
-    digest: Bun.DigestEncoding
+    digest: Bun.DigestEncoding,
+    secret: string | NodeJS.TypedArray
   ) {
-    this.key = key;
-    this.algorithm = algorithm;
-    this.digest = digest;
+    this.#digest = digest;
+    this.#hasher = new Bun.CryptoHasher(algorithm, secret);
   }
 
-  verify(signature: string, data: Bun.BlobOrStringOrBuffer) {
-    const hasher = new Bun.CryptoHasher(this.algorithm, this.key);
-    const hash = hasher.update(data).digest(this.digest);
-    return hash === signature;
+  hash(data: Bun.BlobOrStringOrBuffer) {
+    return this.#hasher.copy().update(data).digest(this.#digest);
+  }
+
+  verify(digest: string, data: Bun.BlobOrStringOrBuffer) {
+    return digest === this.hash(data);
   }
 }
