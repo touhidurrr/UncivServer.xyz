@@ -1,11 +1,11 @@
 import { getAppBaseURL, getRandomSave } from '@lib';
+import { UncivGame } from '@models/UncivGame';
 import type { SYNC_RESPONSE_SCHEMA } from '@routes/sync';
 import axios from 'axios';
 import { describe, expect, test } from 'bun:test';
 import { parse as parseCacheControl } from 'cache-control-parser';
 
 import '@index';
-import { UncivGame } from '@models/UncivGame';
 
 const api = axios.create({
   baseURL: getAppBaseURL(),

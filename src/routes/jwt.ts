@@ -9,7 +9,7 @@ import { Elysia } from 'elysia';
 export const jwtPlugin = new Elysia({ name: 'jwt', prefix: 'jwt' })
   .use(
     connectDB()
-      .then(() => Variable.findById('jwt-key', { value: 1, _id: 0 }))
+      .then(() => Variable.findById('jwt-key', { value: 1, _id: 0 }).lean())
       .then(result => {
         const secret = result?.value ?? process.env.JWT_KEY;
         return jwt({

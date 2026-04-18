@@ -24,7 +24,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
       .guard({ params: type({ gameId: UUID_SCHEMA }) }, app =>
         app
           .get('games/:gameId/name', async ({ status, params: { gameId } }) => {
-            const game = await UncivGame.findById(`${gameId}_Preview`, { _id: 0, name: 1 });
+            const game = await UncivGame.findById(`${gameId}_Preview`, { _id: 0, name: 1 }).lean();
             if (!game || !game.name) return status('Not Found');
             return game.name;
           })
@@ -53,8 +53,8 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
         app
           .get('profiles/:_id', ({ params: { _id } }) =>
             PlayerProfile.findById(_id)
-              .then(p => p || PlayerProfile.create({ _id }))
-              .then(p => p.toObject())
+              .lean()
+              .then(p => p || PlayerProfile.create({ _id }).then(p => p.toObject()))
           )
 
           .post(
@@ -81,7 +81,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
           .get(
             'profiles/:_id/games',
             async ({ status, params: { _id }, query: { playing, limit } }) => {
-              const profile = await PlayerProfile.findById(_id, { uncivUserIds: 1 });
+              const profile = await PlayerProfile.findById(_id, { uncivUserIds: 1 }).lean();
               if (!profile) return status(404);
               if (profile.uncivUserIds.length < 1) return status(204);
 
@@ -97,12 +97,14 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
                   sort: { updatedAt: -1 },
                   limit: Math.max(1, Math.min(25, (limit ?? 25) || 0)),
                 }
-              );
+              ).lean();
+
               games.forEach(game => {
                 if (game._id.endsWith('_Preview')) {
                   game._id = game._id.slice(0, -8);
                 }
               });
+
               return games;
             },
             {
@@ -117,7 +119,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
       .get(
         'users/:_id/profileId',
         async ({ status, params: { _id } }) => {
-          const profile = await PlayerProfile.findOne({ uncivUserIds: _id }, { _id: 1 });
+          const profile = await PlayerProfile.findOne({ uncivUserIds: _id }, { _id: 1 }).lean();
           if (!profile) return status(404);
           return profile._id;
         },
@@ -127,7 +129,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
       .post(
         'profiles/rating',
         async ({ body: { ids } }) => {
-          const profiles = await PlayerProfile.find({ _id: { $in: ids } }, { rating: 1 });
+          const profiles = await PlayerProfile.find({ _id: { $in: ids } }, { rating: 1 }).lean();
 
           if (profiles.length < ids.length) {
             const idSet = new Set(ids);
@@ -136,7 +138,7 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
 
             const newDocs = Array.from(diffSet).map(_id => ({ _id }));
             const newProfiles = await PlayerProfile.create(newDocs);
-            profiles.push(...newProfiles);
+            profiles.push(...newProfiles.map(p => p.toObject()));
           }
 
           const idToProfile = new Map<string, (typeof profiles)[0]>();
@@ -191,7 +193,11 @@ export const apiPlugin = new Elysia({ name: 'api', prefix: 'api' }).use(jwtPlugi
       .post(
         'filterUnregisteredUserIds',
         async ({ body: { userIds } }) => {
-          const profiles = await PlayerProfile.find({ uncivUserIds: userIds }, { uncivUserIds: 1 });
+          const profiles = await PlayerProfile.find(
+            { uncivUserIds: userIds },
+            { uncivUserIds: 1 }
+          ).lean();
+
           return [...new Set(profiles.flatMap(p => p.uncivUserIds)).intersection(new Set(userIds))];
         },
         {

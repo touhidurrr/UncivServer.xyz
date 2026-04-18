@@ -23,7 +23,7 @@ export const jsonsRoute = (app: Elysia) =>
       const cachedGame = filesCache.get(gameId);
       if (cachedGame) return unpackJSON(cachedGame);
 
-      const dbGame = await UncivGame.findById(gameId, { _id: 0, text: 1 });
+      const dbGame = await UncivGame.findById(gameId, { _id: 0, text: 1 }).lean();
       if (!dbGame) {
         set.headers['content-type'] = 'text/plain';
         return status(404);

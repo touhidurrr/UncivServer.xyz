@@ -7,7 +7,7 @@ export const getFile = (app: Elysia) =>
   app.get(
     ':gameId',
     async ({ status, params: { gameId } }) => {
-      const game = await UncivGame.findById(gameId, { _id: 0, text: 1 });
+      const game = await UncivGame.findById(gameId, { _id: 0, text: 1 }).lean();
 
       if (!game || !game.text) return status(404);
 

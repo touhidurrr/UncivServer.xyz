@@ -79,7 +79,7 @@ export const chatWebSocket = (app: Elysia) =>
           // password is required for chatting
           if (!password) return status('Unauthorized');
 
-          const dbAuth = await Auth.findById(userId, { hash: 1 });
+          const dbAuth = await Auth.findById(userId, { hash: 1 }).lean();
           if (!dbAuth) return status('Unauthorized');
           if (dbAuth) {
             const verified = await Bun.password.verify(password, dbAuth.hash);
@@ -133,7 +133,9 @@ export const chatWebSocket = (app: Elysia) =>
               const games = await UncivGame.find(
                 { players: userId, _id: { $in: message.gameIds.map(id => `${id}_Preview`) } },
                 { text: 1 }
-              ).then(games => games.map(g => unpack(g.text)));
+              )
+                .lean()
+                .then(games => games.map(g => unpack(g.text)));
 
               const acceptedGameIds: string[] = [];
               games.forEach(game => {
