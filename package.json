@@ -33,21 +33,18 @@
   "dependencies": {
     "@discordjs/rest": "^2.6.1",
     "@elysiajs/jwt": "^1.4.1",
-    "@elysiajs/static": "^1.4.9",
+    "@elysiajs/static": "1.4.7",
     "@mongodb-js/zstd": "^7.0.0",
     "arktype": "^2.2.0",
     "bytes": "^3.1.2",
     "cache-control-parser": "^2.2.0",
     "date-fns": "^4.1.0",
-    "discord-api-types": "^0.38.46",
+    "discord-api-types": "^0.38.47",
     "elysia": "^1.4.28",
     "lru-cache": "^11.3.5",
     "mongoose": "^9.4.1",
     "openskill": "^4.1.1",
-    "randomcryp": "^2.3.0",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
-    "react-icons": "^5.6.0"
+    "randomcryp": "^2.3.0"
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.1.5",
@@ -63,6 +60,9 @@
     "prettier": "^3.8.3",
     "prettier-plugin-jinja-template": "^2.1.0",
     "prettier-plugin-toml": "^2.0.6",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-icons": "^5.6.0",
     "typescript": "^6.0.2",
     "typescript-eslint": "^8.58.2"
   },
