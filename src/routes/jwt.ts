@@ -1,5 +1,5 @@
 import { BEARER_TOKEN_SCHEMA } from '@constants';
-import { jwt } from '@elysiajs/jwt';
+import { jwt } from '@elysia/jwt';
 import { isValidSyncToken } from '@lib';
 import { Variable } from '@models/Variable';
 import { connectDB } from '@services/mongodb';
