@@ -44,7 +44,10 @@
     "lru-cache": "^11.3.5",
     "mongoose": "^9.5.0",
     "openskill": "^4.1.1",
-    "randomcryp": "^2.3.0"
+    "randomcryp": "^2.3.0",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "react-icons": "^5.6.0"
   },
   "devDependencies": {
     "@11ty/eleventy": "^3.1.5",
@@ -60,9 +63,6 @@
     "prettier": "^3.8.3",
     "prettier-plugin-jinja-template": "^2.1.0",
     "prettier-plugin-toml": "^2.0.6",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
-    "react-icons": "^5.6.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.0"
   },
