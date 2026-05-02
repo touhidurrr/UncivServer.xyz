@@ -49,9 +49,9 @@ jobs:
           bun test
 
   publish:
-    runs-on: ubuntu-24.04-arm
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     needs: test
+    runs-on: ubuntu-24.04-arm
+    if: startsWith(github.ref, 'refs/tags/v')
 
     steps:
       - name: Checkout
