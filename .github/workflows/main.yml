@@ -41,11 +41,6 @@ jobs:
       - name: Lint
         run: bun lint
 
-      # - name: Start MongoDB
-      #   uses: supercharge/mongodb-github-action@1.12.1
-      #   with:
-      #     mongodb-db: unciv
-
       - name: Run tests
         run: |
           JWT_KEY=$(openssl rand -base64 64) \
@@ -85,12 +80,22 @@ jobs:
           VERSION=$(cat package.json | jq -r .version)
           echo "VERSION=$VERSION" >> $GITHUB_ENV
 
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v6
+        with:
+          images: |
+            touhidurrr/uncivserver
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}
+            type=semver,pattern={{major}}.{{minor}}
+
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v7
         with:
           context: .
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: |
-            touhidurrr/uncivserver:latest
-            touhidurrr/uncivserver:${{ env.VERSION }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
