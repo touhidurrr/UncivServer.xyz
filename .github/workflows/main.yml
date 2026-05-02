@@ -18,6 +18,8 @@ jobs:
     services:
       mongodb:
         image: mongo:8
+        ports:
+          - 27017:27017
         env:
           MONGO_INITDB_DATABASE: unciv
 
