@@ -9,10 +9,6 @@ permissions:
 
 jobs:
   test:
-    defaults:
-      run:
-        shell: bash
-
     runs-on: ubuntu-24.04-arm
 
     services:
