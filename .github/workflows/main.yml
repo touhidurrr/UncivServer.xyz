@@ -71,11 +71,6 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Get Project Version
-        run: |
-          VERSION=$(cat package.json | jq -r .version)
-          echo "VERSION=$VERSION" >> $GITHUB_ENV
-
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v6
