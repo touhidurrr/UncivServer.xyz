@@ -3,4 +3,3 @@ bun = true
 
 [install]
 minimumReleaseAge = 259200
-minimumReleaseAgeExcludes = ["@elysia/jwt"]
