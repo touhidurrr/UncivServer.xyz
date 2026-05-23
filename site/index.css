@@ -6,29 +6,60 @@
   padding: 0;
 }
 
+:root {
+  --accent: #6366f1;
+  --accent-bright: #818cf8;
+  --accent-glow: rgba(99, 102, 241, 0.18);
+  --bg: #06060f;
+  --surface: rgba(16, 16, 28, 0.78);
+  --border: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --text: #ffffff;
+  --text-muted: #8080a0;
+  --text-soft: #c4c4dc;
+}
+
 .page-wrapper {
   min-height: 100vh;
   font-family: 'Inter', sans-serif;
-  color: #ffffff;
+  color: var(--text);
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
-  background: radial-gradient(circle at top left, #1a1b1e, #0e0e10);
+  padding: 24px;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 65% 45% at 80% -10%, rgba(168, 85, 247, 0.2) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 35% at 0% 50%, rgba(99, 102, 241, 0.16) 0%, transparent 50%),
+    radial-gradient(ellipse 50% 30% at 100% 90%, rgba(236, 72, 153, 0.07) 0%, transparent 50%);
 }
 
 .dashboard-card {
   display: flex;
   width: 100%;
-  max-width: 900px;
-  background: rgba(30, 31, 35, 0.7);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
+  max-width: 920px;
+  background: linear-gradient(170deg, rgba(14, 14, 26, 0.88) 0%, rgba(7, 7, 14, 0.9) 100%);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--border);
+  border-radius: 18px;
   overflow: hidden;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
-  min-height: 600px; /* Fixed height */
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.07) inset,
+    0 0 0 1px rgba(99, 102, 241, 0.05) inset,
+    0 32px 64px -20px rgba(0, 0, 0, 0.7),
+    0 0 80px -20px rgba(168, 85, 247, 0.18);
+  min-height: 580px;
+  position: relative;
+}
+
+.dashboard-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(ellipse 60% 40% at 30% 0%, rgba(168, 85, 247, 0.06) 0%, transparent 60%);
+  pointer-events: none;
 }
 
 .content-section {
@@ -39,27 +70,32 @@
   justify-content: center;
 }
 
-.header h1 {
-  font-size: 3rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  margin-bottom: 0.5rem;
-  background: linear-gradient(to right, #ffffff, #a5a5a5);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.header .subtitle {
-  color: #9ca3af;
-  font-size: 1.1rem;
+.header {
   margin-bottom: 2.5rem;
 }
 
-.header .subtitle a {
-  color: #5865f2;
-  text-decoration: none;
+.header h1 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+  margin-bottom: 0.75rem;
+  color: var(--text);
+}
+
+.header .subtitle {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.6;
   font-weight: 500;
 }
+
+.header .subtitle a {
+  color: var(--accent-bright);
+  text-decoration: none;
+  font-weight: 600;
+}
+
 .header .subtitle a:hover {
   text-decoration: underline;
 }
@@ -67,122 +103,125 @@
 .actions {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 10px;
   width: 100%;
-  max-width: 360px;
+  max-width: 340px;
 }
 
 .btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  padding: 14px 24px;
-  border-radius: 12px;
+  gap: 9px;
+  padding: 12px 20px;
+  border-radius: 10px;
   text-decoration: none;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 0.9rem;
   cursor: pointer;
-  transition:
-    transform 0.2s,
-    box-shadow 0.2s,
-    background-color 0.2s;
+  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s, background 0.15s, border-color 0.15s;
   border: none;
+  letter-spacing: -0.005em;
 }
 
 .btn:hover {
-  transform: translateY(-2px);
+  transform: translateY(-1px);
+}
+
+.btn:active {
+  transform: translateY(0);
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #5865f2 0%, #4752c4 100%);
-  color: white;
+  background: var(--accent);
+  color: #fff;
   width: 100%;
-  box-shadow: 0 4px 20px rgba(88, 101, 242, 0.4);
+  box-shadow: 0 4px 16px -4px rgba(99, 102, 241, 0.45);
 }
+
 .btn-primary:hover {
-  box-shadow: 0 6px 25px rgba(88, 101, 242, 0.6);
+  box-shadow: 0 6px 22px -4px rgba(99, 102, 241, 0.6);
+  opacity: 0.94;
 }
 
 .btn-row {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   width: 100%;
 }
 
 .btn-secondary {
   flex: 1;
-  background-color: #2b2d31;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  color: #e4e4e7;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--border);
+  color: var(--text-soft);
 }
 
 .btn-secondary:hover {
-  background-color: #35373c;
-  border-color: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.07);
+  border-color: var(--border-strong);
+  color: var(--text);
 }
 
-/* Icon specific color for Patreon if needed */
 .icon-patreon {
-  color: #ff424d;
+  color: #ff6b6b;
 }
 
 .discord-section {
-  width: 380px;
-  background-color: #2b2d31;
-  border-left: 1px solid rgba(255, 255, 255, 0.05);
+  width: 355px;
+  background: rgba(8, 8, 16, 0.5);
+  border-left: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  min-height: 600px;
+  min-height: 580px;
 }
 
 .discord-frame {
   width: 100%;
   height: 100%;
-  min-height: 600px;
+  min-height: 580px;
   border: none;
 }
 
 @media (max-width: 800px) {
   .page-wrapper {
-    padding: 10px;
+    padding: 16px;
     align-items: flex-start;
     overflow-y: auto;
   }
 
   .dashboard-card {
     flex-direction: column;
-    max-width: 500px;
-    margin-top: 20px;
-    margin-bottom: 20px;
+    max-width: 480px;
+    margin: 16px auto;
   }
 
   .content-section {
-    padding: 2.5rem 1.5rem;
+    padding: 2.5rem 2rem;
     align-items: center;
     text-align: center;
   }
 
   .header h1 {
-    font-size: 2rem;
-    line-height: 1.2;
+    font-size: 1.85rem;
+    line-height: 1.15;
   }
 
   .actions {
     width: 100%;
+    max-width: 300px;
   }
 
   .discord-section {
     width: 100%;
-    height: 600px;
-    min-height: 600px;
+    height: 500px;
+    min-height: 500px;
     border-left: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid var(--border);
   }
 
   .discord-frame {
-    height: 600px;
-    min-height: 600px;
+    height: 500px;
+    min-height: 500px;
   }
 }

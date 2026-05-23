@@ -1,12 +1,17 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#0d0d16" />
 <link rel="icon" type="image/png" href="/public/assets/logo.png" />
 
 {% if title %}<title>{{ title }}</title>{% endif %}
 {% if description %}<meta name="description" content="{{ description }}" />{% endif %}
 
-{% if css %}<link rel="stylesheet" href="{{ css }}" />{% endif %}
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="UncivServer.xyz" />
+{% if title %}<meta property="og:title" content="{{ title }}" />{% endif %}
+{% if description %}<meta property="og:description" content="{{ description }}" />{% endif %}
 
+{% if css %}<link rel="stylesheet" href="{{ css }}" />{% endif %}
 {% if script %}<script type="module" src="{{ script }}" defer></script>{% endif %}
 
 <script

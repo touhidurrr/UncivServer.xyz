@@ -4,237 +4,255 @@ import { FaCheckCircle, FaExclamationCircle, FaKey, FaTools, FaUserCheck } from 
 
 const ID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
 
-const Tools = () => {
-  // State for Validator Form
-  const [valUserId, setValUserId] = useState('');
-  const [valPassword, setValPassword] = useState('');
-  const [valStatus, setValStatus] = useState<{ text: string; type: 'success' | 'error' | '' }>({
-    text: '',
-    type: '',
-  });
-  const [valResult, setValResult] = useState('');
+const AUTH_STATUS: Record<number, string> = {
+  200: 'Authenticated',
+  204: 'Unregistered',
+  401: 'Unauthorized',
+};
 
-  // State for Password Changer Form
-  const [chgUserId, setChgUserId] = useState('');
-  const [chgOldPass, setChgOldPass] = useState('');
-  const [chgNewPass, setChgNewPass] = useState('');
-  const [chgConfirmPass, setChgConfirmPass] = useState('');
-  const [chgStatus, setChgStatus] = useState<{ text: string; type: 'success' | 'error' | '' }>({
-    text: '',
-    type: '',
-  });
-  const [chgResult, setChgResult] = useState('');
+type ResultType = 'success' | 'error';
+type Result = { text: string; detail?: string; type: ResultType };
 
-  // Helpers
-  const validateInput = (id: string, pass: string, requirePassLength = false) => {
-    if (!ID_REGEX.test(id.trim())) {
-      alert('Invalid User ID format. A valid UUID is expected.');
-      return false;
-    }
-    if (requirePassLength && pass.length < 6) {
-      alert('Password must be at least 6 characters long.');
-      return false;
-    }
-    return true;
-  };
+const responseToResult = (response: Response, detail?: string): Result => ({
+  text: AUTH_STATUS[response.status] ?? response.statusText,
+  detail: detail || `${response.status} ${response.statusText}`,
+  type: response.ok ? 'success' : 'error',
+});
 
-  // Handlers
-  const handleValidate = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateInput(valUserId, valPassword)) return;
+const basicAuth = (userId: string, password: string) =>
+  'Basic ' + btoa(userId.trim() + ':' + password);
 
-    try {
-      const response = await fetch('/auth', {
-        method: 'GET',
-        headers: {
-          Authorization: 'Basic ' + btoa(valUserId.trim() + ':' + valPassword),
-        },
-      });
+const useApiForm = <T extends Record<string, string>>(initial: T) => {
+  const [form, setForm] = useState<T>(initial);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [result, setResult] = useState<Result | null>(null);
 
-      setValStatus({
-        text: `${response.status} ${response.statusText}`,
-        type: response.ok ? 'success' : 'error',
-      });
+  const update = (key: keyof T) => (e: React.ChangeEvent<HTMLInputElement>) =>
+    setForm(f => ({ ...f, [key]: e.target.value }));
 
-      let authStatus = 'Unknown';
-      switch (response.status) {
-        case 200:
-          authStatus = 'Authenticated';
-          break;
-        case 204:
-          authStatus = 'Unregistered';
-          break;
-        case 401:
-          authStatus = 'Unauthorized';
-          break;
-        default:
-          authStatus = response.statusText;
-      }
-      setValResult(authStatus);
-    } catch (err) {
-      setValStatus({ type: 'error', text: (err as Error)?.message });
-    }
-  };
-
-  const handleChangePassword = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateInput(chgUserId, chgNewPass, true)) return;
-
-    if (chgNewPass !== chgConfirmPass) {
-      alert('New password and confirmation do not match.');
+  const submit = async (validate: () => string | null, request: () => Promise<Result>) => {
+    setError('');
+    setResult(null);
+    const err = validate();
+    if (err) {
+      setError(err);
       return;
     }
-
+    setLoading(true);
     try {
-      const response = await fetch('/auth', {
-        method: 'PUT',
-        headers: {
-          Authorization: 'Basic ' + btoa(chgUserId.trim() + ':' + chgOldPass),
-          'Content-Type': 'text/plain',
-        },
-        body: chgNewPass,
-      });
-
-      setChgStatus({
-        text: `${response.status} ${response.statusText}`,
-        type: response.ok ? 'success' : 'error',
-      });
-
-      const text = await response.text();
-      setChgResult(text);
-    } catch (err) {
-      setChgStatus({ type: 'error', text: (err as Error)?.message });
+      setResult(await request());
+    } catch (e) {
+      setResult({ text: (e as Error).message, type: 'error' });
+    } finally {
+      setLoading(false);
     }
+  };
+
+  return { form, update, loading, error, result, submit };
+};
+
+interface FieldProps {
+  label: string;
+  type?: string;
+  placeholder?: string;
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  required?: boolean;
+  half?: boolean;
+}
+
+const Field = ({ label, type = 'text', half, ...rest }: FieldProps) => (
+  <div className={half ? 'form-group half' : 'form-group'}>
+    <label>{label}</label>
+    <input type={type} {...rest} />
+  </div>
+);
+
+const ResultBox = ({ result }: { result: Result }) => (
+  <div className={`result-box ${result.type}`}>
+    <p className="status-text">
+      {result.type === 'success' ? <FaCheckCircle /> : <FaExclamationCircle />}
+      {result.text}
+    </p>
+    {result.detail && <p className="result-detail">{result.detail}</p>}
+  </div>
+);
+
+interface CardProps {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+  children: React.ReactNode;
+}
+
+const Card = ({ icon, title, desc, children }: CardProps) => (
+  <div className="glass-card">
+    <div className="card-header">
+      <div className="card-title-row">
+        <span className="card-icon-wrap">{icon}</span>
+        <h2>{title}</h2>
+      </div>
+      <p className="card-desc">{desc}</p>
+    </div>
+    {children}
+  </div>
+);
+
+const ValidateCard = () => {
+  const { form, update, loading, error, result, submit } = useApiForm({
+    userId: '',
+    password: '',
+  });
+
+  const onSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    submit(
+      () => (ID_REGEX.test(form.userId.trim()) ? null : 'Invalid UUID format.'),
+      async () => {
+        const response = await fetch('/auth', {
+          method: 'GET',
+          headers: { Authorization: basicAuth(form.userId, form.password) },
+        });
+        return responseToResult(response);
+      }
+    );
   };
 
   return (
-    <div className="page-wrapper">
-      <div className="main-container">
-        <header className="page-header">
-          <h1>
-            <FaTools className="icon-title" /> Toolbox
-          </h1>
-          <p className="subtitle">Manage your UncivServer account credentials</p>
-        </header>
-
-        <div className="cards-grid">
-          {/* Card 1: Validator */}
-          <div className="glass-card">
-            <div className="card-header">
-              <FaUserCheck className="card-icon" />
-              <h2>User ID Validator</h2>
-            </div>
-
-            <form onSubmit={handleValidate}>
-              <div className="form-group">
-                <label>User ID</label>
-                <input
-                  type="text"
-                  placeholder="Enter your UUID"
-                  value={valUserId}
-                  onChange={e => setValUserId(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Password</label>
-                <input
-                  type="password"
-                  placeholder="Current password"
-                  value={valPassword}
-                  onChange={e => setValPassword(e.target.value)}
-                />
-              </div>
-              <button type="submit" className="btn btn-primary">
-                Validate Credentials
-              </button>
-            </form>
-
-            {(valStatus.text || valResult) && (
-              <div className={`result-box ${valStatus.type}`}>
-                <p className="status-text">
-                  {valStatus.type === 'success' ? <FaCheckCircle /> : <FaExclamationCircle />}
-                  {valStatus.text}
-                </p>
-                {valResult && <p className="result-detail">{valResult}</p>}
-              </div>
-            )}
-          </div>
-
-          {/* Card 2: Password Changer */}
-          <div className="glass-card">
-            <div className="card-header">
-              <FaKey className="card-icon" />
-              <h2>Password Changer</h2>
-            </div>
-
-            <form onSubmit={handleChangePassword}>
-              <div className="form-group">
-                <label>User ID</label>
-                <input
-                  type="text"
-                  placeholder="Enter your UUID"
-                  value={chgUserId}
-                  onChange={e => setChgUserId(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Old Password</label>
-                <input
-                  type="password"
-                  placeholder="Leave empty if none"
-                  value={chgOldPass}
-                  onChange={e => setChgOldPass(e.target.value)}
-                />
-              </div>
-              <div className="row">
-                <div className="form-group half">
-                  <label>New Password</label>
-                  <input
-                    type="password"
-                    placeholder="New password"
-                    value={chgNewPass}
-                    onChange={e => setChgNewPass(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="form-group half">
-                  <label>Confirm</label>
-                  <input
-                    type="password"
-                    placeholder="Repeat"
-                    value={chgConfirmPass}
-                    onChange={e => setChgConfirmPass(e.target.value)}
-                    required
-                  />
-                </div>
-              </div>
-              <button type="submit" className="btn btn-danger">
-                Change Password
-              </button>
-            </form>
-
-            {(chgStatus.text || chgResult) && (
-              <div className={`result-box ${chgStatus.type}`}>
-                <p className="status-text">
-                  {chgStatus.type === 'success' ? <FaCheckCircle /> : <FaExclamationCircle />}
-                  {chgStatus.text}
-                </p>
-                {chgResult && <p className="result-detail">{chgResult}</p>}
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="footer-link">
-          <a href="/">← Back to Home</a>
-        </div>
-      </div>
-    </div>
+    <Card
+      icon={<FaUserCheck />}
+      title="Validate Credentials"
+      desc="Check if a user ID and password are correct"
+    >
+      <form onSubmit={onSubmit}>
+        <Field
+          label="User ID"
+          placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+          value={form.userId}
+          onChange={update('userId')}
+          required
+        />
+        <Field
+          label="Password"
+          type="password"
+          placeholder="Current password"
+          value={form.password}
+          onChange={update('password')}
+        />
+        {error && <p className="form-error">{error}</p>}
+        <button type="submit" className="btn btn-primary" disabled={loading}>
+          {loading ? 'Validating…' : 'Validate'}
+        </button>
+      </form>
+      {result && <ResultBox result={result} />}
+    </Card>
   );
 };
 
+const ChangePasswordCard = () => {
+  const { form, update, loading, error, result, submit } = useApiForm({
+    userId: '',
+    oldPass: '',
+    newPass: '',
+    confirmPass: '',
+  });
+
+  const onSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    submit(
+      () => {
+        if (!ID_REGEX.test(form.userId.trim())) return 'Invalid UUID format.';
+        if (form.newPass.length < 6) return 'Password must be at least 6 characters.';
+        if (form.newPass !== form.confirmPass) return 'Passwords do not match.';
+        return null;
+      },
+      async () => {
+        const response = await fetch('/auth', {
+          method: 'PUT',
+          headers: {
+            Authorization: basicAuth(form.userId, form.oldPass),
+            'Content-Type': 'text/plain',
+          },
+          body: form.newPass,
+        });
+        return responseToResult(response, await response.text());
+      }
+    );
+  };
+
+  return (
+    <Card
+      icon={<FaKey />}
+      title="Change Password"
+      desc="Update your account password"
+    >
+      <form onSubmit={onSubmit}>
+        <Field
+          label="User ID"
+          placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+          value={form.userId}
+          onChange={update('userId')}
+          required
+        />
+        <Field
+          label="Current Password"
+          type="password"
+          placeholder="Leave empty if none"
+          value={form.oldPass}
+          onChange={update('oldPass')}
+        />
+        <div className="row">
+          <Field
+            label="New Password"
+            type="password"
+            placeholder="Min. 6 chars"
+            value={form.newPass}
+            onChange={update('newPass')}
+            required
+            half
+          />
+          <Field
+            label="Confirm"
+            type="password"
+            placeholder="Repeat"
+            value={form.confirmPass}
+            onChange={update('confirmPass')}
+            required
+            half
+          />
+        </div>
+        {error && <p className="form-error">{error}</p>}
+        <button type="submit" className="btn btn-danger" disabled={loading}>
+          {loading ? 'Changing…' : 'Change Password'}
+        </button>
+      </form>
+      {result && <ResultBox result={result} />}
+    </Card>
+  );
+};
+
+const Tools = () => (
+  <div className="page-wrapper">
+    <div className="main-container">
+      <header className="page-header">
+        <h1>
+          <FaTools className="icon-title" /> Toolbox
+        </h1>
+        <p className="subtitle">Manage your UncivServer account credentials</p>
+      </header>
+
+      <div className="cards-grid">
+        <ValidateCard />
+        <ChangePasswordCard />
+      </div>
+
+      <div className="footer-link">
+        <a href="/">← Back to Home</a>
+      </div>
+    </div>
+  </div>
+);
+
 const container = document.getElementById('root') as HTMLDivElement;
-const root = createRoot(container);
-root.render(<Tools />);
+createRoot(container).render(<Tools />);
