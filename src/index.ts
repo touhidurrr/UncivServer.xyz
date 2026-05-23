@@ -9,7 +9,7 @@ import {
   NO_CACHE_CONTROL,
   SUPPORT_URL,
 } from '@constants';
-import { staticPlugin } from '@elysiajs/static';
+import { staticPlugin } from '@elysia/static';
 import { apiPlugin } from '@routes/api';
 import { authRoute } from '@routes/auth';
 import { chatWebSocket } from '@routes/chat';
@@ -82,7 +82,7 @@ export const app = new Elysia({
   })
   .all('/support', ctx => ctx.redirect(SUPPORT_URL, 303))
   .all('/discord', ctx => ctx.redirect(DISCORD_INVITE, 303))
-  .use(await staticPlugin({ prefix: '/', alwaysStatic: true }))
+  .use(await staticPlugin({ prefix: '/', alwaysStatic: true, bunFullstack: true }))
   .listen(unix ? { unix } : { port, hostname }, server => {
     if (unix) chmod(unix, 0o666);
     console.log(`Server started at ${server.url}`);
