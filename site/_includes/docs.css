@@ -40,7 +40,11 @@
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    sans-serif;
   background-color: var(--bg);
   background-image:
     radial-gradient(ellipse 65% 45% at 80% -10%, rgba(168, 85, 247, 0.2) 0%, transparent 55%),
@@ -97,7 +101,10 @@ a:hover {
   padding: 6px 12px;
   border-radius: 8px;
   border: 1px solid var(--border);
-  transition: color 0.15s, border-color 0.15s, background 0.15s;
+  transition:
+    color 0.15s,
+    border-color 0.15s,
+    background 0.15s;
 }
 
 .header-home-link:hover {
@@ -117,7 +124,9 @@ a:hover {
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  transition: color 0.15s, background 0.15s;
+  transition:
+    color 0.15s,
+    background 0.15s;
 }
 
 #sidebar-toggle:hover {
@@ -216,7 +225,9 @@ a:hover {
   border-radius: 8px;
   font-size: 0.885rem;
   font-weight: 500;
-  transition: background 0.12s, color 0.12s;
+  transition:
+    background 0.12s,
+    color 0.12s;
   position: relative;
 }
 
@@ -260,7 +271,9 @@ a:hover {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: background 0.12s, color 0.12s;
+  transition:
+    background 0.12s,
+    color 0.12s;
 }
 
 .toc-link:hover {
@@ -290,7 +303,9 @@ a:hover {
   font-weight: 600;
   padding: 0.5rem 0.75rem;
   border-radius: 8px;
-  transition: color 0.15s, background 0.15s;
+  transition:
+    color 0.15s,
+    background 0.15s;
 }
 
 .sidebar-back a:hover {
@@ -381,7 +396,9 @@ a:hover {
   color: var(--text-muted);
   font-size: 0.65em;
   font-weight: 500;
-  transition: opacity 0.15s, color 0.15s;
+  transition:
+    opacity 0.15s,
+    color 0.15s;
   text-decoration: none;
   flex-shrink: 0;
 }

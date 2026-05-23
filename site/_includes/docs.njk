@@ -13,22 +13,24 @@
       rel="stylesheet"
     />
 
-    <script id="__doc__" type="application/json">{
-      "heading": {{ heading | dump | safe }},
-      "content": {{ content | dump | safe }},
-      "navItems": [
-        {% set comma = joiner() %}
-        {% for item in collections.all %}
-          {% if item.data.layout == 'docs.njk' and '/docs/bot/' in item.url %}
-            {{ comma() }}{
-              "url": {{ (item.url | rstrip) | dump | safe }},
-              "title": {{ (item.data.nav or item.data.title) | dump | safe }},
-              "active": {{ ((item.url | rstrip) == (page.url | rstrip)) | dump | safe }}
-            }
-          {% endif %}
-        {% endfor %}
-      ]
-    }</script>
+    <script id="__doc__" type="text/x-nunjucks">
+      {
+            "heading": {{ heading | dump | safe }},
+            "content": {{ content | dump | safe }},
+            "navItems": [
+              {% set comma = joiner() %}
+              {% for item in collections.all %}
+                {% if item.data.layout == 'docs.njk' and '/docs/bot/' in item.url %}
+                  {{ comma() }}{
+                    "url": {{ (item.url | rstrip) | dump | safe }},
+                    "title": {{ (item.data.nav or item.data.title) | dump | safe }},
+                    "active": {{ ((item.url | rstrip) == (page.url | rstrip)) | dump | safe }}
+                  }
+                {% endif %}
+              {% endfor %}
+            ]
+          }
+    </script>
   </head>
 
   <body>

@@ -22,7 +22,11 @@ const SIDEBAR_KEY = 'docs-sidebar';
 const SCROLL_SPY_MARGIN = '-10% 0px -75% 0px';
 
 const slugify = (text: string) =>
-  text.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  text
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
 
 const processContent = (html: string): { html: string; toc: TocItem[] } => {
   const doc = new DOMParser().parseFromString(html, 'text/html');
@@ -139,7 +143,9 @@ const Header = ({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => v
     </div>
 
     <div className="header-right">
-      <a href="/" className="header-home-link">← Home</a>
+      <a href="/" className="header-home-link">
+        ← Home
+      </a>
     </div>
   </header>
 );
@@ -234,10 +240,7 @@ const Docs = () => {
   return (
     <>
       <Header collapsed={collapsed} onToggle={toggleSidebar} />
-      <div
-        className={`doc-container${collapsed ? ' sidebar-collapsed' : ''}`}
-        id="doc-container"
-      >
+      <div className={`doc-container${collapsed ? ' sidebar-collapsed' : ''}`} id="doc-container">
         <Sidebar activeId={activeId} onTocClick={handleTocClick} />
         <Article articleRef={articleRef} />
       </div>

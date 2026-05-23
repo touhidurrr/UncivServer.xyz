@@ -182,11 +182,7 @@ const ChangePasswordCard = () => {
   };
 
   return (
-    <Card
-      icon={<FaKey />}
-      title="Change Password"
-      desc="Update your account password"
-    >
+    <Card icon={<FaKey />} title="Change Password" desc="Update your account password">
       <form onSubmit={onSubmit}>
         <Field
           label="User ID"

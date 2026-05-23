@@ -58,7 +58,11 @@
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: radial-gradient(ellipse 60% 40% at 30% 0%, rgba(168, 85, 247, 0.06) 0%, transparent 60%);
+  background: radial-gradient(
+    ellipse 60% 40% at 30% 0%,
+    rgba(168, 85, 247, 0.06) 0%,
+    transparent 60%
+  );
   pointer-events: none;
 }
 
@@ -119,7 +123,12 @@
   font-weight: 600;
   font-size: 0.9rem;
   cursor: pointer;
-  transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s, background 0.15s, border-color 0.15s;
+  transition:
+    transform 0.15s,
+    box-shadow 0.15s,
+    opacity 0.15s,
+    background 0.15s,
+    border-color 0.15s;
   border: none;
   letter-spacing: -0.005em;
 }
