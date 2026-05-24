@@ -1,7 +1,10 @@
 import bytes from 'bytes';
 import { randomBytes } from 'node:crypto';
 
-export const getRandomBase64String = (targetLength: number | string = 10): string => {
+export const getRandomBase64String = (
+  targetLength: number | string = 10,
+  alphabet: 'base64' | 'base64url' = 'base64'
+): string => {
   if (typeof targetLength === 'string') {
     const parsedByteLength = bytes.parse(targetLength);
     if (parsedByteLength === null) {
@@ -10,5 +13,5 @@ export const getRandomBase64String = (targetLength: number | string = 10): strin
     targetLength = parsedByteLength;
   }
   const buffSize = Math.ceil((targetLength * 3) / 4);
-  return randomBytes(buffSize).toBase64();
+  return randomBytes(buffSize).toBase64({ alphabet, omitPadding: true });
 };
