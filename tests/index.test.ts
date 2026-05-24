@@ -158,6 +158,7 @@ describe.concurrent('Auth', () => {
   test.serial('Initial PUT /auth', async () => {
     const { status, data } = await api.put('/auth', password, {
       auth: { username, password: '' },
+      headers: { 'Content-Type': 'text/plain' },
     });
     expect(status).toBe(200);
     expect(data).toBe('Information added successfully');
@@ -167,6 +168,7 @@ describe.concurrent('Auth', () => {
   test('PUT /auth with no password', async () => {
     const { status } = await api.put('/auth', password, {
       auth: { username, password: '' },
+      headers: { 'Content-Type': 'text/plain' },
     });
     expect(status).toBe(401);
   });
@@ -181,6 +183,7 @@ describe.concurrent('Auth', () => {
   test('PUT /auth with wrong password', async () => {
     const { status } = await api.put('/auth', password, {
       auth: { username, password: password + '1' },
+      headers: { 'Content-Type': 'text/plain' },
     });
     expect(status).toBe(401);
   });
@@ -203,6 +206,7 @@ describe.concurrent('Auth', () => {
     const newPassword = password + '1';
     const { status, data } = await api.put('/auth', newPassword, {
       auth: { username, password },
+      headers: { 'Content-Type': 'text/plain' },
     });
     expect(status).toBe(200);
     expect(data).toBe('Information updated successfully');

@@ -176,11 +176,11 @@ export const authRoute = (app: Elysia) =>
             },
             {
               body: type.or(
-                PASSWORD_SCHEMA.pipe(val => ({ password: val })),
                 type({ 'password?': PASSWORD_SCHEMA, 'email?': 'string.email <= 512' }).narrow(
                   (val, ctx) =>
                     !!val.password || !!val.email || ctx.mustBe('an object with password or email')
-                )
+                ),
+                PASSWORD_SCHEMA.pipe(val => ({ password: val }))
               ),
             }
           )
