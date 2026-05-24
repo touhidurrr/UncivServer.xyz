@@ -79,8 +79,7 @@ const useCardSubmit = () => {
 const btnBase =
   'mt-1 w-full cursor-pointer rounded-lg border-0 px-4 py-2.5 text-sm font-semibold text-white transition hover:-translate-y-px hover:opacity-90 active:translate-y-0 active:opacity-100 disabled:cursor-not-allowed disabled:translate-y-0 disabled:opacity-40 disabled:shadow-none';
 
-const btnDanger =
-  'bg-danger shadow-danger hover:shadow-danger-strong disabled:hover:shadow-danger';
+const btnDanger = 'bg-danger shadow-danger hover:shadow-danger-strong disabled:hover:shadow-danger';
 
 interface FieldProps {
   label: string;
@@ -106,13 +105,8 @@ const Field = ({ label, type = 'text', half, ...rest }: FieldProps) => (
 
 const ResultBox = ({ result }: { result: Result }) => {
   const tone =
-    result.type === 'success'
-      ? 'border-success/25 bg-success/10'
-      : 'border-danger/25 bg-danger/10';
-  const textTone =
-    result.type === 'success'
-      ? 'text-success-soft'
-      : 'text-danger-soft';
+    result.type === 'success' ? 'border-success/25 bg-success/10' : 'border-danger/25 bg-danger/10';
+  const textTone = result.type === 'success' ? 'text-success-soft' : 'text-danger-soft';
   return (
     <div className={`rounded-xl border px-4.5 py-3.5 animate-result-in ${tone}`}>
       <p className={`flex items-center gap-2 text-[14.7px] font-bold ${textTone}`}>
@@ -120,9 +114,7 @@ const ResultBox = ({ result }: { result: Result }) => {
         {result.text}
       </p>
       {result.detail && (
-        <p className="mt-1.5 pl-6 text-[13.3px] font-medium text-muted">
-          {result.detail}
-        </p>
+        <p className="mt-1.5 pl-6 text-[13.3px] font-medium text-muted">{result.detail}</p>
       )}
     </div>
   );
@@ -396,15 +388,15 @@ const Tools = () => {
                 >
                   <span
                     className={`inline-flex size-7 shrink-0 items-center justify-center rounded-lg text-xs md:size-9 md:text-[15px] ${
-                      active
-                        ? 'bg-accent text-white'
-                        : 'bg-accent-glow text-accent-bright'
+                      active ? 'bg-accent text-white' : 'bg-accent-glow text-accent-bright'
                     }`}
                   >
                     {opt.icon}
                   </span>
                   <span className="flex min-w-0 flex-col gap-0.5">
-                    <span className="text-xs font-semibold tracking-tight md:text-sm">{opt.label}</span>
+                    <span className="text-xs font-semibold tracking-tight md:text-sm">
+                      {opt.label}
+                    </span>
                     <span className="text-[11px] font-medium text-subtle md:text-xs">
                       {opt.desc}
                     </span>

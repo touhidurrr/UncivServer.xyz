@@ -1,8 +1,8 @@
 import js from '@eslint/js';
-import globals from 'globals';
-import tseslint from 'typescript-eslint';
 import pluginReact from 'eslint-plugin-react';
 import { defineConfig, globalIgnores } from 'eslint/config';
+import globals from 'globals';
+import tseslint from 'typescript-eslint';
 
 export default defineConfig([
   {
@@ -14,5 +14,5 @@ export default defineConfig([
   tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
   { settings: { react: { version: '19.x' } } },
-  globalIgnores(['**/test*', 'src/types/unciv.ts']),
+  globalIgnores(['public', '**/test*', 'src/types/unciv.ts']),
 ]);

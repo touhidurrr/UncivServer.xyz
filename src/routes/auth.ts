@@ -85,7 +85,7 @@ export const authRoute = (app: Elysia) =>
         const newPassword = getRandomBase64String(16, 'base64url');
 
         try {
-          await brevo.transactionalEmails.sendTransacEmail({
+          await brevo.sendTransacEmail({
             sender: {
               name: 'UncivServer.xyz',
               email: 'no-reply@uncivserver.xyz',

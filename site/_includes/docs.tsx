@@ -144,60 +144,60 @@ const Sidebar = ({ activeId, collapsed, onTocClick }: SidebarProps) => (
     id="doc-sidebar"
     aria-label="Documentation"
   >
+    <div className="flex flex-col">
+      <p className={sidebarSectionTitle}>Bot Documentation</p>
+      <ul className="flex flex-col gap-0.5">
+        {navItems.map(item => (
+          <li key={item.url}>
+            <a
+              href={item.url}
+              className={`block rounded-lg px-3.5 py-2 text-sm font-medium transition-colors ${
+                item.active
+                  ? 'relative bg-accent-glow font-semibold text-accent-bright! md:before:absolute md:before:-left-3.5 md:before:top-1/2 md:before:h-[60%] md:before:w-0.5 md:before:-translate-y-1/2 md:before:rounded-r-sm md:before:bg-accent md:before:content-[""]'
+                  : 'text-muted hover:bg-surface-hover hover:text-fg'
+              }`}
+              aria-current={item.active ? 'page' : undefined}
+            >
+              {item.title}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    {tocItems.length > 0 && (
       <div className="flex flex-col">
-        <p className={sidebarSectionTitle}>Bot Documentation</p>
+        <p className={sidebarSectionTitle}>On this page</p>
         <ul className="flex flex-col gap-0.5">
-          {navItems.map(item => (
-            <li key={item.url}>
+          {tocItems.map(item => (
+            <li key={item.id}>
               <a
-                href={item.url}
-                className={`block rounded-lg px-3.5 py-2 text-sm font-medium transition-colors ${
-                  item.active
-                    ? 'relative bg-accent-glow font-semibold text-accent-bright! md:before:absolute md:before:-left-3.5 md:before:top-1/2 md:before:h-[60%] md:before:w-0.5 md:before:-translate-y-1/2 md:before:rounded-r-sm md:before:bg-accent md:before:content-[""]'
-                    : 'text-muted hover:bg-surface-hover hover:text-fg'
+                href={`#${item.id}`}
+                className={`block truncate rounded-md px-3.5 py-1.5 text-[13px] font-medium transition-colors hover:bg-surface-hover ${
+                  activeId === item.id
+                    ? 'bg-violet-glow font-semibold text-violet-bright'
+                    : 'text-subtle hover:text-muted'
                 }`}
-                aria-current={item.active ? 'page' : undefined}
+                onClick={onTocClick(item.id)}
               >
-                {item.title}
+                {item.text}
               </a>
             </li>
           ))}
         </ul>
       </div>
+    )}
 
-      {tocItems.length > 0 && (
-        <div className="flex flex-col">
-          <p className={sidebarSectionTitle}>On this page</p>
-          <ul className="flex flex-col gap-0.5">
-            {tocItems.map(item => (
-              <li key={item.id}>
-                <a
-                  href={`#${item.id}`}
-                  className={`block truncate rounded-md px-3.5 py-1.5 text-[13px] font-medium transition-colors hover:bg-surface-hover ${
-                    activeId === item.id
-                      ? 'bg-violet-glow font-semibold text-violet-bright'
-                      : 'text-subtle hover:text-muted'
-                  }`}
-                  onClick={onTocClick(item.id)}
-                >
-                  {item.text}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      <div className="mt-auto border-t border-line-subtle pt-4">
-        <a
-          href="/"
-          className="flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-semibold text-subtle transition-colors hover:bg-accent-glow hover:text-accent-bright"
-        >
-          <FaArrowLeft size={13} />
-          Back to UncivServer.xyz
-        </a>
-      </div>
-    </nav>
+    <div className="mt-auto border-t border-line-subtle pt-4">
+      <a
+        href="/"
+        className="flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-semibold text-subtle transition-colors hover:bg-accent-glow hover:text-accent-bright"
+      >
+        <FaArrowLeft size={13} />
+        Back to UncivServer.xyz
+      </a>
+    </div>
+  </nav>
 );
 
 const Article = ({ articleRef }: { articleRef: React.RefObject<HTMLElement | null> }) => (
