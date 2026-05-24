@@ -173,22 +173,32 @@ const ChangePasswordCard = () => {
     submit(
       () => {
         if (!ID_REGEX.test(form.userId.trim())) return 'Invalid UUID format.';
-        if (form.newPass.length < 6) return 'Password must be at least 6 characters.';
-        if (form.newPass !== form.confirmPass) return 'Passwords do not match.';
-        if (form.email.trim() && !EMAIL_REGEX.test(form.email.trim()))
-          return 'Invalid email format.';
+        const newPass = form.newPass;
+        const email = form.email.trim();
+        if (!newPass && !email) return 'Provide a new password or email to update.';
+        if (newPass) {
+          if (newPass.length < 6) return 'Password must be at least 6 characters.';
+          if (newPass !== form.confirmPass) return 'Passwords do not match.';
+        }
+        if (email && !EMAIL_REGEX.test(email)) return 'Invalid email format.';
         return null;
       },
       async () => {
+        const newPass = form.newPass;
         const email = form.email.trim();
-        const body = email ? JSON.stringify({ password: form.newPass, email }) : form.newPass;
+        const useJson = Boolean(email);
         const response = await fetch('/auth', {
           method: 'PUT',
           headers: {
             Authorization: basicAuth(form.userId, form.oldPass),
-            'Content-Type': 'text/plain',
+            'Content-Type': useJson ? 'application/json' : 'text/plain',
           },
-          body,
+          body: useJson
+            ? JSON.stringify({
+                ...(newPass ? { password: newPass } : {}),
+                email,
+              })
+            : newPass,
         });
         return responseToResult(response, await response.text());
       }
@@ -199,7 +209,7 @@ const ChangePasswordCard = () => {
     <Card
       icon={<FaKey />}
       title="Change Password"
-      desc="Update your account password. Optionally set an email for password resets."
+      desc="Update password and/or email. Provide at least one."
     >
       <form onSubmit={onSubmit}>
         <Field
@@ -218,12 +228,11 @@ const ChangePasswordCard = () => {
         />
         <div className="row">
           <Field
-            label="New Password"
+            label="New Password (optional)"
             type="password"
             placeholder="Min. 6 chars"
             value={form.newPass}
             onChange={update('newPass')}
-            required
             half
           />
           <Field
@@ -232,7 +241,6 @@ const ChangePasswordCard = () => {
             placeholder="Repeat"
             value={form.confirmPass}
             onChange={update('confirmPass')}
-            required
             half
           />
         </div>
@@ -245,7 +253,7 @@ const ChangePasswordCard = () => {
         />
         {error && <p className="form-error">{error}</p>}
         <button type="submit" className="btn btn-danger" disabled={loading}>
-          {loading ? 'Changing…' : 'Change Password'}
+          {loading ? 'Updating…' : 'Update Account'}
         </button>
       </form>
       {result && <ResultBox result={result} />}
@@ -256,7 +264,6 @@ const ChangePasswordCard = () => {
 const ResetPasswordCard = () => {
   const { form, update, loading, error, result, submit } = useApiForm({
     userId: '',
-    oldPass: '',
     email: '',
   });
 
@@ -271,11 +278,11 @@ const ResetPasswordCard = () => {
       async () => {
         const response = await fetch('/auth/reset', {
           method: 'POST',
-          headers: {
-            Authorization: basicAuth(form.userId, form.oldPass),
-            'Content-Type': 'text/plain',
-          },
-          body: form.email.trim(),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: form.userId.trim(),
+            email: form.email.trim(),
+          }),
         });
         const text = await response.text();
         return {
@@ -299,14 +306,6 @@ const ResetPasswordCard = () => {
           placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
           value={form.userId}
           onChange={update('userId')}
-          required
-        />
-        <Field
-          label="Current Password"
-          type="password"
-          placeholder="Your current password"
-          value={form.oldPass}
-          onChange={update('oldPass')}
           required
         />
         <Field
