@@ -4,9 +4,9 @@ import {
   FaCheckCircle,
   FaEnvelopeOpenText,
   FaExclamationCircle,
-  FaKey,
   FaTools,
   FaUserCheck,
+  FaUserEdit,
 } from 'react-icons/fa';
 
 const ID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
@@ -202,9 +202,9 @@ const ChangePasswordCard = (props: SharedProps) => {
 
   return (
     <Card
-      icon={<FaKey />}
-      title="Change Password"
-      desc="Update password and/or email. Provide at least one."
+      icon={<FaUserEdit />}
+      title="Update Information"
+      desc="Set or update password or email. Provide at least one."
     >
       <form onSubmit={onSubmit} autoComplete="off">
         <UserIdField {...userId} />
@@ -311,9 +311,9 @@ const TOOL_OPTIONS: ToolOption[] = [
   },
   {
     id: 'change',
-    label: 'Change Password',
-    desc: 'Update password and email',
-    icon: <FaKey />,
+    label: 'Update Information',
+    desc: 'Set or update password or email',
+    icon: <FaUserEdit />,
     Component: ChangePasswordCard,
   },
   {

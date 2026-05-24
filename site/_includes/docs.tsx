@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import logo from '../assets/logo.png';
 
 interface NavItem {
   url: string;
@@ -45,8 +46,6 @@ const processContent = (html: string): { html: string; toc: TocItem[] } => {
   });
   return { html: doc.body.innerHTML, toc };
 };
-
-const logoUrl = document.querySelector<HTMLLinkElement>('link[rel="icon"]')?.href ?? '';
 
 const { heading, content, navItems } = JSON.parse(
   document.getElementById('__doc__')!.textContent!
@@ -134,7 +133,7 @@ const Header = ({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => v
       </button>
 
       <a href="/" className="brand">
-        <img src={logoUrl} alt="UncivGames Logo" className="brand-logo" />
+        <img src={logo} alt="UncivGames Logo" className="brand-logo" />
         <span>UncivGames Docs</span>
       </a>
 
