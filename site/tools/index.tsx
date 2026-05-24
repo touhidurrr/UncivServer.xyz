@@ -10,6 +10,7 @@ import {
 } from 'react-icons/fa';
 
 const ID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const AUTH_STATUS: Record<number, string> = {
   200: 'Authenticated',
@@ -20,23 +21,39 @@ const AUTH_STATUS: Record<number, string> = {
 type ResultType = 'success' | 'error';
 type Result = { text: string; detail?: string; type: ResultType };
 
-const responseToResult = (response: Response, detail?: string): Result => ({
-  text: AUTH_STATUS[response.status] ?? response.statusText,
-  detail: detail || `${response.status} ${response.statusText}`,
-  type: response.ok ? 'success' : 'error',
-});
+const responseToResult = async (response: Response): Promise<Result> => {
+  const body = await response.text();
+  return {
+    text: AUTH_STATUS[response.status] ?? `${response.status} ${response.statusText}`,
+    detail: body || undefined,
+    type: response.ok ? 'success' : 'error',
+  };
+};
 
 const basicAuth = (userId: string, password: string) =>
   'Basic ' + btoa(userId.trim() + ':' + password);
 
-const useApiForm = <T extends Record<string, string>>(initial: T) => {
-  const [form, setForm] = useState<T>(initial);
+interface SharedFields {
+  userId: string;
+  password: string;
+  email: string;
+}
+
+interface SharedProps {
+  shared: SharedFields;
+  setShared: React.Dispatch<React.SetStateAction<SharedFields>>;
+}
+
+const sharedField = ({ shared, setShared }: SharedProps, key: keyof SharedFields) => ({
+  value: shared[key],
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) =>
+    setShared(s => ({ ...s, [key]: e.target.value })),
+});
+
+const useCardSubmit = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState<Result | null>(null);
-
-  const update = (key: keyof T) => (e: React.ChangeEvent<HTMLInputElement>) =>
-    setForm(f => ({ ...f, [key]: e.target.value }));
 
   const submit = async (validate: () => string | null, request: () => Promise<Result>) => {
     setError('');
@@ -56,7 +73,7 @@ const useApiForm = <T extends Record<string, string>>(initial: T) => {
     }
   };
 
-  return { form, update, loading, error, result, submit };
+  return { loading, error, result, submit };
 };
 
 interface FieldProps {
@@ -72,7 +89,7 @@ interface FieldProps {
 const Field = ({ label, type = 'text', half, ...rest }: FieldProps) => (
   <div className={half ? 'form-group half' : 'form-group'}>
     <label>{label}</label>
-    <input type={type} {...rest} />
+    <input type={type} autoComplete={type === 'password' ? 'new-password' : 'off'} {...rest} />
   </div>
 );
 
@@ -106,23 +123,24 @@ const Card = ({ icon, title, desc, children }: CardProps) => (
   </div>
 );
 
-const ValidateCard = () => {
-  const { form, update, loading, error, result, submit } = useApiForm({
-    userId: '',
-    password: '',
-  });
+const UserIdField = (field: { value: string; onChange: FieldProps['onChange'] }) => (
+  <Field label="User ID" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" required {...field} />
+);
+
+const ValidateCard = (props: SharedProps) => {
+  const userId = sharedField(props, 'userId');
+  const password = sharedField(props, 'password');
+  const { loading, error, result, submit } = useCardSubmit();
 
   const onSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     submit(
-      () => (ID_REGEX.test(form.userId.trim()) ? null : 'Invalid UUID format.'),
-      async () => {
-        const response = await fetch('/auth', {
+      () => (ID_REGEX.test(userId.value.trim()) ? null : 'Invalid UUID format.'),
+      () =>
+        fetch('/auth', {
           method: 'GET',
-          headers: { Authorization: basicAuth(form.userId, form.password) },
-        });
-        return responseToResult(response);
-      }
+          headers: { Authorization: basicAuth(userId.value, password.value) },
+        }).then(responseToResult)
     );
   };
 
@@ -132,21 +150,9 @@ const ValidateCard = () => {
       title="Validate Credentials"
       desc="Check if a user ID and password are correct"
     >
-      <form onSubmit={onSubmit}>
-        <Field
-          label="User ID"
-          placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-          value={form.userId}
-          onChange={update('userId')}
-          required
-        />
-        <Field
-          label="Password"
-          type="password"
-          placeholder="Current password"
-          value={form.password}
-          onChange={update('password')}
-        />
+      <form onSubmit={onSubmit} autoComplete="off">
+        <UserIdField {...userId} />
+        <Field label="Password" type="password" placeholder="Current password" {...password} />
         {error && <p className="form-error">{error}</p>}
         <button type="submit" className="btn btn-primary" disabled={loading}>
           {loading ? 'Validating…' : 'Validate'}
@@ -157,51 +163,40 @@ const ValidateCard = () => {
   );
 };
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-const ChangePasswordCard = () => {
-  const { form, update, loading, error, result, submit } = useApiForm({
-    userId: '',
-    oldPass: '',
-    newPass: '',
-    confirmPass: '',
-    email: '',
-  });
+const ChangePasswordCard = (props: SharedProps) => {
+  const userId = sharedField(props, 'userId');
+  const oldPass = sharedField(props, 'password');
+  const email = sharedField(props, 'email');
+  const [newPass, setNewPass] = useState('');
+  const [confirmPass, setConfirmPass] = useState('');
+  const { loading, error, result, submit } = useCardSubmit();
 
   const onSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     submit(
       () => {
-        if (!ID_REGEX.test(form.userId.trim())) return 'Invalid UUID format.';
-        const newPass = form.newPass;
-        const email = form.email.trim();
-        if (!newPass && !email) return 'Provide a new password or email to update.';
+        if (!ID_REGEX.test(userId.value.trim())) return 'Invalid UUID format.';
+        const trimmedEmail = email.value.trim();
+        if (!newPass && !trimmedEmail) return 'Provide a new password or email to update.';
         if (newPass) {
           if (newPass.length < 6) return 'Password must be at least 6 characters.';
-          if (newPass !== form.confirmPass) return 'Passwords do not match.';
+          if (newPass !== confirmPass) return 'Passwords do not match.';
         }
-        if (email && !EMAIL_REGEX.test(email)) return 'Invalid email format.';
+        if (trimmedEmail && !EMAIL_REGEX.test(trimmedEmail)) return 'Invalid email format.';
         return null;
       },
-      async () => {
-        const newPass = form.newPass;
-        const email = form.email.trim();
-        const useJson = Boolean(email);
-        const response = await fetch('/auth', {
+      () =>
+        fetch('/auth', {
           method: 'PUT',
           headers: {
-            Authorization: basicAuth(form.userId, form.oldPass),
-            'Content-Type': useJson ? 'application/json' : 'text/plain',
+            Authorization: basicAuth(userId.value, oldPass.value),
+            'Content-Type': 'application/json',
           },
-          body: useJson
-            ? JSON.stringify({
-                ...(newPass ? { password: newPass } : {}),
-                email,
-              })
-            : newPass,
-        });
-        return responseToResult(response, await response.text());
-      }
+          body: JSON.stringify({
+            ...(newPass ? { password: newPass } : {}),
+            ...(email.value.trim() ? { email: email.value.trim() } : {}),
+          }),
+        }).then(responseToResult)
     );
   };
 
@@ -211,46 +206,33 @@ const ChangePasswordCard = () => {
       title="Change Password"
       desc="Update password and/or email. Provide at least one."
     >
-      <form onSubmit={onSubmit}>
-        <Field
-          label="User ID"
-          placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-          value={form.userId}
-          onChange={update('userId')}
-          required
-        />
+      <form onSubmit={onSubmit} autoComplete="off">
+        <UserIdField {...userId} />
         <Field
           label="Current Password"
           type="password"
           placeholder="Leave empty if none"
-          value={form.oldPass}
-          onChange={update('oldPass')}
+          {...oldPass}
         />
         <div className="row">
           <Field
             label="New Password (optional)"
             type="password"
             placeholder="Min. 6 chars"
-            value={form.newPass}
-            onChange={update('newPass')}
+            value={newPass}
+            onChange={e => setNewPass(e.target.value)}
             half
           />
           <Field
             label="Confirm"
             type="password"
             placeholder="Repeat"
-            value={form.confirmPass}
-            onChange={update('confirmPass')}
+            value={confirmPass}
+            onChange={e => setConfirmPass(e.target.value)}
             half
           />
         </div>
-        <Field
-          label="Email (optional)"
-          type="email"
-          placeholder="For password resets"
-          value={form.email}
-          onChange={update('email')}
-        />
+        <Field label="Email (optional)" type="email" placeholder="For password resets" {...email} />
         {error && <p className="form-error">{error}</p>}
         <button type="submit" className="btn btn-danger" disabled={loading}>
           {loading ? 'Updating…' : 'Update Account'}
@@ -261,36 +243,28 @@ const ChangePasswordCard = () => {
   );
 };
 
-const ResetPasswordCard = () => {
-  const { form, update, loading, error, result, submit } = useApiForm({
-    userId: '',
-    email: '',
-  });
+const ResetPasswordCard = (props: SharedProps) => {
+  const userId = sharedField(props, 'userId');
+  const email = sharedField(props, 'email');
+  const { loading, error, result, submit } = useCardSubmit();
 
   const onSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     submit(
       () => {
-        if (!ID_REGEX.test(form.userId.trim())) return 'Invalid UUID format.';
-        if (!EMAIL_REGEX.test(form.email.trim())) return 'Invalid email format.';
+        if (!ID_REGEX.test(userId.value.trim())) return 'Invalid UUID format.';
+        if (!EMAIL_REGEX.test(email.value.trim())) return 'Invalid email format.';
         return null;
       },
-      async () => {
-        const response = await fetch('/auth/reset', {
+      () =>
+        fetch('/auth/reset', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            userId: form.userId.trim(),
-            email: form.email.trim(),
+            userId: userId.value.trim(),
+            email: email.value.trim(),
           }),
-        });
-        const text = await response.text();
-        return {
-          text: `${response.status} ${response.statusText}`,
-          detail: text || undefined,
-          type: response.ok ? 'success' : 'error',
-        };
-      }
+        }).then(responseToResult)
     );
   };
 
@@ -300,21 +274,14 @@ const ResetPasswordCard = () => {
       title="Reset Password"
       desc="Generate a new random password and send it to your registered email"
     >
-      <form onSubmit={onSubmit}>
-        <Field
-          label="User ID"
-          placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-          value={form.userId}
-          onChange={update('userId')}
-          required
-        />
+      <form onSubmit={onSubmit} autoComplete="off">
+        <UserIdField {...userId} />
         <Field
           label="Registered Email"
           type="email"
           placeholder="The email set on your account"
-          value={form.email}
-          onChange={update('email')}
           required
+          {...email}
         />
         {error && <p className="form-error">{error}</p>}
         <button type="submit" className="btn btn-danger" disabled={loading}>
@@ -331,7 +298,7 @@ interface ToolOption {
   label: string;
   desc: string;
   icon: React.ReactNode;
-  Component: React.FC;
+  Component: React.FC<SharedProps>;
 }
 
 const TOOL_OPTIONS: ToolOption[] = [
@@ -360,8 +327,8 @@ const TOOL_OPTIONS: ToolOption[] = [
 
 const Tools = () => {
   const [activeId, setActiveId] = useState(TOOL_OPTIONS[0].id);
-  const active = TOOL_OPTIONS.find(o => o.id === activeId) ?? TOOL_OPTIONS[0];
-  const Active = active.Component;
+  const [shared, setShared] = useState<SharedFields>({ userId: '', password: '', email: '' });
+  const Active = (TOOL_OPTIONS.find(o => o.id === activeId) ?? TOOL_OPTIONS[0]).Component;
 
   return (
     <div className="page-wrapper">
@@ -392,7 +359,7 @@ const Tools = () => {
           </nav>
 
           <section className="tools-panel">
-            <Active />
+            <Active shared={shared} setShared={setShared} />
           </section>
         </div>
 

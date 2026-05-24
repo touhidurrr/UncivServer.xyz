@@ -11,6 +11,12 @@ import { brevo } from '@services/brevo';
 import { type } from 'arktype';
 import type { Elysia } from 'elysia';
 
+const RESET_BACKOFF_BASE_MS = 60 * 1000;
+const RESET_BACKOFF_MAX_MS = 24 * 3600 * 1000;
+
+const nextResetLockMs = (attempts: number) =>
+  Math.min(RESET_BACKOFF_BASE_MS * 2 ** Math.max(attempts - 1, 0), RESET_BACKOFF_MAX_MS);
+
 const updatePasswordAndEmail = async (config: {
   userId: string;
   password?: string;
@@ -23,12 +29,16 @@ const updatePasswordAndEmail = async (config: {
     config.email ? Bun.password.hash(config.email) : undefined,
   ]);
 
-  const update: { hash?: string; email?: string } = {};
-  if (hash) update.hash = hash;
-  if (email) update.email = email;
-  if (!update.hash && !update.email) return;
+  const set: { hash?: string; email?: string } = {};
+  if (hash) set.hash = hash;
+  if (email) set.email = email;
+  if (!set.hash && !set.email) return;
 
-  await Auth.updateOne({ _id: userId }, update, { upsert });
+  await Auth.updateOne(
+    { _id: userId },
+    { $set: set, $unset: { resetAttempts: 1, resetLockedUntil: 1 } },
+    { upsert }
+  );
   if (password) passwordsCache.set(userId, password);
 };
 
@@ -40,16 +50,33 @@ export const authRoute = (app: Elysia) =>
       async ({ set, status, body: { userId, email } }) => {
         set.headers['cache-control'] = NO_CACHE_CONTROL;
 
-        const dbAuth = await Auth.findById(userId, { email: 1 }).lean();
-        if (dbAuth === null) {
-          await Bun.sleep(50);
-          return status('Not Found', `No account for UUID: ${userId}`);
-        }
-
+        const dbAuth = await Auth.findById(userId, {
+          email: 1,
+          resetAttempts: 1,
+          resetLockedUntil: 1,
+        }).lean();
+        if (dbAuth === null) return status('Not Found', `No account for UUID: ${userId}`);
         if (!dbAuth.email) return status('Not Found', `Email not set for UUID: ${userId}`);
 
+        if (dbAuth.resetLockedUntil && dbAuth.resetLockedUntil > new Date()) {
+          const retryAfter = Math.ceil((dbAuth.resetLockedUntil.getTime() - Date.now()) / 1000);
+          set.headers['retry-after'] = String(retryAfter);
+          return status(
+            'Too Many Requests',
+            `Too many reset attempts. Try again after ${dbAuth.resetLockedUntil.toISOString()}.`
+          );
+        }
+
         const emailOk = await Bun.password.verify(email, dbAuth.email);
-        if (!emailOk) return status('Unauthorized', 'The provided email is incorrect!');
+        if (!emailOk) {
+          const attempts = (dbAuth.resetAttempts ?? 0) + 1;
+          const lockedUntil = new Date(Date.now() + nextResetLockMs(attempts));
+          await Auth.updateOne(
+            { _id: userId },
+            { $set: { resetAttempts: attempts, resetLockedUntil: lockedUntil } }
+          );
+          return status('Unauthorized', 'The provided email is incorrect!');
+        }
 
         if (!brevo) {
           return status('Service Unavailable', 'The server cannot send emails at this moment');
@@ -57,18 +84,32 @@ export const authRoute = (app: Elysia) =>
 
         const newPassword = getRandomBase64String(16, 'base64url');
 
-        await brevo.transactionalEmails.sendTransacEmail({
-          sender: {
-            name: 'UncivServer.xyz',
-            email: 'no-reply@uncivserver.xyz',
-          },
-          to: [{ email }],
-          subject: 'Your UncivServer.xyz password has been reset',
-          htmlContent: passwordResetEmailHtml({ userId, newPassword }),
-        });
+        try {
+          await brevo.transactionalEmails.sendTransacEmail({
+            sender: {
+              name: 'UncivServer.xyz',
+              email: 'no-reply@uncivserver.xyz',
+            },
+            to: [{ email }],
+            subject: 'Your UncivServer.xyz password has been reset',
+            htmlContent: passwordResetEmailHtml({ userId, newPassword }),
+          });
+        } catch (err) {
+          console.error('[POST /auth/reset] Brevo send failed:', err);
+          return status(
+            'Bad Gateway',
+            'Failed to send password reset email. Please try again later.'
+          );
+        }
 
         const newHash = await Bun.password.hash(newPassword);
-        await Auth.updateOne({ _id: userId }, { hash: newHash });
+        await Auth.updateOne(
+          { _id: userId },
+          {
+            $set: { hash: newHash },
+            $unset: { resetAttempts: 1, resetLockedUntil: 1 },
+          }
+        );
         passwordsCache.set(userId, newPassword);
 
         return 'Password reset successfully. A new password has been sent to your email.';
@@ -81,7 +122,7 @@ export const authRoute = (app: Elysia) =>
       }
     )
     .guard(
-      { parse: 'text', headers: UNCIV_BASIC_AUTH_HEADER_SCHEMA },
+      { headers: UNCIV_BASIC_AUTH_HEADER_SCHEMA },
 
       app =>
         app
@@ -91,9 +132,7 @@ export const authRoute = (app: Elysia) =>
             const [userId, password] = headers.authorization;
 
             if (passwordsCache.has(userId)) {
-              if (passwordsCache.verify(userId, password)) {
-                return 'Authenticated';
-              }
+              if (passwordsCache.verify(userId, password)) return 'Authenticated';
               return status('Unauthorized');
             }
 
@@ -117,7 +156,7 @@ export const authRoute = (app: Elysia) =>
               if (passwordsCache.has(userId)) {
                 if (!passwordsCache.verify(userId, password)) return status('Unauthorized');
                 await updatePasswordAndEmail({ userId, ...body });
-                return 'Successfully updated account';
+                return 'Information updated successfully';
               }
 
               const dbAuth = await Auth.findById(userId, { hash: 1 }).lean();
@@ -126,17 +165,16 @@ export const authRoute = (app: Elysia) =>
                   return status('Bad Request', 'Password is required to create an account');
                 }
                 await updatePasswordAndEmail({ userId, ...body, upsert: true });
-                return 'Successfully assigned a new password';
+                return 'Information added successfully';
               }
 
               const verified = await Bun.password.verify(password, dbAuth.hash);
               if (!verified) return status('Unauthorized');
 
               await updatePasswordAndEmail({ userId, ...body });
-              return 'Successfully updated account';
+              return 'Information updated successfully';
             },
             {
-              parse: ['json', 'text'],
               body: type.or(
                 PASSWORD_SCHEMA.pipe(val => ({ password: val })),
                 type({ 'password?': PASSWORD_SCHEMA, 'email?': 'string.email <= 512' }).narrow(

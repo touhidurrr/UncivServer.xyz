@@ -160,7 +160,7 @@ describe.concurrent('Auth', () => {
       auth: { username, password: '' },
     });
     expect(status).toBe(200);
-    expect(data).toBe('Successfully assigned a new password');
+    expect(data).toBe('Information added successfully');
     expect(passwordsCache.verify(username, password)).toBe(true);
   });
 
@@ -205,7 +205,7 @@ describe.concurrent('Auth', () => {
       auth: { username, password },
     });
     expect(status).toBe(200);
-    expect(data).toBe('Successfully updated password');
+    expect(data).toBe('Information updated successfully');
     expect(passwordsCache.verify(username, password)).toBe(false);
     expect(passwordsCache.verify(username, newPassword)).toBe(true);
   });
