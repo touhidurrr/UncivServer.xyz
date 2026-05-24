@@ -1,13 +1,21 @@
 import passwordsCache from '@cache/passwordsCache';
-import { NO_CACHE_CONTROL, UNCIV_BASIC_AUTH_HEADER_SCHEMA } from '@constants';
+import { NO_CACHE_CONTROL, PASSWORD_SCHEMA, UNCIV_BASIC_AUTH_HEADER_SCHEMA } from '@constants';
 import { Auth } from '@models/Auth';
 import { type } from 'arktype';
 import type { Elysia } from 'elysia';
 
-const updatePassword = async (userId: string, newPassword: string) => {
-  const hash = await Bun.password.hash(newPassword);
-  await Auth.updateOne({ _id: userId }, { hash }, { upsert: true });
-  passwordsCache.set(userId, newPassword);
+const updatePasswordAndEmail = async (config: {
+  userId: string;
+  password: string;
+  email?: string;
+}) => {
+  const { userId, password } = config;
+  const [hash, email] = await Promise.all([
+    Bun.password.hash(password),
+    config.email ? Bun.password.hash(config.email) : undefined,
+  ]);
+  await Auth.updateOne({ _id: userId }, { hash, email }, { upsert: true });
+  passwordsCache.set(userId, password);
 };
 
 // unlike in files route, this route checks the db every time
@@ -41,29 +49,34 @@ export const authRoute = (app: Elysia) =>
 
         .put(
           '/auth',
-          async ({ set, status, headers, body: newPassword }) => {
+          async ({ set, status, headers, body }) => {
             set.headers['cache-control'] = NO_CACHE_CONTROL;
 
             const [userId, password] = headers.authorization;
 
             if (passwordsCache.has(userId)) {
               if (!passwordsCache.verify(userId, password)) return status('Unauthorized');
-              await updatePassword(userId, newPassword);
+              await updatePasswordAndEmail({ userId, ...body });
               return 'Successfully updated password';
             }
 
             const dbAuth = await Auth.findById(userId, { hash: 1 }).lean();
             if (dbAuth === null) {
-              await updatePassword(userId, newPassword);
+              await updatePasswordAndEmail({ userId, ...body });
               return 'Successfully assigned a new password';
             }
 
             const verified = await Bun.password.verify(password, dbAuth.hash);
             if (!verified) return status('Unauthorized');
 
-            await updatePassword(userId, newPassword);
+            await updatePasswordAndEmail({ userId, ...body });
             return 'Successfully updated password';
           },
-          { body: type('6 <= string <= 512') }
+          {
+            body: type.or(
+              PASSWORD_SCHEMA.pipe(val => ({ password: val })),
+              type({ password: PASSWORD_SCHEMA, 'email?': 'string.email <= 512' })
+            ),
+          }
         )
   );

@@ -31,6 +31,7 @@ export const MAX_FILE_SIZE = Math.min(MAX_CONTENT_LENGTH, bytes.parse('2mb')!);
 
 // Auth
 export const NUMERIC_REGEX = /^\d+$/;
+export const PASSWORD_SCHEMA = type('6 <= string <= 512');
 export const UUID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
 export const UUID_SCHEMA = type('string.lower').pipe(type(UUID_REGEX));
 export const GAME_ID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}(_Preview)?$/;
