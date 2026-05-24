@@ -57,6 +57,7 @@
     "@types/bytes": "^3.1.5",
     "@types/react-dom": "^19.2.3",
     "axios": "^1.16.1",
+    "bun-plugin-tailwind": "^0.1.2",
     "eslint": "^10.4.0",
     "eslint-plugin-react": "^7.37.5",
     "globals": "^17.6.0",
@@ -64,6 +65,7 @@
     "prettier": "^3.8.3",
     "prettier-plugin-jinja-template": "^2.2.0",
     "prettier-plugin-toml": "^2.0.6",
+    "tailwindcss": "^4.3.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.59.4"
   },

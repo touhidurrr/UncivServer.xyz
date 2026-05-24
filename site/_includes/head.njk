@@ -11,7 +11,13 @@
 {% if title %}<meta property="og:title" content="{{ title }}" />{% endif %}
 {% if description %}<meta property="og:description" content="{{ description }}" />{% endif %}
 
-{% if css %}<link rel="stylesheet" href="{{ css }}" />{% endif %}
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+/>
+<link rel="stylesheet" href="/public/index.css" />
 {% if script %}<script type="module" src="{{ script }}" defer></script>{% endif %}
 
 <script
