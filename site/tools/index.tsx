@@ -1,6 +1,13 @@
 import React, { useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { FaCheckCircle, FaExclamationCircle, FaKey, FaTools, FaUserCheck } from 'react-icons/fa';
+import {
+  FaCheckCircle,
+  FaEnvelopeOpenText,
+  FaExclamationCircle,
+  FaKey,
+  FaTools,
+  FaUserCheck,
+} from 'react-icons/fa';
 
 const ID_REGEX = /^[\da-f]{8}-([\da-f]{4}-){3}[\da-f]{12}$/;
 
@@ -150,12 +157,15 @@ const ValidateCard = () => {
   );
 };
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const ChangePasswordCard = () => {
   const { form, update, loading, error, result, submit } = useApiForm({
     userId: '',
     oldPass: '',
     newPass: '',
     confirmPass: '',
+    email: '',
   });
 
   const onSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
@@ -165,16 +175,20 @@ const ChangePasswordCard = () => {
         if (!ID_REGEX.test(form.userId.trim())) return 'Invalid UUID format.';
         if (form.newPass.length < 6) return 'Password must be at least 6 characters.';
         if (form.newPass !== form.confirmPass) return 'Passwords do not match.';
+        if (form.email.trim() && !EMAIL_REGEX.test(form.email.trim()))
+          return 'Invalid email format.';
         return null;
       },
       async () => {
+        const email = form.email.trim();
+        const body = email ? JSON.stringify({ password: form.newPass, email }) : form.newPass;
         const response = await fetch('/auth', {
           method: 'PUT',
           headers: {
             Authorization: basicAuth(form.userId, form.oldPass),
             'Content-Type': 'text/plain',
           },
-          body: form.newPass,
+          body,
         });
         return responseToResult(response, await response.text());
       }
@@ -182,7 +196,11 @@ const ChangePasswordCard = () => {
   };
 
   return (
-    <Card icon={<FaKey />} title="Change Password" desc="Update your account password">
+    <Card
+      icon={<FaKey />}
+      title="Change Password"
+      desc="Update your account password. Optionally set an email for password resets."
+    >
       <form onSubmit={onSubmit}>
         <Field
           label="User ID"
@@ -218,6 +236,13 @@ const ChangePasswordCard = () => {
             half
           />
         </div>
+        <Field
+          label="Email (optional)"
+          type="email"
+          placeholder="For password resets"
+          value={form.email}
+          onChange={update('email')}
+        />
         {error && <p className="form-error">{error}</p>}
         <button type="submit" className="btn btn-danger" disabled={loading}>
           {loading ? 'Changing…' : 'Change Password'}
@@ -228,27 +253,157 @@ const ChangePasswordCard = () => {
   );
 };
 
-const Tools = () => (
-  <div className="page-wrapper">
-    <div className="main-container">
-      <header className="page-header">
-        <h1>
-          <FaTools className="icon-title" /> Toolbox
-        </h1>
-        <p className="subtitle">Manage your UncivServer account credentials</p>
-      </header>
+const ResetPasswordCard = () => {
+  const { form, update, loading, error, result, submit } = useApiForm({
+    userId: '',
+    oldPass: '',
+    email: '',
+  });
 
-      <div className="cards-grid">
-        <ValidateCard />
-        <ChangePasswordCard />
-      </div>
+  const onSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    submit(
+      () => {
+        if (!ID_REGEX.test(form.userId.trim())) return 'Invalid UUID format.';
+        if (!EMAIL_REGEX.test(form.email.trim())) return 'Invalid email format.';
+        return null;
+      },
+      async () => {
+        const response = await fetch('/auth/reset', {
+          method: 'POST',
+          headers: {
+            Authorization: basicAuth(form.userId, form.oldPass),
+            'Content-Type': 'text/plain',
+          },
+          body: form.email.trim(),
+        });
+        const text = await response.text();
+        return {
+          text: `${response.status} ${response.statusText}`,
+          detail: text || undefined,
+          type: response.ok ? 'success' : 'error',
+        };
+      }
+    );
+  };
 
-      <div className="footer-link">
-        <a href="/">← Back to Home</a>
+  return (
+    <Card
+      icon={<FaEnvelopeOpenText />}
+      title="Reset Password"
+      desc="Generate a new random password and send it to your registered email"
+    >
+      <form onSubmit={onSubmit}>
+        <Field
+          label="User ID"
+          placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+          value={form.userId}
+          onChange={update('userId')}
+          required
+        />
+        <Field
+          label="Current Password"
+          type="password"
+          placeholder="Your current password"
+          value={form.oldPass}
+          onChange={update('oldPass')}
+          required
+        />
+        <Field
+          label="Registered Email"
+          type="email"
+          placeholder="The email set on your account"
+          value={form.email}
+          onChange={update('email')}
+          required
+        />
+        {error && <p className="form-error">{error}</p>}
+        <button type="submit" className="btn btn-danger" disabled={loading}>
+          {loading ? 'Sending…' : 'Reset Password'}
+        </button>
+      </form>
+      {result && <ResultBox result={result} />}
+    </Card>
+  );
+};
+
+interface ToolOption {
+  id: string;
+  label: string;
+  desc: string;
+  icon: React.ReactNode;
+  Component: React.FC;
+}
+
+const TOOL_OPTIONS: ToolOption[] = [
+  {
+    id: 'validate',
+    label: 'Validate Credentials',
+    desc: 'Check user ID and password',
+    icon: <FaUserCheck />,
+    Component: ValidateCard,
+  },
+  {
+    id: 'change',
+    label: 'Change Password',
+    desc: 'Update password and email',
+    icon: <FaKey />,
+    Component: ChangePasswordCard,
+  },
+  {
+    id: 'reset',
+    label: 'Reset Password',
+    desc: 'Email a new random password',
+    icon: <FaEnvelopeOpenText />,
+    Component: ResetPasswordCard,
+  },
+];
+
+const Tools = () => {
+  const [activeId, setActiveId] = useState(TOOL_OPTIONS[0].id);
+  const active = TOOL_OPTIONS.find(o => o.id === activeId) ?? TOOL_OPTIONS[0];
+  const Active = active.Component;
+
+  return (
+    <div className="page-wrapper">
+      <div className="main-container">
+        <header className="page-header">
+          <h1>
+            <FaTools className="icon-title" /> Toolbox
+          </h1>
+          <p className="subtitle">Manage your UncivServer account credentials</p>
+        </header>
+
+        <div className="tools-layout">
+          <nav className="tools-nav" aria-label="Tools">
+            {TOOL_OPTIONS.map(opt => (
+              <button
+                key={opt.id}
+                type="button"
+                className={`tools-nav-item${opt.id === activeId ? ' active' : ''}`}
+                onClick={() => setActiveId(opt.id)}
+              >
+                <span className="tools-nav-icon">{opt.icon}</span>
+                <span className="tools-nav-text">
+                  <span className="tools-nav-label">{opt.label}</span>
+                  <span className="tools-nav-desc">{opt.desc}</span>
+                </span>
+              </button>
+            ))}
+          </nav>
+
+          <section className="tools-panel">
+            <Active />
+          </section>
+        </div>
+
+        <div className="footer-link">
+          <a href="/">← Back to Home</a>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const container = document.getElementById('root') as HTMLDivElement;
 createRoot(container).render(<Tools />);
