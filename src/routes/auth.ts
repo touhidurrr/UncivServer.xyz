@@ -14,9 +14,6 @@ import type { Elysia } from 'elysia';
 const RESET_BACKOFF_BASE_MS = 60 * 1000;
 const RESET_BACKOFF_MAX_MS = 24 * 3600 * 1000;
 
-const nextResetLockMs = (attempts: number) =>
-  Math.min(RESET_BACKOFF_BASE_MS * 2 ** Math.max(attempts - 1, 0), RESET_BACKOFF_MAX_MS);
-
 const updatePasswordAndEmail = async (config: {
   userId: string;
   password?: string;
@@ -36,7 +33,7 @@ const updatePasswordAndEmail = async (config: {
 
   await Auth.updateOne(
     { _id: userId },
-    { $set: set, $unset: { resetAttempts: 1, resetLockedUntil: 1 } },
+    { $set: set, $unset: { resetAttempts: 1, resetLockedUntil: 1, resetLockMs: 1 } },
     { upsert }
   );
   if (password) passwordsCache.set(userId, password);
@@ -55,6 +52,7 @@ export const authRoute = (app: Elysia) =>
           resetAttempts: 1,
           resetLockedUntil: 1,
         }).lean();
+
         if (dbAuth === null) return status('Not Found', `No account for UUID: ${userId}`);
         if (!dbAuth.email) return status('Not Found', `Email not set for UUID: ${userId}`);
 
@@ -69,12 +67,26 @@ export const authRoute = (app: Elysia) =>
 
         const emailOk = await Bun.password.verify(email, dbAuth.email);
         if (!emailOk) {
-          const attempts = (dbAuth.resetAttempts ?? 0) + 1;
-          const lockedUntil = new Date(Date.now() + nextResetLockMs(attempts));
-          await Auth.updateOne(
-            { _id: userId },
-            { $set: { resetAttempts: attempts, resetLockedUntil: lockedUntil } }
-          );
+          await Auth.updateOne({ _id: userId }, [
+            {
+              $set: {
+                resetAttempts: { $add: [{ $ifNull: ['$resetAttempts', 0] }, 1] },
+                resetLockMs: {
+                  $min: [
+                    {
+                      $multiply: [{ $ifNull: ['$resetLockMs', RESET_BACKOFF_BASE_MS / 2] }, 2],
+                    },
+                    RESET_BACKOFF_MAX_MS,
+                  ],
+                },
+              },
+            },
+            {
+              $set: {
+                resetLockedUntil: { $add: ['$$NOW', '$resetLockMs'] },
+              },
+            },
+          ]);
           return status('Unauthorized', 'The provided email is incorrect!');
         }
 
@@ -107,7 +119,7 @@ export const authRoute = (app: Elysia) =>
           { _id: userId },
           {
             $set: { hash: newHash },
-            $unset: { resetAttempts: 1, resetLockedUntil: 1 },
+            $unset: { resetAttempts: 1, resetLockedUntil: 1, resetLockMs: 1 },
           }
         );
         passwordsCache.set(userId, newPassword);
