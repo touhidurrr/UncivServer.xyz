@@ -9,6 +9,7 @@ import { getRandomBase64String, passwordResetEmailHtml } from '@lib';
 import { Auth } from '@models/Auth';
 import { brevo } from '@services/brevo';
 import { type } from 'arktype';
+import { formatDistanceToNow } from 'date-fns/formatDistanceToNow';
 import type { Elysia } from 'elysia';
 
 const RESET_BACKOFF_BASE_MS = 60 * 1000;
@@ -58,10 +59,15 @@ export const authRoute = (app: Elysia) =>
 
         if (dbAuth.resetLockedUntil && dbAuth.resetLockedUntil > new Date()) {
           const retryAfter = Math.ceil((dbAuth.resetLockedUntil.getTime() - Date.now()) / 1000);
-          set.headers['retry-after'] = String(retryAfter);
+          set.headers['retry-after'] = retryAfter.toString();
+
+          const readableRetryAfter = formatDistanceToNow(dbAuth.resetLockedUntil, {
+            includeSeconds: true,
+          });
+
           return status(
             'Too Many Requests',
-            `Too many reset attempts. Try again after ${dbAuth.resetLockedUntil.toISOString()}.`
+            `Too many reset attempts. Try again after ${readableRetryAfter}.`
           );
         }
 
