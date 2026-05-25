@@ -3,17 +3,17 @@
   "editor.quickSuggestions": {
     "strings": "on"
   },
-  "typescript.preferences.autoImportSpecifierExcludeRegexes": ["^(node:)?os$"],
+  "js/ts.preferences.autoImportSpecifierExcludeRegexes": ["^(node:)?os$"],
 
   // cSpell
-  "cSpell.words": ["arktype", "buymeacoffee", "eleventy"],
+  "cSpell.words": ["arktype", "Brevo", "buymeacoffee", "eleventy"],
 
   // misc
   "[nunjucks]": {
-    "editor.defaultFormatter": "prettier.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
 
   "[jinja-html]": {
-    "editor.defaultFormatter": "prettier.prettier-vscode"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }

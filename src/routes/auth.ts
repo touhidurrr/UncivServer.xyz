@@ -97,8 +97,8 @@ export const authRoute = (app: Elysia) =>
         } catch (err) {
           console.error('[POST /auth/reset] Brevo send failed:', err);
           return status(
-            'Bad Gateway',
-            'Failed to send password reset email. Please try again later.'
+            'Service Unavailable',
+            "Failed to send password reset email. It's not you, its us. Please try again later."
           );
         }
 
