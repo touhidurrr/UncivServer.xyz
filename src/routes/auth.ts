@@ -67,26 +67,30 @@ export const authRoute = (app: Elysia) =>
 
         const emailOk = await Bun.password.verify(email, dbAuth.email);
         if (!emailOk) {
-          await Auth.updateOne({ _id: userId }, [
-            {
-              $set: {
-                resetAttempts: { $add: [{ $ifNull: ['$resetAttempts', 0] }, 1] },
-                resetLockMs: {
-                  $min: [
-                    {
-                      $multiply: [{ $ifNull: ['$resetLockMs', RESET_BACKOFF_BASE_MS / 2] }, 2],
-                    },
-                    RESET_BACKOFF_MAX_MS,
-                  ],
+          await Auth.updateOne(
+            { _id: userId },
+            [
+              {
+                $set: {
+                  resetAttempts: { $add: [{ $ifNull: ['$resetAttempts', 0] }, 1] },
+                  resetLockMs: {
+                    $min: [
+                      {
+                        $multiply: [{ $ifNull: ['$resetLockMs', RESET_BACKOFF_BASE_MS / 2] }, 2],
+                      },
+                      RESET_BACKOFF_MAX_MS,
+                    ],
+                  },
                 },
               },
-            },
-            {
-              $set: {
-                resetLockedUntil: { $add: ['$$NOW', '$resetLockMs'] },
+              {
+                $set: {
+                  resetLockedUntil: { $add: ['$$NOW', '$resetLockMs'] },
+                },
               },
-            },
-          ]);
+            ],
+            { updatePipeline: true }
+          );
           return status('Unauthorized', 'The provided email is incorrect!');
         }
 
