@@ -24,7 +24,7 @@ type Result = { text: string; detail?: string; type: ResultType };
 const responseToResult = async (response: Response): Promise<Result> => {
   const body = await response.text();
   return {
-    text: AUTH_STATUS[response.status] ?? `${response.status} ${response.statusText}`,
+    text: `${response.status} ${AUTH_STATUS[response.status] ?? response.statusText}`,
     detail: body || undefined,
     type: response.ok ? 'success' : 'error',
   };
