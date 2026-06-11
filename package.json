@@ -28,7 +28,8 @@
     "lint": "tsc && eslint .",
     "format": "prettier --write '**/?*.*'",
     "wc": "find src tests -type f -exec wc {} +",
-    "build": "bun scripts/build.bun.sh"
+    "build": "bun scripts/build.bun.sh",
+    "compile": "bun scripts/compile.ts"
   },
   "dependencies": {
     "@discordjs/rest": "^2.6.1",

@@ -6,14 +6,12 @@ COPY . .
 RUN bun run build
 
 ENV NODE_ENV=production
-RUN bun build \
-  --compile-exec-argv="--smol" --production \
-  --bytecode --minify --sourcemap --format=esm \
-  --compile src/index.ts --outfile uncivserver
+RUN bun compile
 
 FROM dhi.io/bun:1
 WORKDIR /touhidurrr/uncivserver
 
+COPY *.map .
 COPY LICENSE .
 COPY bunfig.toml .
 COPY --from=build --chmod=+x /build/uncivserver /usr/local/bin/bun
