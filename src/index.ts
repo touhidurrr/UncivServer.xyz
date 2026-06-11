@@ -9,7 +9,6 @@ import {
   NO_CACHE_CONTROL,
   SUPPORT_URL,
 } from '@constants';
-import { staticPlugin } from '@elysia/static';
 import { apiPlugin } from '@routes/api';
 import { authRoute } from '@routes/auth';
 import { chatWebSocket } from '@routes/chat';
@@ -23,6 +22,7 @@ import { webhooksPlugin } from '@routes/webhooks';
 import { connectDB } from '@services/mongodb';
 import { Elysia } from 'elysia';
 import { chmod } from 'node:fs/promises';
+import routes from '@public/_routes';
 
 const port = process.env.PORT ?? DEFAULT_PORT;
 const hostname = process.env.HOST ?? DEFAULT_HOST;
@@ -46,6 +46,7 @@ import '@services/sync';
 
 export const app = new Elysia({
   serve: {
+    routes,
     maxRequestBodySize: 1.1 * MAX_CONTENT_LENGTH,
   },
   websocket: {
@@ -82,7 +83,6 @@ export const app = new Elysia({
   })
   .all('/support', ctx => ctx.redirect(SUPPORT_URL, 303))
   .all('/discord', ctx => ctx.redirect(DISCORD_INVITE, 303))
-  .use(await staticPlugin({ prefix: '/', alwaysStatic: true, bunFullstack: true }))
   .listen(unix ? { unix } : { port, hostname }, server => {
     if (unix) chmod(unix, 0o666);
     console.log(`Server started at ${server.url}`);

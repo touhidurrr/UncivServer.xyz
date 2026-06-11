@@ -17,6 +17,7 @@
       "@index": ["./src/index"],
       "@constants": ["./src/constants"],
 
+      "@public/*": ["./public/*"],
       "@package.json": ["./package.json"],
 
       "@lib/*": ["./src/lib/*"],
