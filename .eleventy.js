@@ -46,7 +46,7 @@ export default function (eleventyConfig) {
       const varName = getHashedVariableName(path);
 
       imports.push(`import ${varName} from '${path}' with { type: "file" };`);
-      routes[url] = `Bun.file(${varName})`;
+      routes[url] = `new Response(Bun.file(${varName}))`;
     });
 
     const outputPaths = results.map(r => r.outputPath.replace(`${config.dir.output}/`, ''));
