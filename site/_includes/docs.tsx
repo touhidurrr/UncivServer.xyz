@@ -23,6 +23,34 @@ interface DocData {
 const SIDEBAR_KEY = 'docs-sidebar';
 const SCROLL_SPY_MARGIN = '-10% 0px -75% 0px';
 
+const sanitizeHref = (url: string): string => {
+  const value = url.trim();
+  if (!value) return '#';
+
+  // Allow safe in-site navigations.
+  if (
+    value.startsWith('/') ||
+    value.startsWith('./') ||
+    value.startsWith('../') ||
+    value.startsWith('#') ||
+    value.startsWith('?')
+  ) {
+    return value;
+  }
+
+  // Allow only http(s) absolute URLs.
+  try {
+    const parsed = new URL(value, window.location.origin);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return value;
+    }
+  } catch {
+    // Invalid URL falls through to safe fallback.
+  }
+
+  return '#';
+};
+
 const slugify = (text: string) =>
   text
     .toLowerCase()
@@ -150,7 +178,7 @@ const Sidebar = ({ activeId, collapsed, onTocClick }: SidebarProps) => (
         {navItems.map(item => (
           <li key={item.url}>
             <a
-              href={item.url}
+              href={sanitizeHref(item.url)}
               className={`block rounded-lg px-3.5 py-2 text-sm font-medium transition-colors ${
                 item.active
                   ? 'relative bg-accent-glow font-semibold text-accent-bright! md:before:absolute md:before:-left-3.5 md:before:top-1/2 md:before:h-[60%] md:before:w-0.5 md:before:-translate-y-1/2 md:before:rounded-r-sm md:before:bg-accent md:before:content-[""]'
