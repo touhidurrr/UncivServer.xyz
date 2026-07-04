@@ -71,5 +71,8 @@
   },
   "trustedDependencies": [
     "@mongodb-js/zstd"
-  ]
+  ],
+  "overrides": {
+    "bson": "7.2.0"
+  }
 }
