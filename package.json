@@ -43,7 +43,7 @@
     "date-fns": "^4.4.0",
     "discord-api-types": "^0.38.49",
     "elysia": "^1.4.29",
-    "lru-cache": "^11.5.1",
+    "lru-cache": "^11.5.2",
     "mongoose": "^9.7.3",
     "openskill": "^5.0.1",
     "randomcryp": "^2.3.0",
