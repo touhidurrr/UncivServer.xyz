@@ -60,20 +60,23 @@ async function publishChat(
     return ws.publish(`game:${chat.gameId}`, JSON.stringify(chat));
   }
 
+  delete chat.userId;
+
   // to the specific user
   const userInGame = await UncivGame.exists({
     _id: `${chat.gameId}_Preview`,
     players: chat.userId,
   });
 
-  if (userInGame) {
-    return ws.publish(`user:${chat.userId}`, JSON.stringify(chat));
-  } else {
+  if (!userInGame) {
     chat.message = `User not found in game ${chat.gameId}`;
     chat.civName = 'Server';
-    delete chat.userId;
     return ws.send(chat);
   }
+
+  //@ts-expect-error need to add proper types later
+  chat.private = true;
+  return ws.publish(`user:${chat.userId}`, JSON.stringify(chat));
 }
 
 export const chatWebSocket = (app: Elysia) =>
