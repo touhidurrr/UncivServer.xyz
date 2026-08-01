@@ -7,7 +7,7 @@
       "dependencies": {
         "@discordjs/rest": "^2.6.1",
         "@elysia/jwt": "^1.4.2",
-        "@getbrevo/brevo": "^6.0.1",
+        "@getbrevo/brevo": "^6.0.2",
         "@mongodb-js/zstd": "^7.0.0",
         "arktype": "^2.2.2",
         "bun-plugin-tailwind": "^0.1.2",
@@ -99,7 +99,7 @@
 
     "@eslint/plugin-kit": ["@eslint/plugin-kit@0.7.2", "", { "dependencies": { "@eslint/core": "^1.2.1", "levn": "^0.4.1" } }, "sha512-+CNAzxglkrpNf/kKywqQfk74QjtceuOE7Qm+AF8miRvPF/wmmK5+OJOgVh3AVTT3RP2mH3+FOaxlE5v72owk0A=="],
 
-    "@getbrevo/brevo": ["@getbrevo/brevo@6.0.1", "", {}, "sha512-XFFbR1CvMTdu9n98ToLC1lWPIZ0F1P5y7Wxml6YpLEMt9lDwqOwt5hqkgavQ8/t2oJn2/BcyiTZIgYaaLI3uzA=="],
+    "@getbrevo/brevo": ["@getbrevo/brevo@6.0.2", "", {}, "sha512-yxyacx4wkuWcCbFDdFE3RxklaHSGXEP3d0gZaxPy+9aBquvl4ksr7IQgbRCcF8crx5aRvpStVBLeh5iCbWHJrg=="],
 
     "@humanfs/core": ["@humanfs/core@0.19.2", "", { "dependencies": { "@humanfs/types": "^0.15.0" } }, "sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA=="],
 

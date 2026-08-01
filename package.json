@@ -34,7 +34,7 @@
   "dependencies": {
     "@discordjs/rest": "^2.6.1",
     "@elysia/jwt": "^1.4.2",
-    "@getbrevo/brevo": "^6.0.1",
+    "@getbrevo/brevo": "^6.0.2",
     "@mongodb-js/zstd": "^7.0.0",
     "arktype": "^2.2.2",
     "bun-plugin-tailwind": "^0.1.2",
