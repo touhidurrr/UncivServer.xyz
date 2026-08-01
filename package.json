@@ -32,7 +32,7 @@
     "compile": "bun scripts/compile.ts"
   },
   "dependencies": {
-    "@discordjs/rest": "^2.6.1",
+    "@discordjs/rest": "^2.6.3",
     "@elysia/jwt": "^1.4.2",
     "@getbrevo/brevo": "^6.0.1",
     "@mongodb-js/zstd": "^7.0.0",
