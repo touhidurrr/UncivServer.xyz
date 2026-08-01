@@ -9,6 +9,7 @@ export const IS_ALIVE = { authVersion: 1, chatVersion: 1 };
 // Utils
 export const IS_PRODUCTION = process.env.NODE_ENV === 'production';
 export const IS_DEVELOPMENT = !IS_PRODUCTION;
+export const SANITIZED_TEXT_SCHEMA = type.string.pipe(val => val.replaceAll(/\s+/g, ' ').trim());
 
 // Server
 export const DEFAULT_PORT = '1557';

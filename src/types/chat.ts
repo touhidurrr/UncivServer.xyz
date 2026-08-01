@@ -1,27 +1,20 @@
+import type {
+  WS_CHAT_MESSAGE_SCHEMA,
+  WS_MESSAGE_CHAT_SCHEMA,
+  WS_MESSAGE_JOIN_SCHEMA,
+  WS_MESSAGE_LEAVE_SCHEMA,
+} from '@routes/chat/validation';
 import type { ElysiaWS } from 'elysia/ws';
 
-export type WSChatMessageRelay = {
-  type: 'chat';
-  civName: string;
-  message: string;
-  gameId: string;
-  userId?: string;
-};
+export type WSChatMessageRelay = typeof WS_MESSAGE_CHAT_SCHEMA.infer;
 
 export type WSChatResponseRelay = WSChatMessageRelay & { gameId?: string };
 
-export type WSChatMessage =
-  WSChatMessageRelay | WSChatMessageGameSubscribe | WSChatMessageGameUnsubscribe;
+export type WSChatMessage = typeof WS_CHAT_MESSAGE_SCHEMA.infer;
 
-export type WSChatMessageGameSubscribe = {
-  type: 'join';
-  gameIds: string[];
-};
+export type WSChatMessageGameSubscribe = typeof WS_MESSAGE_JOIN_SCHEMA.infer;
 
-export type WSChatMessageGameUnsubscribe = {
-  type: 'leave';
-  gameIds: string[];
-};
+export type WSChatMessageGameUnsubscribe = typeof WS_MESSAGE_LEAVE_SCHEMA.infer;
 
 export type WSChatResponse = WSChatResponseRelay | WSChatResponseJoinSuccess | WSChatResponseError;
 

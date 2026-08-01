@@ -1,11 +1,5 @@
-import {
-  MAX_CHAT_MESSAGE_LENGTH,
-  NO_CACHE_CONTROL,
-  UNCIV_BASIC_AUTH_HEADER_SCHEMA,
-  UUID_REGEX,
-} from '@constants';
+import { NO_CACHE_CONTROL, UNCIV_BASIC_AUTH_HEADER_SCHEMA } from '@constants';
 import type {
-  WSChatMessage,
   WSChatMessageRelay,
   WSChatResponseError,
   WSChatResponseJoinSuccess,
@@ -14,9 +8,11 @@ import type {
 import { Auth } from '@models/Auth';
 import { UncivGame } from '@models/UncivGame';
 import { unpack } from '@services/uncivJSON';
+import { type } from 'arktype';
 import type { Elysia } from 'elysia';
 import type { ElysiaWS } from 'elysia/ws';
 import { commands } from './commands';
+import { WS_CHAT_MESSAGE_SCHEMA } from './validation';
 
 async function publishChat(
   ws: ElysiaWS<{ gameId2CivNames: Map<string, string[]> }>,
@@ -30,9 +26,6 @@ async function publishChat(
     delete chat.userId;
     return ws.send(chat);
   }
-
-  // sanitize message, cleanup whitespaces
-  chat.message = chat.message.replaceAll(/\s+/g, ' ').trim();
 
   // enter commands scheme
   if (chat.message.startsWith('/')) {
@@ -62,34 +55,24 @@ async function publishChat(
     return command.run({ ws, name, input, chat });
   }
 
-  if (chat.message.length > 0) {
-    // to all players in the game
-    if (!chat.userId) {
-      return ws.publish(`game:${chat.gameId}`, JSON.stringify(chat));
-    }
+  // to all players in the game
+  if (!chat.userId) {
+    return ws.publish(`game:${chat.gameId}`, JSON.stringify(chat));
+  }
 
-    // check if the userId is a valid UUID
-    if (!UUID_REGEX.test(chat.userId)) {
-      chat.message = 'Invalid user ID format.';
-      chat.civName = 'Server';
-      delete chat.userId;
-      return ws.send(chat);
-    }
+  // to the specific user
+  const userInGame = await UncivGame.exists({
+    _id: `${chat.gameId}_Preview`,
+    players: chat.userId,
+  });
 
-    // to the specific user
-    const userInGame = await UncivGame.exists({
-      _id: `${chat.gameId}_Preview`,
-      players: chat.userId,
-    });
-
-    if (userInGame) {
-      return ws.publish(`user:${chat.userId}`, JSON.stringify(chat));
-    } else {
-      chat.message = `User not found in game ${chat.gameId}`;
-      chat.civName = 'Server';
-      delete chat.userId;
-      return ws.send(chat);
-    }
+  if (userInGame) {
+    return ws.publish(`user:${chat.userId}`, JSON.stringify(chat));
+  } else {
+    chat.message = `User not found in game ${chat.gameId}`;
+    chat.civName = 'Server';
+    delete chat.userId;
+    return ws.send(chat);
   }
 }
 
@@ -139,22 +122,18 @@ export const chatWebSocket = (app: Elysia) =>
             ].join(' '),
           } satisfies WSChatResponseRelay;
         },
-        message: async (ws, message: WSChatMessage) => {
-          if (typeof message !== 'object' || !message.type) {
+        message: async (ws, _message: unknown) => {
+          const message = WS_CHAT_MESSAGE_SCHEMA(_message as unknown);
+          if (message instanceof type.errors) {
             return ws.send({
               type: 'error',
-              message: 'Expecting valid JSON data with a "type" field',
+              message: message.summary,
             } satisfies WSChatResponseError);
           }
 
           switch (message.type) {
             case 'chat': {
               if (ws.isSubscribed(`game:${message.gameId}`)) {
-                if (message.message.length > MAX_CHAT_MESSAGE_LENGTH) {
-                  message.civName = 'Server';
-                  message.message = `Message too long. Maximum allowed characters: ${MAX_CHAT_MESSAGE_LENGTH}.`;
-                  return ws.send(message);
-                }
                 await publishChat(ws, message);
               }
               break;
@@ -162,7 +141,10 @@ export const chatWebSocket = (app: Elysia) =>
             case 'join': {
               const { userId, gameId2CivNames } = ws.data;
               const games = await UncivGame.find(
-                { players: userId, _id: { $in: message.gameIds.map(id => `${id}_Preview`) } },
+                {
+                  players: userId,
+                  _id: { $in: message.gameIds.map(id => `${id}_Preview`) },
+                },
                 { text: 1 }
               )
                 .lean()
