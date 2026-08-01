@@ -9,7 +9,7 @@
         "@elysia/jwt": "^1.4.2",
         "@getbrevo/brevo": "^6.0.1",
         "@mongodb-js/zstd": "^7.0.0",
-        "arktype": "^2.2.2",
+        "arktype": "^2.2.3",
         "bun-plugin-tailwind": "^0.1.2",
         "bytes": "^3.1.2",
         "cache-control-parser": "^2.2.0",
@@ -69,9 +69,9 @@
 
     "@11ty/recursive-copy": ["@11ty/recursive-copy@4.0.4", "", { "dependencies": { "errno": "^1.0.0", "junk": "^3.1.0", "minimatch": "^3.1.5", "slash": "^3.0.0" } }, "sha512-oI7m8pa7/IAU/3lqRU9vjBbs20iKFo7x+1K9kT3aVira6scc1X9MjBdgLCHzLJeJ7iB6wydioA+kr9/qPnvmlQ=="],
 
-    "@ark/schema": ["@ark/schema@0.56.1", "", { "dependencies": { "@ark/util": "0.56.1" } }, "sha512-1Cf2g9nKD8K/3JGRu+gCCfYw5d4qR8YLLjDs5W5kpmaButCYWAPFUJqSXyBATPjglzCd4tIkp398iPYVs8MjRA=="],
+    "@ark/schema": ["@ark/schema@0.56.2", "", { "dependencies": { "@ark/util": "0.56.2" } }, "sha512-Qx4D2JFbBWpntiHZaTv7bGG4H/M2rigiknezKg/WVyDSaLdE4YCcWAOoFB7pjjDqHbbV2OqRfntm1nnXvwMexg=="],
 
-    "@ark/util": ["@ark/util@0.56.1", "", {}, "sha512-Tp1rTik3q5Z+jAeeDxr5JZpmVIw0miti1ykSEHyZv5Pw3TIJl2xbN6KTacOxITp0l3s9ytlrWd30Zvqcy5vzoQ=="],
+    "@ark/util": ["@ark/util@0.56.2", "", {}, "sha512-9kU2sUE38FZEGG7l3hamYMBieLYEJh2L1mrYD2eXpT+78EnQSV1bhjxJhnxGBMSTbtwpBSDNSK+K60WvaI/DTQ=="],
 
     "@borewit/text-codec": ["@borewit/text-codec@0.2.2", "", {}, "sha512-DDaRehssg1aNrH4+2hnj1B7vnUGEjU6OIlyRdkMd0aUdIUvKXrJfXsy8LVtXAy7DRvYVluWbMspsRhz2lcW0mQ=="],
 
@@ -519,9 +519,9 @@
 
     "argparse": ["argparse@2.0.1", "", {}, "sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q=="],
 
-    "arkregex": ["arkregex@0.0.7", "", { "dependencies": { "@ark/util": "0.56.1" } }, "sha512-O/Ltrn9EUSn3ui0KVzfyrWGDUsHlzKxDVBtpQxL/6JmLRMAZAebfSNf/A/J5Ny5S6QIwrXX+RfXsu888HMs35A=="],
+    "arkregex": ["arkregex@0.0.8", "", { "dependencies": { "@ark/util": "0.56.2" } }, "sha512-PJcx6G1kQTgLKPUbeYlYecDRaKq15AMSGVajlKFYWlPeJRQL+j3dKE6tyMs40HZ99djS1l9Vhl3ezAHy9JBIqQ=="],
 
-    "arktype": ["arktype@2.2.2", "", { "dependencies": { "@ark/schema": "0.56.1", "@ark/util": "0.56.1", "arkregex": "0.0.7" } }, "sha512-YYf1xhL2dh5aPZFlsY0RAsxv5HZqfLGLptH2ZP3JidTmsGRW8VOymhPjjMTkerL12vR2YtX0SK4c1mATtae8SA=="],
+    "arktype": ["arktype@2.2.3", "", { "dependencies": { "@ark/schema": "0.56.2", "@ark/util": "0.56.2", "arkregex": "0.0.8" } }, "sha512-7W+0RLTUNJiBFIIZXwOQxSR8Z273IAd6IvqBeG9+gHnQKFsIx2C0iOtGTmMrPnlX4qLXyc5+ll7A0BIj9WrbTg=="],
 
     "array-buffer-byte-length": ["array-buffer-byte-length@1.0.2", "", { "dependencies": { "call-bound": "^1.0.3", "is-array-buffer": "^3.0.5" } }, "sha512-LHE+8BuR7RYGDKvnrmcuSq3tDcKv9OFEXQt/HpbZhY7V6h0zlUXutnAD82GiFx9rdieCMjkvtcsPqBwgUl1Iiw=="],
 
