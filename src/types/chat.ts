@@ -5,14 +5,13 @@ export type WSChatMessageRelay = {
   civName: string;
   message: string;
   gameId: string;
+  userId?: string;
 };
 
 export type WSChatResponseRelay = WSChatMessageRelay & { gameId?: string };
 
 export type WSChatMessage =
-  | WSChatMessageRelay
-  | WSChatMessageGameSubscribe
-  | WSChatMessageGameUnsubscribe;
+  WSChatMessageRelay | WSChatMessageGameSubscribe | WSChatMessageGameUnsubscribe;
 
 export type WSChatMessageGameSubscribe = {
   type: 'join';

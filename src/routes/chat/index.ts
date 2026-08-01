@@ -2,6 +2,7 @@ import {
   MAX_CHAT_MESSAGE_LENGTH,
   NO_CACHE_CONTROL,
   UNCIV_BASIC_AUTH_HEADER_SCHEMA,
+  UUID_REGEX,
 } from '@constants';
 import type {
   WSChatMessage,
@@ -17,26 +18,29 @@ import type { Elysia } from 'elysia';
 import type { ElysiaWS } from 'elysia/ws';
 import { commands } from './commands';
 
-function publishChat(
+async function publishChat(
   ws: ElysiaWS<{ gameId2CivNames: Map<string, string[]> }>,
   chat: WSChatMessageRelay
 ) {
+  // prohibit sending messages from civs that the user does not own
   const civNames = ws.data.gameId2CivNames.get(chat.gameId);
-  if (!civNames || !civNames.includes(chat.civName)) {
+  if (!civNames?.includes(chat.civName)) {
     chat.message = `Unauthorized Civ: ${chat.civName}`;
     chat.civName = 'Server';
+    delete chat.userId;
     return ws.send(chat);
   }
 
+  // sanitize message, cleanup whitespaces
   chat.message = chat.message.replaceAll(/\s+/g, ' ').trim();
 
-  // commands scheme
+  // enter commands scheme
   if (chat.message.startsWith('/')) {
     chat.message = chat.message.slice(1);
 
     // commands ignore scheme
     if (chat.message.startsWith('/')) {
-      return ws.publish(chat.gameId, JSON.stringify(chat));
+      return ws.publish(`game:${chat.gameId}`, JSON.stringify(chat));
     }
 
     // proceed with commands
@@ -59,7 +63,33 @@ function publishChat(
   }
 
   if (chat.message.length > 0) {
-    return ws.publish(chat.gameId, JSON.stringify(chat));
+    // to all players in the game
+    if (!chat.userId) {
+      return ws.publish(`game:${chat.gameId}`, JSON.stringify(chat));
+    }
+
+    // check if the userId is a valid UUID
+    if (!UUID_REGEX.test(chat.userId)) {
+      chat.message = 'Invalid user ID format.';
+      chat.civName = 'Server';
+      delete chat.userId;
+      return ws.send(chat);
+    }
+
+    // to the specific user
+    const userInGame = await UncivGame.exists({
+      _id: `${chat.gameId}_Preview`,
+      players: chat.userId,
+    });
+
+    if (userInGame) {
+      return ws.publish(`user:${chat.userId}`, JSON.stringify(chat));
+    } else {
+      chat.message = `User not found in game ${chat.gameId}`;
+      chat.civName = 'Server';
+      delete chat.userId;
+      return ws.send(chat);
+    }
   }
 }
 
@@ -95,6 +125,7 @@ export const chatWebSocket = (app: Elysia) =>
       .ws('/chat', {
         open: ws => {
           ws.subscribe('chat');
+          ws.subscribe(`user:${ws.data.userId}`);
           return {
             type: 'chat',
             gameId: '',
@@ -118,7 +149,7 @@ export const chatWebSocket = (app: Elysia) =>
 
           switch (message.type) {
             case 'chat': {
-              if (ws.isSubscribed(message.gameId)) {
+              if (ws.isSubscribed(`game:${message.gameId}`)) {
                 if (message.message.length > MAX_CHAT_MESSAGE_LENGTH) {
                   message.civName = 'Server';
                   message.message = `Message too long. Maximum allowed characters: ${MAX_CHAT_MESSAGE_LENGTH}.`;
@@ -139,13 +170,11 @@ export const chatWebSocket = (app: Elysia) =>
 
               const acceptedGameIds: string[] = [];
               games.forEach(game => {
-                ws.subscribe(game.gameId);
+                ws.subscribe(`game:${game.gameId}`);
                 acceptedGameIds.push(game.gameId);
                 game.civilizations.forEach(civ => {
                   if (civ.playerId === userId) {
-                    const civNames = gameId2CivNames.get(game.gameId) || [];
-                    civNames.push(civ.civName);
-                    gameId2CivNames.set(game.gameId, civNames);
+                    gameId2CivNames.getOrInsert(game.gameId, []).push(civ.civName);
                   }
                 });
               });
@@ -157,7 +186,7 @@ export const chatWebSocket = (app: Elysia) =>
             }
             case 'leave': {
               message.gameIds.forEach(gameId => {
-                ws.unsubscribe(gameId);
+                ws.unsubscribe(`game:${gameId}`);
                 ws.data.gameId2CivNames.delete(gameId);
               });
               break;

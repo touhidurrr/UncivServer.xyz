@@ -1,14 +1,7 @@
 export type Position = { x?: number; y?: number };
 
 export type GameDifficulty =
-  | 'Settler'
-  | 'Chieftain'
-  | 'Warlord'
-  | 'Prince'
-  | 'King'
-  | 'Emperor'
-  | 'Immortal'
-  | 'Deity';
+  'Settler' | 'Chieftain' | 'Warlord' | 'Prince' | 'King' | 'Emperor' | 'Immortal' | 'Deity';
 
 export type VictoryType = 'Scientific' | 'Cultural' | 'Domination' | 'Diplomatic';
 
