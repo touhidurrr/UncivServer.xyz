@@ -1,6 +1,6 @@
 import filesCache from '@cache/filesCache';
 import passwordsCache from '@cache/passwordsCache';
-import { MAX_FILE_SIZE, TEST_GAME_ID } from '@constants';
+import { IS_ALIVE, MAX_FILE_SIZE, TEST_GAME_ID } from '@constants';
 import { getAppBaseURL, getRandomBase64String, getRandomSave } from '@lib';
 import { Auth } from '@models/Auth';
 import { UncivGame } from '@models/UncivGame';
@@ -23,7 +23,7 @@ test.concurrent('GET /isalive', () =>
   api.get('/isalive').then(({ status, data }) => {
     expect(status).toBe(200);
     expect(data).toBeObject();
-    expect(data).toStrictEqual({ authVersion: 1, chatVersion: 1 });
+    expect(data).toStrictEqual(IS_ALIVE);
   })
 );
 
