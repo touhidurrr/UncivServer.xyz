@@ -79,7 +79,9 @@ const publishChat = async (
     return ws.send(chat);
   }
 
-  return ws.publish(`user:${chat.userId}`, JSON.stringify(toPrivateChat(chat)));
+  const privateChat = toPrivateChat(chat);
+  ws.send(privateChat);
+  return ws.publish(`user:${chat.userId}`, JSON.stringify(privateChat));
 };
 
 export const chatWebSocket = (app: Elysia) =>
