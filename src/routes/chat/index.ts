@@ -4,6 +4,7 @@ import type {
   WSChatResponseError,
   WSChatResponseJoinSuccess,
   WSChatResponseRelay,
+  WSPrivateChatResponseRelay,
 } from '@localTypes/chat';
 import { Auth } from '@models/Auth';
 import { UncivGame } from '@models/UncivGame';
@@ -14,10 +15,16 @@ import type { ElysiaWS } from 'elysia/ws';
 import { commands } from './commands';
 import { WS_CHAT_MESSAGE_SCHEMA } from './validation';
 
-async function publishChat(
+const toPrivateChat = (chat: WSChatMessageRelay): WSPrivateChatResponseRelay => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { userId, ...rest } = chat;
+  return { ...rest, private: true };
+};
+
+const publishChat = async (
   ws: ElysiaWS<{ gameId2CivNames: Map<string, string[]> }>,
   chat: WSChatMessageRelay
-) {
+) => {
   // prohibit sending messages from civs that the user does not own
   const civNames = ws.data.gameId2CivNames.get(chat.gameId);
   if (!civNames?.includes(chat.civName)) {
@@ -60,8 +67,6 @@ async function publishChat(
     return ws.publish(`game:${chat.gameId}`, JSON.stringify(chat));
   }
 
-  delete chat.userId;
-
   // to the specific user
   const userInGame = await UncivGame.exists({
     _id: `${chat.gameId}_Preview`,
@@ -74,10 +79,8 @@ async function publishChat(
     return ws.send(chat);
   }
 
-  //@ts-expect-error need to add proper types later
-  chat.private = true;
-  return ws.publish(`user:${chat.userId}`, JSON.stringify(chat));
-}
+  return ws.publish(`user:${chat.userId}`, JSON.stringify(toPrivateChat(chat)));
+};
 
 export const chatWebSocket = (app: Elysia) =>
   app.guard({ headers: UNCIV_BASIC_AUTH_HEADER_SCHEMA }, app =>

@@ -10,6 +10,8 @@ export type WSChatMessageRelay = typeof WS_MESSAGE_CHAT_SCHEMA.infer;
 
 export type WSChatResponseRelay = WSChatMessageRelay & { gameId?: string };
 
+export type WSPrivateChatResponseRelay = Omit<WSChatMessageRelay & { private: true }, 'userId'>;
+
 export type WSChatMessage = typeof WS_CHAT_MESSAGE_SCHEMA.infer;
 
 export type WSChatMessageGameSubscribe = typeof WS_MESSAGE_JOIN_SCHEMA.infer;
