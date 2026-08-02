@@ -40,7 +40,7 @@ const publishChat = async (
 
     // commands ignore scheme
     if (chat.message.startsWith('/')) {
-      return ws.publish(`game:${chat.gameId}`, JSON.stringify(chat));
+      return ws.publish(`game:${chat.gameId}`, chat);
     }
 
     // proceed with commands
@@ -64,7 +64,7 @@ const publishChat = async (
 
   // to all players in the game
   if (!chat.userId) {
-    return ws.publish(`game:${chat.gameId}`, JSON.stringify(chat));
+    return ws.publish(`game:${chat.gameId}`, chat);
   }
 
   // to the specific user
@@ -81,7 +81,7 @@ const publishChat = async (
 
   const privateChat = toPrivateChat(chat);
   ws.send(privateChat);
-  return ws.publish(`user:${chat.userId}`, JSON.stringify(privateChat));
+  return ws.publish(`user:${chat.userId}`, privateChat);
 };
 
 export const chatWebSocket = (app: Elysia) =>
