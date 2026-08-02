@@ -4,7 +4,7 @@ import { stringify as stringifyCacheControl } from 'cache-control-parser';
 import type { APIEmbed } from 'discord-api-types/v10';
 
 // IsAlive
-export const IS_ALIVE = { authVersion: 1, chatVersion: 1 };
+export const IS_ALIVE = { authVersion: 1, chatVersion: 2 };
 
 // Utils
 export const IS_PRODUCTION = process.env.NODE_ENV === 'production';
