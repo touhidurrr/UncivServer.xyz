@@ -151,7 +151,7 @@ describe.concurrent('Auth', () => {
     });
     expect(status).toBe(204);
     expect(data).toBe('');
-    expect(Number(headers['content-length'])).toBe(0);
+    expect(Number(headers['content-length'])).toBeNaN();
     expect(passwordsCache.has(username)).toBe(false);
   });
 
