@@ -1,4 +1,4 @@
-FROM dhi.io/bun:1-dev AS build
+FROM oven/bun:slim AS build
 WORKDIR /build
 
 COPY . .
@@ -8,7 +8,7 @@ RUN bun run build
 ENV NODE_ENV=production
 RUN bun compile
 
-FROM dhi.io/bun:1
+FROM oven/bun:slim
 WORKDIR /touhidurrr/uncivserver
 
 COPY *.map .
