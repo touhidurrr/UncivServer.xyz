@@ -1,4 +1,4 @@
-FROM oven/bun AS build
+FROM dhi.io/bun:1-dev AS build
 WORKDIR /build
 
 COPY . .
