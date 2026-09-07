@@ -9,6 +9,7 @@ import {
   NO_CACHE_CONTROL,
   SUPPORT_URL,
 } from '@constants';
+import routes from '@public/_routes';
 import { apiPlugin } from '@routes/api';
 import { authRoute } from '@routes/auth';
 import { chatWebSocket } from '@routes/chat';
@@ -22,7 +23,6 @@ import { webhooksPlugin } from '@routes/webhooks';
 import { connectDB } from '@services/mongodb';
 import { Elysia } from 'elysia';
 import { chmod } from 'node:fs/promises';
-import routes from '@public/_routes';
 
 const port = process.env.PORT ?? DEFAULT_PORT;
 const hostname = process.env.HOST ?? DEFAULT_HOST;
@@ -47,6 +47,7 @@ import '@services/sync';
 export const app = new Elysia({
   serve: {
     routes,
+    http2: true,
     maxRequestBodySize: 1.1 * MAX_CONTENT_LENGTH,
   },
   websocket: {
