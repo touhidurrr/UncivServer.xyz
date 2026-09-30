@@ -5,4 +5,4 @@ bun = true
 minimumReleaseAge = 259200
 
 [serve.static]
-plugins = ["bun-plugin-tailwind"]
+plugins = ['bun-plugin-tailwind']
