@@ -27,7 +27,8 @@ const sanitizeHref = (url: string): string => {
   const value = url.trim();
   if (!value) return '#';
 
-  // Allow safe in-site navigations.
+  // Allow safe in-site navigations, but return canonicalized URL parts
+  // rather than the original tainted input.
   if (
     value.startsWith('/') ||
     value.startsWith('./') ||
@@ -35,14 +36,22 @@ const sanitizeHref = (url: string): string => {
     value.startsWith('#') ||
     value.startsWith('?')
   ) {
-    return value;
+    try {
+      if (value.startsWith('#')) {
+        return new URL(value, window.location.origin).hash || '#';
+      }
+      const parsed = new URL(value, window.location.origin);
+      return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+    } catch {
+      return '#';
+    }
   }
 
   // Allow only http(s) absolute URLs.
   try {
     const parsed = new URL(value, window.location.origin);
     if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
-      return value;
+      return parsed.href;
     }
   } catch {
     // Invalid URL falls through to safe fallback.
