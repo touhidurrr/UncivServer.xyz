@@ -93,9 +93,9 @@ interface FieldProps {
 
 const Field = ({ label, type = 'text', half, ...rest }: FieldProps) => (
   <div className={`flex flex-col gap-1.5 ${half ? 'min-w-0 flex-1' : ''}`}>
-    <label className="text-xs font-semibold text-muted">{label}</label>
+    <label className="text-muted text-xs font-semibold">{label}</label>
     <input
-      className="w-full rounded-lg border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm font-medium text-fg placeholder:font-normal placeholder:text-subtle/60 transition focus:border-accent focus:bg-accent/5 focus:shadow-input-focus focus:outline-none"
+      className="text-fg placeholder:text-subtle/60 focus:border-accent focus:bg-accent/5 focus:shadow-input-focus w-full rounded-lg border border-white/10 bg-white/5 px-3.5 py-2.5 text-sm font-medium transition placeholder:font-normal focus:outline-none"
       type={type}
       autoComplete={type === 'password' ? 'new-password' : 'off'}
       {...rest}
@@ -108,13 +108,13 @@ const ResultBox = ({ result }: { result: Result }) => {
     result.type === 'success' ? 'border-success/25 bg-success/10' : 'border-danger/25 bg-danger/10';
   const textTone = result.type === 'success' ? 'text-success-soft' : 'text-danger-soft';
   return (
-    <div className={`rounded-xl border px-4.5 py-3.5 animate-result-in ${tone}`}>
+    <div className={`animate-result-in rounded-xl border px-4.5 py-3.5 ${tone}`}>
       <p className={`flex items-center gap-2 text-[14.7px] font-bold ${textTone}`}>
         {result.type === 'success' ? <FaCheckCircle /> : <FaExclamationCircle />}
         {result.text}
       </p>
       {result.detail && (
-        <p className="mt-1.5 pl-6 text-[13.3px] font-medium text-muted">{result.detail}</p>
+        <p className="text-muted mt-1.5 pl-6 text-[13.3px] font-medium">{result.detail}</p>
       )}
     </div>
   );
@@ -128,15 +128,15 @@ interface CardProps {
 }
 
 const Card = ({ icon, title, desc, children }: CardProps) => (
-  <div className="flex flex-col gap-5.5 rounded-2xl border border-line bg-card p-6 shadow-card transition-colors hover:border-line-strong hover:shadow-card-hover sm:p-7">
+  <div className="border-line bg-card shadow-card hover:border-line-strong hover:shadow-card-hover flex flex-col gap-5.5 rounded-2xl border p-6 transition-colors sm:p-7">
     <div className="flex flex-col gap-2">
       <div className="flex items-center gap-3.5">
-        <span className="inline-flex size-8.5 shrink-0 items-center justify-center rounded-lg bg-accent-glow text-accent-bright">
+        <span className="bg-accent-glow text-accent-bright inline-flex size-8.5 shrink-0 items-center justify-center rounded-lg">
           {icon}
         </span>
-        <h2 className="text-base font-bold leading-tight tracking-tight text-fg">{title}</h2>
+        <h2 className="text-fg text-base leading-tight font-bold tracking-tight">{title}</h2>
       </div>
-      <p className="text-[13.6px] font-medium leading-snug text-subtle">{desc}</p>
+      <p className="text-subtle text-[13.6px] leading-snug font-medium">{desc}</p>
     </div>
     {children}
   </div>
@@ -357,20 +357,20 @@ const Tools = () => {
   const Active = (TOOL_OPTIONS.find(o => o.id === activeId) ?? TOOL_OPTIONS[0]).Component;
 
   return (
-    <div className="flex min-h-screen justify-center bg-aurora-tools px-5 pb-14 pt-18">
+    <div className="bg-aurora-tools flex min-h-screen justify-center px-5 pt-18 pb-14">
       <div className="flex w-full max-w-320 flex-col gap-12">
         <header className="text-center">
-          <h1 className="flex items-center justify-center gap-3 text-4xl font-extrabold leading-tight tracking-tight text-fg sm:text-[34.4px]">
+          <h1 className="text-fg flex items-center justify-center gap-3 text-4xl leading-tight font-extrabold tracking-tight sm:text-[34.4px]">
             <FaTools size={28} className="text-accent-bright/85" /> Toolbox
           </h1>
-          <p className="mt-2.5 text-[14.7px] font-medium text-subtle">
+          <p className="text-subtle mt-2.5 text-[14.7px] font-medium">
             Manage your UncivServer account credentials
           </p>
         </header>
 
         <div className="grid w-full items-start justify-center gap-5.5 md:grid-cols-[260px_minmax(0,520px)] lg:grid-cols-[300px_minmax(0,580px)] lg:gap-7">
           <nav
-            className="flex flex-row gap-2.5 overflow-x-auto scrollbar-hide md:sticky md:top-6 md:flex-col md:overflow-x-visible"
+            className="scrollbar-hide flex flex-row gap-2.5 overflow-x-auto md:sticky md:top-6 md:flex-col md:overflow-x-visible"
             aria-label="Tools"
           >
             {TOOL_OPTIONS.map(opt => {
@@ -379,7 +379,7 @@ const Tools = () => {
                 <button
                   key={opt.id}
                   type="button"
-                  className={`flex shrink-0 cursor-pointer items-center gap-2.5 rounded-xl border bg-card px-3 py-2.5 text-left font-[inherit] transition duration-200 md:w-full md:gap-3.5 md:px-4 md:py-3.5 ${
+                  className={`bg-card flex shrink-0 cursor-pointer items-center gap-2.5 rounded-xl border px-3 py-2.5 text-left font-[inherit] transition duration-200 md:w-full md:gap-3.5 md:px-4 md:py-3.5 ${
                     active
                       ? 'border-accent/55 bg-card-active text-fg shadow-nav-active'
                       : 'border-line text-muted hover:border-line-strong hover:text-fg'
@@ -397,7 +397,7 @@ const Tools = () => {
                     <span className="text-xs font-semibold tracking-tight md:text-sm">
                       {opt.label}
                     </span>
-                    <span className="text-[11px] font-medium text-subtle md:text-xs">
+                    <span className="text-subtle text-[11px] font-medium md:text-xs">
                       {opt.desc}
                     </span>
                   </span>
@@ -414,7 +414,7 @@ const Tools = () => {
         <div className="text-center">
           <a
             href="/"
-            className="rounded-lg px-4 py-2 text-sm font-semibold text-subtle transition-colors hover:bg-accent-glow hover:text-accent-bright"
+            className="text-subtle hover:bg-accent-glow hover:text-accent-bright rounded-lg px-4 py-2 text-sm font-semibold transition-colors"
           >
             ← Back to Home
           </a>

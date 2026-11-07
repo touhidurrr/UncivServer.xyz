@@ -2,7 +2,8 @@ import type { UncivJSON } from '@localTypes/unciv';
 
 /**
  * Unpacks the given base64 Unciv game data a JSON string
- * @param data base64 string to be unpacked
+ *
+ * @param data Base64 string to be unpacked
  * @returns JSON string
  */
 export const unpackJSON = (data: string): string =>
@@ -10,14 +11,16 @@ export const unpackJSON = (data: string): string =>
 
 /**
  * Unpacks the given base64 Unciv game data string into an object
- * @param data base64 string to be unpacked
+ *
+ * @param data Base64 string to be unpacked
  * @returns Unpacked object
  */
 export const unpack = (data: string): UncivJSON => JSON.parse(unpackJSON(data));
 
 /**
  * Unpacks the given base64 Unciv game data file into an object
- * @param path path to the file
+ *
+ * @param path Path to the file
  * @returns Unpacked object
  */
 export const unpackFromFile = async (path: string): Promise<UncivJSON> => {
@@ -27,7 +30,8 @@ export const unpackFromFile = async (path: string): Promise<UncivJSON> => {
 
 /**
  * Packs the given object into a base64 Unciv game data compatible string
- * @param data object to be packed
+ *
+ * @param data Object to be packed
  * @returns Packed base64 string
  */
 export const pack = (data: object): string => {

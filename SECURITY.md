@@ -9,4 +9,5 @@
 
 ## Reporting a Vulnerability
 
-Open a new issue or email security@uncivserver.xyz. No bounty is offered for reporting vulnerabilities.
+Open a new issue or email security@uncivserver.xyz. No bounty is offered for reporting
+vulnerabilities.

@@ -43,12 +43,11 @@ const hmac = new HMAC('blake2b512', 'base64', randomBytes(64));
 /**
  * ## PasswordsCache
  *
- * Since argon2 is expensive, we use an in-memory LRU cache
- * to store HMAC digests of passwords for quick verification.
+ * Since argon2 is expensive, we use an in-memory LRU cache to store HMAC digests of passwords for
+ * quick verification.
  *
- * This allows us to avoid expensive argon2 computations on every request
- * while still ensuring that we never store plaintext passwords
- * or even argon2 hashes in memory.
+ * This allows us to avoid expensive argon2 computations on every request while still ensuring that
+ * we never store plaintext passwords or even argon2 hashes in memory.
  *
  * **Algorithm:** `BLAKE2b-512`
  *
@@ -57,6 +56,7 @@ const hmac = new HMAC('blake2b512', 'base64', randomBytes(64));
  * **Secret:** `64` random bytes (`512` bits) generated at startup
  *
  * ### Algorithm choice requirements:
+ *
  * 1. Post Quantum Secure
  * 2. Provided by Bun's built-in CryptoHasher or Node's crypto module
  * 3. Fast to compute

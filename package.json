@@ -2,23 +2,23 @@
   "name": "uncivserver.xyz",
   "version": "4.67.4",
   "description": "An Open Source, Free to Play, Unciv Multiplayer Server written in Javascript",
-  "author": "Md. Touhidur Rahman",
-  "license": "BSD-3-Clause",
-  "repository": "touhidurrr/UncivServer.xyz",
+  "keywords": [
+    "Bun",
+    "Discord",
+    "Elysia",
+    "Multiplayer",
+    "Notifications",
+    "Server",
+    "Turn",
+    "Unciv"
+  ],
   "homepage": "https://github.com/touhidurrr/UncivServer.xyz#readme",
   "bugs": {
     "url": "https://github.com/touhidurrr/UncivServer.xyz/issues"
   },
-  "keywords": [
-    "Unciv",
-    "Multiplayer",
-    "Server",
-    "Discord",
-    "Turn",
-    "Notifications",
-    "Bun",
-    "Elysia"
-  ],
+  "license": "BSD-3-Clause",
+  "author": "Md. Touhidur Rahman",
+  "repository": "touhidurrr/UncivServer.xyz",
   "type": "module",
   "main": "src/index.ts",
   "module": "src/index.ts",
@@ -26,7 +26,7 @@
     "dev": "bun --watch src",
     "start": "bun src",
     "lint": "tsc && eslint .",
-    "format": "prettier --write '**/?*.*'",
+    "format": "bun fmt",
     "wc": "find src tests -type f -exec wc {} +",
     "build": "bun scripts/build.bun.sh",
     "compile": "bun scripts/compile.ts"
@@ -34,42 +34,43 @@
   "dependencies": {
     "@discordjs/rest": "^2.6.3",
     "@elysia/jwt": "^1.4.2",
-    "@getbrevo/brevo": "^6.0.3",
+    "@getbrevo/brevo": "^6.2.0",
     "@mongodb-js/zstd": "^7.0.0",
-    "arktype": "^2.2.5",
+    "arktype": "^2.2.9",
     "bun-plugin-tailwind": "^0.1.2",
     "bytes": "^3.1.2",
     "cache-control-parser": "^2.2.0",
     "date-fns": "^4.4.0",
-    "discord-api-types": "^0.38.55",
+    "discord-api-types": "^0.38.57",
     "elysia": "^1.4.30",
     "lru-cache": "^11.5.3",
-    "mongoose": "^9.10.2",
+    "mongoose": "^9.11.4",
     "openskill": "^5.0.1",
     "randomcryp": "^2.3.0",
-    "react": "^19.3.0",
-    "react-dom": "^19.3.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
     "react-icons": "^5.7.0",
-    "tailwindcss": "^4.3.3"
+    "tailwindcss": "^4.3.4"
   },
   "devDependencies": {
-    "@11ty/eleventy": "^3.1.6",
+    "@11ty/eleventy": "^3.1.8",
     "@eslint/js": "^10.0.1",
-    "@types/bun": "^1.4.2",
+    "@types/bun": "^1.4.4",
     "@types/bytes": "^3.1.6",
     "@types/react-dom": "^19.3.0",
-    "axios": "^1.20.0",
-    "eslint": "^10.11.0",
+    "axios": "^1.21.0",
+    "eslint": "^10.14.0",
     "eslint-plugin-react": "^7.37.5",
-    "globals": "^17.12.0",
+    "globals": "^17.14.0",
     "jiti": "^2.7.0",
-    "prettier": "^3.9.9",
+    "prettier": "^3.9.10",
     "prettier-plugin-jinja-template": "^2.2.0",
-    "prettier-plugin-toml": "^3.0.2",
+    "prettier-plugin-toml": "^4.1.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.70.1"
+    "typescript-eslint": "^8.72.1"
   },
   "trustedDependencies": [
-    "@mongodb-js/zstd"
+    "@mongodb-js/zstd",
+    "bun"
   ]
 }

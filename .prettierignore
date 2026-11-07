@@ -1,9 +1,0 @@
-*.sh
-*.png
-*.txt
-*.service
-/*.md
-node_modules/
-bun.lock
-yarn.lock
-package-lock.json

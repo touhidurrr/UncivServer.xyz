@@ -174,12 +174,14 @@ export class UncivSave {
 
   /**
    * Get game data packed into an Unciv game data string
+   *
    * @returns Unciv game data string
    */
   asText = () => pack(this.data);
 
   /**
    * Get game preview packed into an Unciv game data string
+   *
    * @returns Unciv game data string
    */
   asPreviewText = () => pack(this.getPreview());

@@ -1,6 +1,5 @@
 # UncivServer.xyz ![UncivServerxyz](https://cronitor.io/badges/Kaypra/production/lEZjMiCpMzbYrsBnSfGjVGmdw9I.svg) [![Discord](https://img.shields.io/discord/866650187211210762)](https://discord.com/invite/H9em4ws8XP)
 
-
 An open source, free-to-play, Unciv multiplayer server written in TypeScript.
 
 ## To run locally
@@ -32,9 +31,10 @@ echo "SYNC_TOKEN=$(openssl rand -base64 32)" >> .env
 ```
 
 Now run the following commands to start your server! By default, the server will start at
-`http://[::]:1557` (port 1557 on all ipv6 addresses), which you can access from `http://localhost:1557` from your browser. However,
-you can change this behavior setting `PORT` and `HOST` environment variables in the `.env` file you
-just made. Note that both of these variables are optional.
+`http://[::]:1557` (port 1557 on all ipv6 addresses), which you can access from
+`http://localhost:1557` from your browser. However, you can change this behavior setting `PORT` and
+`HOST` environment variables in the `.env` file you just made. Note that both of these variables are
+optional.
 
 ```bash
 bun run build

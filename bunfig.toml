@@ -6,3 +6,10 @@ minimumReleaseAge = 259200
 
 [serve.static]
 plugins = ['bun-plugin-tailwind']
+
+[fmt]
+jsdoc = true
+sortPackageJson = true
+sortTailwindcss = true
+allowUnsupported = true
+ignorePatterns = ['CODE_OF_CONDUCT.md']

@@ -127,35 +127,35 @@ const useScrollSpy = (ref: React.RefObject<HTMLElement | null>) => {
 };
 
 const Header = ({ collapsed, onToggle }: { collapsed: boolean; onToggle: () => void }) => (
-  <header className="sticky top-0 z-50 flex h-15 items-center justify-between border-b border-line-subtle bg-bg-translucent px-6 backdrop-blur-2xl backdrop-saturate-150">
+  <header className="border-line-subtle bg-bg-translucent sticky top-0 z-50 flex h-15 items-center justify-between border-b px-6 backdrop-blur-2xl backdrop-saturate-150">
     <div className="flex items-center gap-3.5">
       <button
         aria-label="Toggle Navigation"
         aria-expanded={!collapsed}
         aria-controls="doc-sidebar"
         onClick={onToggle}
-        className="flex shrink-0 cursor-pointer items-center rounded-lg p-1.5 text-muted transition-colors hover:bg-accent-glow hover:text-accent-bright"
+        className="text-muted hover:bg-accent-glow hover:text-accent-bright flex shrink-0 cursor-pointer items-center rounded-lg p-1.5 transition-colors"
       >
         <FaBars size={20} />
       </button>
 
       <a
         href="/"
-        className="flex items-center gap-2.5 text-[15px] font-bold tracking-tight text-fg hover:opacity-85"
+        className="text-fg flex items-center gap-2.5 text-[15px] font-bold tracking-tight hover:opacity-85"
       >
         <img src={logo} alt="UncivGames" className="h-6.5 w-auto rounded-md" />
         <span className="hidden md:inline">UncivGames Docs</span>
       </a>
 
-      <div className="mx-1.5 hidden h-5 w-px shrink-0 bg-line md:block" />
-      <span className="hidden rounded-md bg-accent-glow px-2.5 py-0.75 text-xs font-semibold tracking-wide text-accent-bright md:inline">
+      <div className="bg-line mx-1.5 hidden h-5 w-px shrink-0 md:block" />
+      <span className="bg-accent-glow text-accent-bright hidden rounded-md px-2.5 py-0.75 text-xs font-semibold tracking-wide md:inline">
         Bot
       </span>
     </div>
 
     <a
       href="/"
-      className="rounded-lg border border-line px-3 py-1.5 text-xs font-semibold text-muted transition hover:border-accent-bright hover:bg-accent-glow hover:text-fg"
+      className="border-line text-muted hover:border-accent-bright hover:bg-accent-glow hover:text-fg rounded-lg border px-3 py-1.5 text-xs font-semibold transition"
     >
       ← Home
     </a>
@@ -173,7 +173,7 @@ const sidebarSectionTitle =
 
 const Sidebar = ({ activeId, collapsed, onTocClick }: SidebarProps) => (
   <nav
-    className={`flex flex-col gap-7 overflow-hidden border-line-subtle transition-all duration-200 md:sticky md:top-15 md:h-[calc(100vh-60px)] md:overflow-y-auto md:border-r ${
+    className={`border-line-subtle flex flex-col gap-7 overflow-hidden transition-all duration-200 md:sticky md:top-15 md:h-[calc(100vh-60px)] md:overflow-y-auto md:border-r ${
       collapsed
         ? 'h-0 opacity-0 md:border-r-0'
         : 'h-auto border-b px-3.5 py-7 pb-8 opacity-100 md:border-b-0'
@@ -190,7 +190,7 @@ const Sidebar = ({ activeId, collapsed, onTocClick }: SidebarProps) => (
               href={sanitizeHref(item.url)}
               className={`block rounded-lg px-3.5 py-2 text-sm font-medium transition-colors ${
                 item.active
-                  ? 'relative bg-accent-glow font-semibold text-accent-bright! md:before:absolute md:before:-left-3.5 md:before:top-1/2 md:before:h-[60%] md:before:w-0.5 md:before:-translate-y-1/2 md:before:rounded-r-sm md:before:bg-accent md:before:content-[""]'
+                  ? 'bg-accent-glow text-accent-bright! md:before:bg-accent relative font-semibold md:before:absolute md:before:top-1/2 md:before:-left-3.5 md:before:h-[60%] md:before:w-0.5 md:before:-translate-y-1/2 md:before:rounded-r-sm md:before:content-[""]'
                   : 'text-muted hover:bg-surface-hover hover:text-fg'
               }`}
               aria-current={item.active ? 'page' : undefined}
@@ -210,9 +210,9 @@ const Sidebar = ({ activeId, collapsed, onTocClick }: SidebarProps) => (
             <li key={item.id}>
               <a
                 href={`#${item.id}`}
-                className={`block truncate rounded-md px-3.5 py-1.5 text-[13px] font-medium transition-colors hover:bg-surface-hover ${
+                className={`hover:bg-surface-hover block truncate rounded-md px-3.5 py-1.5 text-[13px] font-medium transition-colors ${
                   activeId === item.id
-                    ? 'bg-violet-glow font-semibold text-violet-bright'
+                    ? 'bg-violet-glow text-violet-bright font-semibold'
                     : 'text-subtle hover:text-muted'
                 }`}
                 onClick={onTocClick(item.id)}
@@ -225,10 +225,10 @@ const Sidebar = ({ activeId, collapsed, onTocClick }: SidebarProps) => (
       </div>
     )}
 
-    <div className="mt-auto border-t border-line-subtle pt-4">
+    <div className="border-line-subtle mt-auto border-t pt-4">
       <a
         href="/"
-        className="flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-semibold text-subtle transition-colors hover:bg-accent-glow hover:text-accent-bright"
+        className="text-subtle hover:bg-accent-glow hover:text-accent-bright flex items-center gap-2 rounded-lg px-3 py-2 text-[13px] font-semibold transition-colors"
       >
         <FaArrowLeft size={13} />
         Back to UncivServer.xyz
@@ -238,13 +238,13 @@ const Sidebar = ({ activeId, collapsed, onTocClick }: SidebarProps) => (
 );
 
 const Article = ({ articleRef }: { articleRef: React.RefObject<HTMLElement | null> }) => (
-  <main className="min-w-0 flex-1 px-6 pb-12 pt-9 md:px-14 md:pb-20 md:pt-14">
+  <main className="min-w-0 flex-1 px-6 pt-9 pb-12 md:px-14 md:pt-14 md:pb-20">
     <article ref={articleRef} className="mx-auto max-w-184">
-      <div className="mb-10 border-b border-line-subtle pb-7">
-        <p className="mb-3.5 inline-block rounded-md bg-accent-glow px-2.5 py-1 text-[10.9px] font-bold uppercase tracking-[0.12em] text-accent-bright">
+      <div className="border-line-subtle mb-10 border-b pb-7">
+        <p className="bg-accent-glow text-accent-bright mb-3.5 inline-block rounded-md px-2.5 py-1 text-[10.9px] font-bold tracking-[0.12em] uppercase">
           Democracy Bot Documentation
         </p>
-        <h1 className="text-2xl font-extrabold leading-tight tracking-tight text-fg md:text-3xl">
+        <h1 className="text-fg text-2xl leading-tight font-extrabold tracking-tight md:text-3xl">
           {heading}
         </h1>
       </div>
@@ -254,7 +254,7 @@ const Article = ({ articleRef }: { articleRef: React.RefObject<HTMLElement | nul
 );
 
 const Footer = () => (
-  <footer className="border-t border-line-subtle px-8 py-4 text-center text-xs font-medium text-subtle">
+  <footer className="border-line-subtle text-subtle border-t px-8 py-4 text-center text-xs font-medium">
     <p>
       &copy; 2022&ndash;{new Date().getFullYear()}{' '}
       <a
