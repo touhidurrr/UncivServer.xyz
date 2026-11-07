@@ -1,6 +1,6 @@
 {
   "name": "uncivserver.xyz",
-  "version": "4.67.4",
+  "version": "4.68.0",
   "description": "An Open Source, Free to Play, Unciv Multiplayer Server written in Javascript",
   "keywords": [
     "Bun",
