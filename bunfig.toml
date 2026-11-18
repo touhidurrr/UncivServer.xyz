@@ -2,7 +2,7 @@
 bun = true
 
 [install]
-minimumReleaseAge = 259200
+minimumReleaseAge = '3 days'
 
 [serve.static]
 plugins = ['bun-plugin-tailwind']
